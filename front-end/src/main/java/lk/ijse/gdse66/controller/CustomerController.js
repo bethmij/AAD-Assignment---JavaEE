@@ -1,5 +1,5 @@
-import {customer} from "./model/Customer.js";
-import {customerDetail, itemDetail} from "./db/DB.js";
+import {customer} from "../model/Customer.js";
+import {customerDetail, itemDetail} from "../db/DB.js";
 import {setCusID} from "./OrderController.js";
 
 let cusId = $('#txtCusID');
@@ -15,34 +15,46 @@ $(document).on('keydown', function(event) {
 });
 
 btnCustomerSave.click(function (event){
-    // let customer = {"cusID":cusId.val(), "cusName":cusName.val(), "cusAddress":cusAddress.val(), "cusSalary":cusSalary.val()}
-    let customer = $("#cusForm").serialize()
-    console.log(customer)
 
-    $.ajax({
-        url: "http://localhost:8080/java-pos/customer",
-        method: "POST",
-        data: customer,
-        success: function (resp){
-            if(resp.status===200){
-                alert(resp.message);
-                $('#cusTBody').append(
-                    `<tr>
+    if(btnCustomerSave.text()==="Save ") {
+        let customer = $("#cusForm").serialize();
+
+        $.ajax({
+            url: "http://localhost:8080/java-pos/customer",
+            method: "POST",
+            data: customer,
+            success: function (resp) {
+                if (resp.status === 200) {
+                    alert(resp.message);
+                    $('#cusTBody').append(
+                        `<tr>
                         <th scope="row">${cusId.val()}</th>
                         <td>${cusName.val()}</td>
                         <td>${cusAddress.val()}</td>
                         <td>${cusSalary.val()}</td>
 <!--                        <td style="width: 10%"><img class="delete opacity-75" src="../../../../../../resources/assests/img/icons8-delete-96.png" alt="Logo" width="50%" ></td>-->
                     </tr>`
-                );
-            }else {
+                    );
+                } else {
+                    alert(resp.message);
+                }
+            },
+            error: function (resp) {
                 alert(resp.message);
             }
-        },
-        error: function (resp){
-            alert(resp.message);
-        }
-    }),
+        });
+    }else if(btnCustomerSave.text()==="Update "){
+        let customer = {"cusID":cusId.val(), "cusName":cusName, "cusAddress":cusAddress, "cusSalary":cusSalary}
+
+        $.ajax({
+            url: "http://localhost:8080/java-pos/customer",
+            method: "PUT",
+            data: JSON.stringify(customer),
+            success: function (resp) {
+
+            }
+        })
+    }
     // if(btnCustomerSave.text()=="Save ") {
     //     let count = 0;
     //     var userChoice = window.confirm("Do you want to save the customer?");
@@ -134,34 +146,23 @@ function getAll() {
         method: "GET",
         success: function (resp) {
             if(resp.status===200){
+                $("#cusTBody").empty();
                 for (let respElement of resp.data) {
-                    tBody.append(`<tr>
+                    $("#cusTBody").append(`<tr>
                         <th scope="row">${respElement.cusID}</th>
                         <td>${respElement.cusName}</td>
                         <td>${respElement.cusAddress}</td>
                         <td>${respElement.cusSalary}</td>
-<!--                        <td style="width: 10%"><img class="delete opacity-75" src="../../../../../../resources/assests/img/icons8-delete-96.png" alt="Logo" width="50%" ></td>-->
+                        <td style="width: 10%"><img  class="delete"  src="../resources/assests/img/icons8-delete-96.png" alt="Logo" width="50%" class="opacity-75"></td>
                 </tr>`);
+                    deleteDetail();
+                    setFeilds();
                 }
 
             }
         }
     })
-    let tBody = $('#cusTBody')
-    tBody.empty();
 
-    for (let i = 0; i < customerDetail.length; i++) {
-        tBody.append(`<tr>
-            <th scope="row">${customerDetail[i].id}</th>
-            <td>${customerDetail[i].name}</td>
-            <td>${customerDetail[i].address}</td>
-            <td>${customerDetail[i].salary}</td>
-<!--            <td style="width: 10%"><img class="delete" src="../../../../../../resources/assests/img/icons8-delete-96.png" alt="Logo" width="50%" className="opacity-75"></td>-->
-            </tr>`);
-        deleteDetail();
-        setFeilds();
-    }
-    ;
 }
 
 setFeilds();

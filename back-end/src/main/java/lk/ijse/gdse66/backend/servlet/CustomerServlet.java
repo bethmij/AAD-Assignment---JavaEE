@@ -20,10 +20,10 @@ public class CustomerServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        resp.addHeader("Access-Control-Allow-Origin", "*");
         resp.setContentType("application/json");
         JsonArrayBuilder arrayBuilder = Json.createArrayBuilder();
-        try {
-            Connection connection = source.getConnection();
+        try (Connection connection = source.getConnection()) {
             PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM customer");
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
@@ -48,6 +48,7 @@ public class CustomerServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        resp.addHeader("Access-Control-Allow-Origin", "*");
         resp.setContentType("application/json");
         String id = req.getParameter("cusID");
         String name = req.getParameter("cusName");
@@ -78,7 +79,20 @@ public class CustomerServlet extends HttpServlet {
 
     @Override
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        super.doPut(req, resp);
+        resp.addHeader("Access-Control-Allow-Origin", "*");
+        resp.setContentType("application/json");
+        JsonReader reader = Json.createReader(req.getReader());
+        JsonObject jsonObject = reader.readObject();
+        String cusID = jsonObject.getString("cusID");
+        String cusName = jsonObject.getString("cusName");
+        String cusAddress = jsonObject.getString("cusAddress");
+        String cusSalary = jsonObject.getString("cusSalary");
+        System.out.println(cusID+" "+cusName+" "+cusAddress+" "+cusSalary );
+        try (Connection connection = source.getConnection()){
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -87,8 +101,11 @@ public class CustomerServlet extends HttpServlet {
     }
 
     @Override
-    protected void doOptions(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        super.doOptions(req, resp);
+    protected void doOptions(HttpServletRequest req, HttpServletResponse response) throws ServletException, IOException {
+        response.addHeader("Access-Control-Allow-Methods", "DELETE");
+        response.addHeader("Access-Control-Allow-Methods", "PUT");
+        response.addHeader("Access-Control-Allow-Origin", "*");
+        response.addHeader("Access-Control-Allow-Headers", "Context-Type");
     }
 
     public <T> void sendMsg(HttpServletResponse resp, JsonArray data, String message, int status) throws IOException {

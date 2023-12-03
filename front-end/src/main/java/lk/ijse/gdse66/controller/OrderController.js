@@ -1,8 +1,8 @@
-import {customer} from "./model/Customer.js";
-import {order} from "./model/Order.js";
-import {orderDetails} from "./model/OrderDetail.js";
-import {customerDetail, itemDetail, orders, orderDetail} from "./db/DB.js";
-import {item} from "./model/Item.js";
+import {customer} from "../model/Customer.js";
+import {order} from "../model/Order.js";
+import {orderDetails} from "../model/OrderDetail.js";
+import {customerDetail, itemDetail, orders, orderDetail} from "../db/DB.js";
+import {item} from "../model/Item.js";
 let selectCusOp = $('#cusID');
 let selectItemOp = $('#itemCode');
 let btnSave = $('#btnAddCart');
