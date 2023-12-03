@@ -1,0 +1,517 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>POS System</title>
+    <link rel="stylesheet" href="../resources/assests/css/bootstrap/css/bootstrap.css">
+    <link rel="stylesheet" href="../resources/assests/css/index.css">
+    <link rel="stylesheet" href="../resources/assests/font-awesome/css/all.min.css">
+    <link rel="stylesheet" href="../resources/assests/css/index2.css">
+
+
+
+</head>
+<body >
+<header>
+    <nav class="navbar bg-body-tertiary p-0 z-3" >
+        <div class="container-fluid position-fixed top-0 p-0 " style="background-color: #252525; height: 60px;" >
+            <a class="navbar-brand " style="color: #919191;">
+                <img src="../resources/assests/img/Green_Leaf_Aesthetic_Organic_Skincare_Logo__2_-removebg-preview.png" alt="Logo" width="15%" class="d-inline-block align-text-top ">
+                <label class="position-absolute fs-4" style="">Harvest Mart Pos System</label>
+                <img class=" menu d-none" src="../resources/assests/img/icons8-menu-100.png" alt="Logo" width="100%" >
+            </a>
+            <div class="container  h-100 position-absolute end-0 " style="width:35%;" >
+                <div class="row w-100 h-100">
+                    <div id="currDate" class="col  text-white-50  text-center mt-3" style="font-size: 1.2vw;"></div>
+                    <div id="currTime" class="col  text-white-50  text-center mt-3" style="font-size: 1.2vw;"></div>
+                    <div class="col  ">
+                        <i class="fa-regular fa-circle-user fa-2x mt-3 ms-2 p-0" style="color: #014919;"></i>
+                        <p class="text-white-50 d-inline-block  ms-3 mt-3 position-absolute" style="font-size: 1.2vw;">Sign Up</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </nav>
+</header>
+
+<main id="homeContent" style="display: block">
+    <div id="container" class="container-fluid position-absolute top-50 start-50 translate-middle" style="height:25vw; width: 100%; ">
+        <div class="row justify-content-around h-100">
+            <div class="col-sm-5 col-md-3" style="height:30vw;  ">
+                <div class="row-cols-1  position-relative border"  style="height: calc((100%/6)*4)">
+                    <img class="img menuImg btnCustomer" href="#" src="../resources/assests/img/icons8-customer-100_(2).png" alt="Logo" class="position-absolute top-50 start-50 translate-middle " style="width: 20vw; opacity: 0.7;" >
+                </div>
+                <div class="row-cols-1 position-relative opacity-50 " style="height: calc((100%/6)*1);  background-color: #153823;">
+                    <p class="text-center  text-white " style="font-size: 3vw;">Customers</p>
+                </div>
+                <div class="row-cols-1 position-relative opacity-50 " style="height: calc((100%/6)*1);  background-color:#1D2320;">
+                    <p class="text-center text-white " style="font-size: 3vw;">05</p>
+                </div>
+            </div>
+            <div class="col-sm-5 col-md-3" style="height:30vw; ">
+                <div class="row-cols-1  position-relative border"  style="height: calc((100%/6)*4); width: 100%;">
+                    <img class="img menuImg btnItem" href="#" src="../resources/assests/img/icons8-item-100_(1).png" alt="Logo" class="position-absolute top-50 start-50 translate-middle opacity-75" style="width: 20vw; opacity: 0.7;" >
+                </div>
+                <div class="row-cols-1 position-relative opacity-50 " style="height: calc((100%/6)*1);  background-color: #153823;">
+                    <p class="text-center  text-white " style="font-size: 3vw;">Items</p>
+                </div>
+                <div class="row-cols-1 position-relative opacity-50 " style="height: calc((100%/6)*1);  background-color: #1D2320;">
+                    <p class="text-center  text-white " style="font-size: 3vw;">10</p>
+                </div>
+            </div>
+            <div class="col-sm-5 col-md-3 " style="height:30vw; ">
+                <div class="row-cols-1  position-relative border"  style="height: calc((100%/6)*4)">
+                    <img class="img menuImg btnOrder " href="#" src="../resources/assests/img/icons8-cart-100_(2).png" alt="Logo" class="position-absolute top-50 start-50 translate-middle opacity-75" style="width: 20vw; opacity: 0.7;" >
+                </div>
+                <div class="row-cols-1 position-relative opacity-50 " style="height: calc((100%/6)*1);  background-color: #153823;">
+                    <p class="text-center text-white " style="font-size: 3vw;">Orders</p>
+                </div>
+                <div class="row-cols-1 position-relative opacity-50 " style="height: calc((100%/6)*1);  background-color:#1D2320;">
+                    <p class="text-center  text-white " style="font-size: 3vw;">08</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<main id="customerContent" style="display: block" >
+    <div class="container-fluid text-center position-relative">
+        <div class="row">
+            <div  class="menuContainer col-sm-1 col-md-1  p-0 " style="height: 91vh; margin-top: 60px;">
+                <nav  class=" navbar  p-0 position-relative" style="height: 100%; width:60%; background-color: #171717; z-index: 0">
+
+                    <div style="width:70%; height: 20vw ; top: 1vw" class=" bg-transparent d-flex flex-column position-absolute ">
+                        <a class="menuBtn btnHome mb-5 p-0 ms-2" href="#">
+                            <img src="../resources/assests/img/Screenshot__540_-removebg-preview.png" alt="Logo" width="90%" style="opacity: 0.5;">
+                        </a>
+                        <a class="menuBtn btnCustomer position-relative mb-5 ms-2" href="#">
+                            <div class=" position-absolute " style="width: 5.5vw; height: 4vw; top: -1vw; left: -1vw; border-right: 3px solid #0d4920; background-color:#030E00; z-index: -1;"></div>
+                            <img src="../resources/assests/img/Screenshot__541_-removebg-preview.png" alt="Logo" width="90%" style="z-index: 10;" >
+                        </a>
+                        <a class="menuBtn  btnItem mb-5 ms-2" href="#" >
+                            <img src="../resources/assests/img/Screenshot__546_-removebg-preview.png" alt="Logo" width="90%" style="opacity: 0.5;">
+                        </a>
+                        <a class="menuBtn btnOrder mb-5 ms-2" href="#">
+                            <img src="../resources/assests/img/Screenshot__543_-removebg-preview.png" alt="Logo" width="90%" style="opacity: 0.5;">
+                        </a>
+                    </div>
+                    <div style="width:70%; height: 10vw; bottom: 0vw;" class="menuBtn  bg-transparent d-flex flex-column position-absolute ">
+                        <a class="mb-5 p-0 ms-2" href="#">
+                            <img src="../resources/assests/img/Screenshot__545_-removebg-preview.png" alt="Logo" width="80%" style="opacity: 0.5;">
+                        </a>
+                        <a class="menuBtn mb-5 ms-2" href="#">
+                            <img src="../resources/assests/img/Screenshot__544_-removebg-preview.png" alt="Logo" width="80%" style="opacity: 0.5;">
+                        </a>
+                    </div>
+
+                </nav>
+            </div>
+            <div class="col-sm-12 col-md-5  position-relative" style="height: 82vh; margin-top: 90px;">
+                <div class=" position-absolute  p-0 mt-3" style="height: 97%; width: 95%; background-color: #151515">
+                    <div class="position-relative" style="width: 100%; height: 15%; background-color: #252525" >
+                        <img src="../resources/assests/img/Screenshot__541_-removebg-preview.png" alt="Logo" width="10%" class=" position-absolute " style="left: 5vw; top: 1vw">
+                        <h1 class="text-center  top-50 start-50 translate-middle position-absolute fs-2" style="color: #019D30; ">Manage Customer</h1>
+                    </div>
+
+                    <form class="container-fluid  mt-4" style="height: 76%; ">
+                        <div class=" row row-cols-1 p-3 justify-content-center" style="height: calc(100%/5)">
+                            <input id="txtCusID" class=" cusInput input form-control text-white "  placeholder="Customer ID" style="height: 90%; width: 70%; background-color: #252525;">
+                            <p id="cusIDPara" class="text-danger-emphasis text-start" style="width: 70%;"></p>
+                        </div>
+                        <div class="row row-cols-1 p-3 justify-content-center" style="height: calc(100%/5)">
+                            <input id="txtCusName" class=" cusInput input form-control text-white "  placeholder="Customer Name" style="height: 90%; width: 70%; background-color: #252525;">
+                            <p id="cusNamePara" class="text-danger-emphasis text-start ms-5" style="width: 85%;;"></p>
+                        </div>
+                        <div class="row row-cols-1 p-3 justify-content-center" style="height: calc(100%/5)">
+                            <input id="txtCusAddress" class=" cusInput input form-control text-white "  placeholder="Customer Address" style="height: 90%; width: 70%; background-color: #252525;">
+                            <p id="cusAddressPara" class="text-danger-emphasis text-start" style="width: 70%;"></p>
+                        </div>
+                        <div class="row row-cols-1 p-3 justify-content-center" style="height: calc(100%/5)">
+                            <input id="txtCusSalary" class=" cusInput input form-control text-white "  placeholder="Customer Salary" style="height: 90%; width: 70%; background-color: #252525;">
+                            <p id="cusSalaryPara" class="text-danger-emphasis text-start" style="width: 70%;"></p>
+                        </div>
+                        <div class="row p-3" style="height: calc(100%/5)">
+                            <div class="col"><button id="clear" type="submit"  class="btn btn-outline-danger ms-5 " style="width: 10vw; " >Clear</button></div>
+                            <div class="col "><button id="btnSave"  type="submit" class="btn  btn-outline-success me-5" style="width: 10vw;">Save </button></div>
+                        </div>
+                    </form>
+                </div>
+
+
+            </div>
+            <div  class="col-sm-12 col-md-6  position-relative p-0 " style="height: 89vh; margin-top: 60px;">
+                <div class=" tableContent container-fluid position-absolute mt-3" style=" height: 100%; ">
+                    <div class="row  p-4" style="height: calc((100%/4)*1)" >
+                        <div class="container-fluid " style="height: 100%">
+                            <div class="row " style="height: calc(100%/2)">
+                                <div class="col-9 ">
+                                    <input id="txtSearch" class="search form-control me-2 bg-transparent text-white-50" type="search" style="height: 90%;" placeholder="Search" aria-label="Search">
+                                </div>
+                                <div class="col-3 mt-2"><button id="btnSearch" class="btn btn-outline-success" type="submit" style="height: 90%; width:100%;">Search</button></div>
+                            </div>
+                            <div class="row justify-content-end" style="height: calc(100%/2)">
+                                <div class="col-3 "></div>
+                                <div class="col-3 " >
+                                    <button id="getAll" type="submit" class="btn btn-outline-success mt-3" style="height: 70%; width:100%; " ><img src="../resources/assests/img/Screenshot__550_-removebg-preview.png" alt="Logo" width="20%" class="opacity-50 me-2">Get All</button>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row tableDiv " style="height: calc((100%/4)*2.7)">
+                        <div class="col" style="">
+                            <table id="cusTable" class="table table table-striped table-hover table-dark">
+                                <thead>
+                                <tr>
+                                    <th scope="col">ID</th>
+                                    <th scope="col">Name</th>
+                                    <th scope="col">Address</th>
+                                    <th scope="col">Salary (LKR)</th>
+                                    <th scope="col"></th>
+                                </tr>
+                                </thead>
+                                <tbody id="cusTBody">
+                                <tr>
+                                    <th class="id" scope="row">C00-001</th>
+                                    <td class="name">Kasun Perera</td>
+                                    <td class="address">Main-Street Galle</td>
+                                    <td class="salary">50000</td>
+                                    <td style="width: 10%"><img  class="delete"  src="../resources/assests/img/icons8-delete-96.png" alt="Logo" width="50%" class="opacity-75"></td>
+                                </tr>
+                                <tr>
+                                    <th  class="id"scope="row">C00-002</th>
+                                    <td class="name">Amal Dias</td>
+                                    <td class="address" >No.123 Matara</td>
+                                    <td class="salary">25000</td>
+                                    <td style="width: 10%"><img class="delete" src="../resources/assests/img/icons8-delete-96.png" alt="Logo" width="50%" class="opacity-75"></td>
+                                </tr>
+                                <tr>
+                                    <th class="id" scope="row">C00-003</th>
+                                    <td class="name" >Sadun Kumara</td>
+                                    <td class="address">New-Rd Colombo</td>
+                                    <td class="salary">65000</td>
+                                    <td style="width: 10%"><img class="delete" src="../resources/assests/img/icons8-delete-96.png" alt="Logo" width="50%" class="opacity-75"></td>
+                                </tr>
+
+
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<main id="itemContent" style="display: block">
+    <div class="container-fluid text-center position-relative">
+        <div class="row">
+            <div class="menuContainer col-sm-1 col-md-1  p-0 " style="height: 91vh; margin-top: 60px;">
+                <nav class="navbar  p-0 position-relative" style="height: 100%; width:60%; background-color: #171717; z-index: 0;">
+
+                    <div style="width:70%; height: 20vw ; top: 1vw" class=" bg-transparent d-flex flex-column position-absolute ">
+                        <a class="menuBtn btnHome mb-5 p-0 ms-2" href="#">
+                            <img src="../resources/assests/img/Screenshot__540_-removebg-preview.png" alt="Logo" width="90%" style="opacity: 0.5;">
+                        </a>
+                        <a class="menuBtn  btnCustomer mb-5 ms-2" href="#">
+                            <img src="../resources/assests/img/Screenshot__541_-removebg-preview.png" alt="Logo" width="90%" style="opacity: 0.5;">
+                        </a>
+                        <a class="menuBtn position-relative  btnItem mb-5 ms-2" href="#">
+                            <div class=" position-absolute " style="width: 5.5vw; height: 4vw; top: -1vw; left: -1vw; border-right: 3px solid #0d4920; background-color:#030E00; z-index: -1;"></div>
+                            <img src="../resources/assests/img/Screenshot__546_-removebg-preview.png" alt="Logo" width="90%" style="z-index: 10;">
+                        </a>
+                        <a class="menuBtn  btnOrder mb-5 ms-2" href="#">
+                            <img src="../resources/assests/img/Screenshot__543_-removebg-preview.png" alt="Logo" width="90%" style="opacity: 0.5;">
+                        </a>
+                    </div>
+                    <div style="width:70%; height: 10vw; bottom: 0vw;" class="menuBtn  bg-transparent d-flex flex-column position-absolute ">
+                        <a class="mb-5 p-0 ms-2" href="#">
+                            <img src="../resources/assests/img/Screenshot__545_-removebg-preview.png" alt="Logo" width="80%" style="opacity: 0.5;">
+                        </a>
+                        <a class="menuBtn mb-5 ms-2" href="#">
+                            <img src="../resources/assests/img/Screenshot__544_-removebg-preview.png" alt="Logo" width="80%" style="opacity: 0.5;">
+                        </a>
+                    </div>
+
+                </nav>
+            </div>
+            <div class="col-sm-12 col-md-5  position-relative" style="height: 82vh; margin-top: 90px;">
+                <div class=" position-absolute  p-0 mt-3" style="height: 97%; width: 95%; background-color: #151515">
+                    <div class="position-relative" style="width: 100%; height: 15%; background-color: #252525" >
+                        <img src="../resources/assests/img/Screenshot__541_-removebg-preview.png" alt="Logo" width="10%" class="position-absolute " style="left: 5vw; top: 1vw">
+                        <h1 class="text-center  top-50 start-50 translate-middle position-absolute fs-2" style="color: #019D30; ">Manage Store</h1>
+                    </div>
+
+                    <form class="container-fluid  mt-4" style="height: 76%; ">
+                        <div class=" row row-cols-1 p-3 justify-content-center" style="height: calc(100%/5)">
+                            <input id="txtItemCode" class="input form-control text-white " placeholder="Item Code" style="height: 90%; width: 70%; background-color: #252525;">
+                            <p id="itemCodePara" class="text-danger-emphasis text-start" style="width: 70%;"></p>
+                        </div>
+                        <div class="row row-cols-1 p-3 justify-content-center" style="height: calc(100%/5)">
+                            <input id="txtItemName" class="input form-control text-white " placeholder="Item Name" style="height: 90%; width: 70%; background-color: #252525;">
+                            <p id="itemNamePara" class="text-danger-emphasis text-start ms-5" style="width: 85%;"></p>
+                        </div>
+                        <div class="row row-cols-1 p-3 justify-content-center" style="height: calc(100%/5)">
+                            <input id="txtItemPrice" class="input form-control text-white " placeholder="Item Unit Price" style="height: 90%; width: 70%; background-color: #252525;">
+                            <p id="itemPricePara" class="text-danger-emphasis text-start" style="width: 70%;"></p>
+                        </div>
+                        <div class="row row-cols-1 p-3 justify-content-center" style="height: calc(100%/5)">
+                            <input id="txtItemQuantity" class="input form-control text-white " placeholder="Item Quantity" style="height: 90%; width: 70%; background-color: #252525;">
+                            <p id="itemQtyPara" class="text-danger-emphasis text-start" style="width: 70%;"></p>
+                        </div>
+                        <div class="row p-3" style="height: calc(100%/5)">
+                            <div class="col"><button type="submit" id="itemClear" class="btn btn-outline-danger ms-5 " style="width: 10vw; " >Clear</button></div>
+                            <div class="col "><button id="itemSave" type="submit" class="btn  btn-outline-success me-5" style="width: 10vw;">Save </button></div>
+                        </div>
+                    </form>
+                </div>
+
+
+            </div>
+            <div  class="col-sm-12 col-md-6  position-relative p-0 " style="height: 89vh; margin-top: 60px;">
+                <div  class=" tableContent container-fluid position-absolute mt-3" style=" height: 100%; ">
+                    <div class="row  p-4" style="height: calc((100%/4)*1)" >
+                        <div class="container-fluid " style="height: 100%">
+                            <div class="row " style="height: calc(100%/2)">
+                                <div class="col-9 ">
+                                    <input id="txtItemSearch" class="search form-control me-2 bg-transparent text-white-50" type="search" style="height: 90%;" placeholder="Search" aria-label="Search">
+                                </div>
+                                <div class="col-3 mt-2"><button id="itemSearch" class="btn btn-outline-success" type="submit" style="height: 90%; width:100%;">Search</button></div>
+                            </div>
+                            <div class="row justify-content-end" style="height: calc(100%/2)">
+                                <div class="col-3 ">
+                                </div>
+                                <div class="col-3 " >
+                                    <button type="submit" id="itemGetAll" class="btn btn-outline-success mt-3" style="height: 70%; width:100%; " ><img src="../../CSS_Framework/POS/assets/Screenshot__550_-removebg-preview.png" alt="Logo" width="20%" class="opacity-50 me-2">Get All</button>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row tableDiv" style="height: calc((100%/4)*2.7)">
+                        <div class="col" style="">
+                            <table class="table table table-striped table-hover table-dark">
+                                <thead>
+                                <tr >
+                                    <th scope="col">Code</th>
+                                    <th scope="col">Name</th>
+                                    <th scope="col">Price</th>
+                                    <th scope="col">Quantity</th>
+                                    <th scope="col"></th>
+                                </tr>
+                                </thead>
+                                <tbody id="itemBody">
+                                <tr>
+                                    <th scope="row">I00-001</th>
+                                    <td>Soap Rose Scented</td>
+                                    <td>55.00</td>
+                                    <td>200</td>
+                                    <td style="width: 10%"><img class="itemDelete" src="../resources/assests/img/icons8-delete-96.png" alt="Logo" width="50%" class="opacity-50"></td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">I00-002</th>
+                                    <td >Rice Basmathi</td>
+                                    <td>95.00</td>
+                                    <td>100</td>
+                                    <td style="width: 10%"><img class="itemDelete" src="../resources/assests/img/icons8-delete-96.png" alt="Logo" width="50%" class="opacity-50"></td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">I00-003</th>
+                                    <td>Milk Powder</td>
+                                    <td>1150.00</td>
+                                    <td>122</td>
+                                    <td style="width: 10%"><img class="itemDelete" src="../resources/assests/img/icons8-delete-96.png" alt="Logo" width="50%" class="opacity-50"></td>
+                                </tr>
+
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<main id="orderContent" style="display: block">
+    <div class="container-fluid text-center position-relative">
+        <div class="row">
+            <div class="menuContainer col-sm-1 col-md-1  p-0 " style="height: 91vh; margin-top: 60px;">
+                <nav id="navbar" class="navbar  p-0 position-relative" style="height: 100%; width:60%; background-color: #171717; z-index: 0;">
+
+                    <div style="width:70%; height: 20vw ; top: 1vw" class=" bg-transparent d-flex flex-column position-absolute ">
+                        <a class="menuBtn btnHome mb-5 p-0 ms-2" href="#">
+                            <img src="../resources/assests/img/Screenshot__540_-removebg-preview.png" alt="Logo" width="90%" style="opacity: 0.5;">
+                        </a>
+                        <a class="menuBtn btnCustomer mb-5 ms-2" href="#" >
+                            <img src="../resources/assests/img/Screenshot__541_-removebg-preview.png" alt="Logo" width="90%" style="opacity: 0.5;">
+                        </a>
+                        <a class="menuBtn btnItem mb-5 ms-2" href="#">
+                            <img src="../resources/assests/img/Screenshot__546_-removebg-preview.png" alt="Logo" width="90%" style="opacity: 0.5;">
+                        </a>
+                        <a class="menuBtn btnOrder position-relative mb-5 ms-2" href="#">
+                            <div class=" position-absolute " style="width: 5.5vw; height: 4vw; top: -1vw; left: -1vw; border-right: 3px solid #0d4920; background-color:#030E00; z-index: -1;"></div>
+                            <img src="../resources/assests/img/Screenshot__543_-removebg-preview.png" alt="Logo" width="90%" style="z-index: 10;">
+                        </a>
+                    </div>
+                    <div style="width:70%; height: 10vw; bottom: 0vw;" class="menuBtn  bg-transparent d-flex flex-column position-absolute ">
+                        <a class="mb-5 p-0 ms-2" href="#">
+                            <img src="../resources/assests/img/Screenshot__545_-removebg-preview.png" alt="Logo" width="80%" style="opacity: 0.5;">
+                        </a>
+                        <a class="menuBtn mb-5 ms-2" href="#">
+                            <img src="../resources/assests/img/Screenshot__544_-removebg-preview.png" alt="Logo" width="80%" style="opacity: 0.5;">
+                        </a>
+                    </div>
+
+                </nav>
+            </div>
+
+            <div class=" col-sm-12 col-md-5  position-relative p-0 " style="height: 91vh; margin-top: 60px;">
+                <div class="container   p-0  mt-0" style="width: 100%; height: 100%; border: 1px solid transparent; ">
+                    <div class="row ms-0 mb-5 bg-info" style="width: 100%; height: 35%; margin-top: 1vw;">
+                        <div class="col  p-0" style="height: 100%; width: 100%; background-color: #151515">
+                            <div class="position-relative " style="width: 100%; height: 15%; background-color: #252525" >
+                                <h1 class="text-center  fs-5 top-50 start-50 translate-middle position-absolute" style="color: #019D30">Invoice Details</h1>
+                            </div>
+
+                            <form class="container position-relative text-center " style="width: 100%; height: 85%;">
+                                <div class="  row justify-content-center p-2" style="height: calc(100%/3);">
+                                    <div class="col-6 ">
+                                        <input id="orderID" class="input form-control me-1 mt-2 bg-transparent border-0 text-white-50" disabled="true"  value="Order ID : " style="height: 85%; width: 80%; background-color: #252525; outline: none; ">
+                                    </div>
+                                    <div class="col-6 ps-3 "  >
+                                        <select id="cusID" class="  ms-0 select  form-select text-white-50 mt-2" value="dsfsdfsdg" aria-label="Default select example" style="height: 80%; width: 83%; background-color: #252525;">--></select>
+                                    </div>
+
+                                </div>
+                                <div class="  row p-2 justify-content-end align-items-center  " style="height: calc(100%/3);">
+                                    <div class="col  h-100 ">
+                                        <input id="cusName" class="input form-control ms-0 mt-2 bg-transparent border-0 text-white-50" disabled="true" value="Customer Name : " style="height: 85%; width: 100%; background-color: #252525; outline: none;">
+                                    </div>
+                                    <div class="col h-100 ">
+                                        <input id="cusSalary" class="input form-control text-white  me-2 mt-2 bg-transparent border-0 text-white-50" disabled="true" value="Customer Salary : " style="height: 85%; width: 80%; background-color: #252525; right: 0; outline: none;">
+                                    </div>
+                                </div>
+                                <div class="  row row-cols-1 ps-3 " style="height: calc(100%/3);">
+                                    <input id="cusAddress" class="input form-control text-white e ms-2 bg-transparent border-0 text-white-50" disabled="true" value="Customer Address : " style="height: 80%; width:95%; background-color: #252525; outline: none; ">
+                                </div>
+
+                            </form>
+                        </div>
+                    </div>
+                    <div class="row ms-0 bg-success" style="width: 100%; height: 55%;">
+                        <div class="col  p-0" style="height: 100%; width: 100%; background-color: #151515">
+                            <div class="position-relative" style="width: 100%; height: 10%; background-color: #252525" >
+                                <h1 class="text-center  fs-5 top-50 start-50 translate-middle position-absolute" style="color: #019D30">Item Select</h1>
+                            </div>
+                            <form class="container position-relative " style="width: 100%; height: 80%;">
+                                <div class="row mt-3 mb-4 justify-content-center p-2 mt-1 " style="height: calc(100%/5);">
+                                    <div class="col-6 ">
+                                        <input id="itemName"  class="input form-control text-white e ms-4 bg-transparent border-0 text-white-50"  value="Item Name : " style="height: 90%; width:90%; background-color: #252525;  ">
+                                    </div>
+                                    <div class="col-6">
+                                        <select id="itemCode" class="select  form-select text-white-50 mt-2 ms-3" aria-label="Default select example"  style="height: 80%; width: 75%; background-color: #252525; ">-->
+                                            <option  class="text-white" value="1">I001</option>
+                                            <option  class="text-white" value="2">I002</option>
+                                            <option class="text-white" value="3">I003</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="row p-2 justify-content-end mb-3  " style="height: calc(100%/5);">
+                                    <div class="col  ">
+                                        <input id="itemPrice" class="input form-control text-white bg-transparent border-0 text-white-50 ms-4"  value="Item Price : " style="height: 95%; width: 80%; background-color: #252525; ">
+                                    </div>
+                                    <div class="col  ">
+                                        <input id="itemQuantity" class="input form-control text-white ms-2 bg-transparent border-0 text-white-50"  value="Item Quantity : " style="height: 95%; width: 80%; background-color: #252525; right: 0;">
+                                    </div>
+                                </div>
+                                <div class="row row-cols-1 p-2 " style="height: calc(100%/5);">
+                                    <input id="orderQuantity" class="input form-control text-white ms-5 "  placeholder="Order Quantity" style="height: 100%; width: 80%; background-color: #252525; ">
+                                    <p id="orderQtyPara" class="text-danger-emphasis text-start ms-5" style="width: 70%;"></p>
+                                </div>
+                                <div class="row row-cols-1 p-2 d-flex  ms-5 justify-content-around justify-content-center mt-3" style="height: calc(100%/5); width:85%;">
+                                    <button type="submit" id="orderClear" class="btn btn-outline-danger ms-0 " style="width: 10vw; " >Clear</button>
+                                    <button id="btnAddCart" type="submit" class="btn btn-outline-success "  style="width: 35%;"><img src="../resources/assests/img/Screenshot__543_-removebg-preview.png" alt="Logo" width="25vw" class="opacity-50 me-3">Add to Cart </button>
+                                </div>
+
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class=" col-sm-12 col-md-6   position-relative p-0 " style="height: 89vh; margin-top: 60px;">
+                <div class="container-fluid position-absolute top-0 mt-3" style="height: 100%; width: 95%;">
+                    <div class="row " style="height: 10%;">
+                        <div class="col-9 ">
+                            <input id="txtOrderSearch" class="search form-control me-0 ms-2 bg-transparent text-white-50" type="search" style="height: 65%;" placeholder="Search" aria-label="Search">
+                        </div>
+                        <div class="col-3 mt-0 "><button id="orderSearch" class="btn btn-outline-success" type="submit" style="height: 65%; width:95%;">Search</button></div>
+                    </div>
+                    <div  class="row ms-0 pt-0 tableDiv " style="height: 45%;  ">
+                        <div class="col">
+                            <table class="table table-hover table-striped table-dark" style="">
+
+                                <tbody id="orderTbody">
+                                <tr >
+                                    <th scope="col">Code</th>
+                                    <th scope="col">Name</th>
+                                    <th scope="col">Price</th>
+                                    <th scope="col">Order Qty</th>
+                                    <th scope="col"></th>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div id="total" class="row mt-3 ms-5  " style="height: 40%; width: 40vw;">
+                        <div class="container-fluid w-100 h-100 ">
+                            <div class="row " style="height: calc(100%/4);">
+                                <div class="col"><span id="total-text" class="text-white-50  me-5" style="font-size: 2vw;">Total : 00.00</span></div>
+                                <div class="col"><span id="subTotal-text" class="text-white-50  " style="font-size: 2vw;">Sub Total : 00.00</span></div>
+                            </div>
+                            <div class="row " style="height: calc(100%/4);">
+                                <div class="col p-3 ms-5">
+                                    <input id="cash" type="number" class="input form-control text-white p-2 " min="0" placeholder="Cash" style="height: 100%; width: 80%; background-color: #252525; ">
+                                </div>
+                                <div class="col p-3 ms-2">
+                                    <input id="discount" type="number" class="input form-control text-white p-2" min="0" max="100" placeholder="Discount (%)" style="height: 100%; width: 80%; background-color: #252525; ">
+                                </div>
+                            </div>
+                            <div class="row-cols-1 p-1 ms-5" style="height: calc(100%/4);">
+                                <input id="balance" class="input form-control text-white-50 bg-transparent border-0 fs-4" disabled="true"  placeholder="Balance : 0" style="height: 78%; width:87%; background-color: #252525;  ">
+                            </div>
+                            <div class="row-cols-1 justify-content-center" style="height: calc(100%/4); ">
+                                <button id="btnPlaceOrder" type="submit" class="btn btn-outline-success"  style="width: 45%;" ><img src="../resources/assests/img/Screenshot__550_-removebg-preview.png" alt="Logo" width="25vw" class="opacity-50 me-2">Place Order </button>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+
+<script src="../resources/assests/js/jquery-3.7.1.min.js"></script>
+<script src="../resources/assests/css/bootstrap/js/bootstrap.js"></script>
+<script src="../java/lk/ijse/gdse66/frontend/controller/CustomerController.js"></script>
+<script src="../java/lk/ijse/gdse66/frontend/controller/DashboardController.js"></script>
+<script src="../java/lk/ijse/gdse66/frontend/controller/ItemController.js"></script>
+<script src="../java/lk/ijse/gdse66/frontend/controller/OrderController.js"></script>
+<script src="../java/lk/ijse/gdse66/frontend/controller/validations/CustomerValidation.js"></script>
+<script src="../java/lk/ijse/gdse66/frontend/controller/validations/ItemValidation.js"></script>
+<script src="../java/lk/ijse/gdse66/frontend/controller/validations/OrderValidation.js"></script>
+
+<script>
+
+</script>
+</body>
+</html>
