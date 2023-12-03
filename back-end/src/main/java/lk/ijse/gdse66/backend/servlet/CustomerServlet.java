@@ -1,5 +1,10 @@
 package lk.ijse.gdse66.backend.servlet;
 
+import jakarta.json.Json;
+import jakarta.json.JsonArray;
+import jakarta.json.JsonArrayBuilder;
+import jakarta.json.JsonObjectBuilder;
+
 import javax.annotation.Resource;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -8,10 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.sql.*;
 
 @WebServlet(urlPatterns = "/customer")
 public class CustomerServlet extends HttpServlet {
@@ -21,7 +23,30 @@ public class CustomerServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        super.doGet(req, resp);
+        resp.setContentType("application/json");
+        JsonArrayBuilder arrayBuilder = Json.createArrayBuilder();
+        try {
+            Connection connection = source.getConnection();
+            PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM customer");
+            ResultSet resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()) {
+                String id = resultSet.getString(1);
+                String name = resultSet.getString(2);
+                String address = resultSet.getString(3);
+                String salary = resultSet.getString(4);
+
+                JsonObjectBuilder builder = Json.createObjectBuilder();
+                builder.add("cusID",id);
+                builder.add("cusName",name);
+                builder.add("cusAddress",address);
+                builder.add("cusSalary",salary);
+                arrayBuilder.add(builder.build());
+            }
+
+            sendMsg(resp, arrayBuilder.build(),"Got the Customer",200);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -34,10 +59,7 @@ public class CustomerServlet extends HttpServlet {
         System.out.println(id+" "+name+" "+address+" "+salary);
 
 
-        try {
-//            Class.forName("com.mysql.cj.jdbc.Driver");
-//            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/company","root","1234");
-            Connection connection = source.getConnection();
+        try (Connection connection = source.getConnection()) {
             PreparedStatement pst = connection.prepareStatement(
                     "INSERT INTO company.customer (id, name, address, salary) VALUES (?,?,?,?)");
             pst.setString(1,id);
@@ -47,13 +69,12 @@ public class CustomerServlet extends HttpServlet {
             boolean isAdded = pst.executeUpdate() > 0;
 
             if(isAdded){
-                System.out.println("Added Successfully");
+                sendMsg(resp, "", "Customer Added Successfully", 200);
             }else {
-                System.out.println("Failed");
+                sendMsg(resp, "", "Customer Addition Failed", 400);
             }
-            connection.close();
         } catch (SQLException e) {
-            e.printStackTrace();
+            sendMsg(resp, "", e.getLocalizedMessage(), 400);
         }
 
     }
@@ -71,5 +92,14 @@ public class CustomerServlet extends HttpServlet {
     @Override
     protected void doOptions(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         super.doOptions(req, resp);
+    }
+
+    public <T extends JsonArray> void sendMsg(HttpServletResponse resp, T data, String message, int status) throws IOException {
+        resp.setStatus(200);
+        JsonObjectBuilder builder = Json.createObjectBuilder();
+        builder.add("data",(T)data);
+        builder.add("message",message);
+        builder.add("status",status);
+        resp.getWriter().println(builder.build());
     }
 }

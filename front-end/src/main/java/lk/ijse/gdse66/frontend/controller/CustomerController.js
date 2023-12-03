@@ -23,10 +23,16 @@ btnCustomerSave.click(function (event){
         url: "http://localhost:8080/java-pos/customer",
         method: "POST",
         data: customer,
-        success: function (){
-            alert("Done")
+        success: function (resp){
+            if(resp.status===200){
+                alert(resp.message);
+            }else {
+                alert(resp.message);
+            }
         },
-        error: function (){}
+        error: function (resp){
+            alert(resp.message);
+        }
     }),
     // if(btnCustomerSave.text()=="Save ") {
     //     let count = 0;
