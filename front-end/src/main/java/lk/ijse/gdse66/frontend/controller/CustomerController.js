@@ -1,7 +1,6 @@
-import {customer} from "./model/Customer";
+import {customer} from "./model/Customer.js";
 import {customerDetail, itemDetail} from "./db/DB.js";
 import {setCusID} from "./OrderController.js";
-import {orderDetails} from "./model/OrderDetail.js";
 
 let cusId = $('#txtCusID');
 let cusName = $('#txtCusName');
@@ -16,59 +15,71 @@ $(document).on('keydown', function(event) {
 });
 
 btnCustomerSave.click(function (event){
+    // let customer = {"cusID":cusId.val(), "cusName":cusName.val(), "cusAddress":cusAddress.val(), "cusSalary":cusSalary.val()}
+    let customer = $("#cusForm").serialize()
+    console.log(customer)
 
-    if(btnCustomerSave.text()=="Save ") {
-        let count = 0;
-        var userChoice = window.confirm("Do you want to save the customer?");
-
-        if (userChoice) {
-            for (let i = 0; i < customerDetail.length; i++) {
-                if(customerDetail[i].id!=cusId.val()) {
-                    count++;
-                }
-            }
-            if(count==customerDetail.length) {
-            let newCustomerDetails = Object.assign({}, customer);
-                newCustomerDetails.id = cusId.val();
-                newCustomerDetails.name = cusName.val();
-                newCustomerDetails.address = cusAddress.val();
-                newCustomerDetails.salary = cusSalary.val();
-
-                customerDetail.push(newCustomerDetails);
-
-                $('#cusTBody').append(
-                    `<tr>
-                        <th scope="row">${cusId.val()}</th>
-                        <td>${cusName.val()}</td>
-                        <td>${cusAddress.val()}</td>
-                        <td>${cusSalary.val()}</td>
-                        <td style="width: 10%"><img class="delete" src="../../CSS_Framework/POS/assets/icons8-delete-96.png" alt="Logo" width="50%" className="opacity-75"></td>
-                    </tr>`
-                );
-                deleteDetail();
-                setFeilds();
-                clearAll(event);
-                setCusID();
-                btnCustomerSave.attr("disabled", true);
-            }else {
-                alert("Duplicate customer ID!");
-            }
-        }
-    }else if(btnCustomerSave.text()=="Update ") {
-        for (let i = 0; i < customerDetail.length; i++) {
-
-            if(customerDetail[i].id == $('#txtCusID').val()){
-                customerDetail[i].name = $('#txtCusName').val();
-                customerDetail[i].address = $('#txtCusAddress').val();
-                customerDetail[i].salary = $('#txtCusSalary').val();
-                getAll();
-                clearAll(event);
-                btnCustomerSave.text("Save ");
-                btnCustomerSave.attr("disabled", true);
-                cusId.attr("disabled", false);
-            }
-        }
-    }
+    $.ajax({
+        url: "http://localhost:8080/java-pos/customer",
+        method: "POST",
+        data: customer,
+        success: function (){
+            alert("Done")
+        },
+        error: function (){}
+    }),
+    // if(btnCustomerSave.text()=="Save ") {
+    //     let count = 0;
+    //     var userChoice = window.confirm("Do you want to save the customer?");
+    //
+    //     if (userChoice) {
+    //         for (let i = 0; i < customerDetail.length; i++) {
+    //             if(customerDetail[i].id!=cusId.val()) {
+    //                 count++;
+    //             }
+    //         }
+    //         if(count==customerDetail.length) {
+    //         let newCustomerDetails = Object.assign({}, customer);
+    //             newCustomerDetails.id = cusId.val();
+    //             newCustomerDetails.name = cusName.val();
+    //             newCustomerDetails.address = cusAddress.val();
+    //             newCustomerDetails.salary = cusSalary.val();
+    //
+    //             customerDetail.push(newCustomerDetails);
+    //
+    //             $('#cusTBody').append(
+    //                 `<tr>
+    //                     <th scope="row">${cusId.val()}</th>
+    //                     <td>${cusName.val()}</td>
+    //                     <td>${cusAddress.val()}</td>
+    //                     <td>${cusSalary.val()}</td>
+    //                     <td style="width: 10%"><img class="delete" src="../../CSS_Framework/POS/assets/icons8-delete-96.png" alt="Logo" width="50%" className="opacity-75"></td>
+    //                 </tr>`
+    //             );
+    //             deleteDetail();
+    //             setFeilds();
+    //             clearAll(event);
+    //             setCusID();
+    //             btnCustomerSave.attr("disabled", true);
+    //         }else {
+    //             alert("Duplicate customer ID!");
+    //         }
+    //     }
+    // }else if(btnCustomerSave.text()=="Update ") {
+    //     for (let i = 0; i < customerDetail.length; i++) {
+    //
+    //         if(customerDetail[i].id == $('#txtCusID').val()){
+    //             customerDetail[i].name = $('#txtCusName').val();
+    //             customerDetail[i].address = $('#txtCusAddress').val();
+    //             customerDetail[i].salary = $('#txtCusSalary').val();
+    //             getAll();
+    //             clearAll(event);
+    //             btnCustomerSave.text("Save ");
+    //             btnCustomerSave.attr("disabled", true);
+    //             cusId.attr("disabled", false);
+    //         }
+    //     }
+    // }
     event.preventDefault();
 })
 

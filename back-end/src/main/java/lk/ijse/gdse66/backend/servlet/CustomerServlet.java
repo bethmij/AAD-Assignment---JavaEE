@@ -18,7 +18,13 @@ public class CustomerServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        super.doPost(req, resp);
+        resp.setContentType("application/json");
+        String id = req.getParameter("cusID");
+        String name = req.getParameter("cusName");
+        String address = req.getParameter("cusAddress");
+        String salary = req.getParameter("cusSalary");
+        System.out.println(id+" "+name+" "+address+" "+salary);
+
     }
 
     @Override

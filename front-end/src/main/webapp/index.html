@@ -20,7 +20,7 @@
         <div class="container-fluid position-fixed top-0 p-0 " style="background-color: #252525; height: 60px;" >
             <a class="navbar-brand " style="color: #919191;">
                 <img src="../resources/assests/img/Green_Leaf_Aesthetic_Organic_Skincare_Logo__2_-removebg-preview.png" alt="Logo" width="15%" class="d-inline-block align-text-top ">
-                <label class="position-absolute fs-4" style="">Harvest Mart Pos System</label>
+<!--                <p class="position-absolute fs-4" style="">Harvest Mart Pos System</p>-->
                 <img class=" menu d-none" src="../resources/assests/img/icons8-menu-100.png" alt="Logo" width="100%" >
             </a>
             <div class="container  h-100 position-absolute end-0 " style="width:35%;" >
@@ -117,21 +117,25 @@
                         <h1 class="text-center  top-50 start-50 translate-middle position-absolute fs-2" style="color: #019D30; ">Manage Customer</h1>
                     </div>
 
-                    <form class="container-fluid  mt-4" style="height: 76%; ">
+                    <form id="cusForm" class="container-fluid  mt-4 " style="height: 76%; ">
                         <div class=" row row-cols-1 p-3 justify-content-center" style="height: calc(100%/5)">
-                            <input id="txtCusID" class=" cusInput input form-control text-white "  placeholder="Customer ID" style="height: 90%; width: 70%; background-color: #252525;">
+                            <label for="txtCusID" class="form-label"></label>
+                            <input id="txtCusID" class=" cusInput input form-control text-white " name="cusID" placeholder="Customer ID" style="height: 90%; width: 70%; background-color: #252525;">
                             <p id="cusIDPara" class="text-danger-emphasis text-start" style="width: 70%;"></p>
                         </div>
                         <div class="row row-cols-1 p-3 justify-content-center" style="height: calc(100%/5)">
-                            <input id="txtCusName" class=" cusInput input form-control text-white "  placeholder="Customer Name" style="height: 90%; width: 70%; background-color: #252525;">
+                            <label for="txtCusName" class="form-label"></label>
+                            <input id="txtCusName" class=" cusInput input form-control text-white " name="cusName" placeholder="Customer Name" style="height: 90%; width: 70%; background-color: #252525;">
                             <p id="cusNamePara" class="text-danger-emphasis text-start ms-5" style="width: 85%;;"></p>
                         </div>
                         <div class="row row-cols-1 p-3 justify-content-center" style="height: calc(100%/5)">
-                            <input id="txtCusAddress" class=" cusInput input form-control text-white "  placeholder="Customer Address" style="height: 90%; width: 70%; background-color: #252525;">
+                            <label for="txtCusAddress" class="form-label"></label>
+                            <input id="txtCusAddress" class=" cusInput input form-control text-white " name="cusAddress" placeholder="Customer Address" style="height: 90%; width: 70%; background-color: #252525;">
                             <p id="cusAddressPara" class="text-danger-emphasis text-start" style="width: 70%;"></p>
                         </div>
                         <div class="row row-cols-1 p-3 justify-content-center" style="height: calc(100%/5)">
-                            <input id="txtCusSalary" class=" cusInput input form-control text-white "  placeholder="Customer Salary" style="height: 90%; width: 70%; background-color: #252525;">
+                            <label for="txtCusSalary" class="form-label"></label>
+                            <input id="txtCusSalary" class=" cusInput input form-control text-white " name="cusSalary" placeholder="Customer Salary" style="height: 90%; width: 70%; background-color: #252525;">
                             <p id="cusSalaryPara" class="text-danger-emphasis text-start" style="width: 70%;"></p>
                         </div>
                         <div class="row p-3" style="height: calc(100%/5)">
@@ -287,7 +291,7 @@
                                 <div class="col-3 ">
                                 </div>
                                 <div class="col-3 " >
-                                    <button type="submit" id="itemGetAll" class="btn btn-outline-success mt-3" style="height: 70%; width:100%; " ><img src="../../CSS_Framework/POS/assets/Screenshot__550_-removebg-preview.png" alt="Logo" width="20%" class="opacity-50 me-2">Get All</button>
+                                    <button type="submit" id="itemGetAll" class="btn btn-outline-success mt-3" style="height: 70%; width:100%; " ><img src="../resources/assests/img/Screenshot__550_-removebg-preview.png" alt="Logo" width="20%" class="opacity-50 me-2">Get All</button>
 
                                 </div>
                             </div>
@@ -502,13 +506,13 @@
 
 <script src="../resources/assests/js/jquery-3.7.1.min.js"></script>
 <script src="../resources/assests/css/bootstrap/js/bootstrap.js"></script>
-<script src="../java/lk/ijse/gdse66/frontend/controller/CustomerController.js"></script>
 <script src="../java/lk/ijse/gdse66/frontend/controller/DashboardController.js"></script>
-<script src="../java/lk/ijse/gdse66/frontend/controller/ItemController.js"></script>
-<script src="../java/lk/ijse/gdse66/frontend/controller/OrderController.js"></script>
-<script src="../java/lk/ijse/gdse66/frontend/controller/validations/CustomerValidation.js"></script>
-<script src="../java/lk/ijse/gdse66/frontend/controller/validations/ItemValidation.js"></script>
-<script src="../java/lk/ijse/gdse66/frontend/controller/validations/OrderValidation.js"></script>
+<script type="module" src="../java/lk/ijse/gdse66/frontend/controller/CustomerController.js"></script>
+<script type="module" src="../java/lk/ijse/gdse66/frontend/controller/ItemController.js"></script>
+<script type="module" src="../java/lk/ijse/gdse66/frontend/controller/OrderController.js"></script>
+<!--<script type="module" src="../java/lk/ijse/gdse66/frontend/controller/validations/CustomerValidation.js"></script>-->
+<!--<script type="module" src="../java/lk/ijse/gdse66/frontend/controller/validations/ItemValidation.js"></script>-->
+<!--<script type="module" src="../java/lk/ijse/gdse66/frontend/controller/validations/OrderValidation.js"></script>-->
 
 <script>
 

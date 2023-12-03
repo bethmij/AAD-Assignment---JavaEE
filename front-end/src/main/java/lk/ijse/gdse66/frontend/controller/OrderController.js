@@ -24,9 +24,9 @@ setCusID();
 setOrderID();
 setItemCode();
 
-for (let i = 0; i < customerDetail.length; i++) {
-    console.log(customerDetail[i].id);
-}
+// for (let i = 0; i < customerDetail.length; i++) {
+//     console.log(customerDetail[i].id);
+// }
 
 export function setCusID() {
     selectCusOp.empty();

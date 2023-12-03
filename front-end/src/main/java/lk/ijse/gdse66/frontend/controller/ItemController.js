@@ -1,7 +1,6 @@
 import {item} from "./model/Item.js";
 import {customerDetail, itemDetail} from "./db/DB.js";
 import {setCusID, setItemCode} from "./OrderController.js";
-import {customer} from "./model/Customer.js";
 
 let itemCode = $('#txtItemCode');
 let itemName = $('#txtItemName');
