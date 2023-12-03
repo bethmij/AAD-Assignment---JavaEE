@@ -109,7 +109,7 @@ btnSave.click(function (event){
                         <td>${itemName[1]}</td>
                         <td>${itemPrice[1]}</td>
                         <td>${txtOrderQty.val()}</td>
-                        <td style="width: 10%"><img class="orderDelete" src="../../CSS_Framework/POS/assets/icons8-delete-96.png" alt="Logo" width="50%" className="opacity-75"></td>
+<!--                        <td style="width: 10%"><img class="orderDelete" src="../../CSS_Framework/POS/assets/icons8-delete-96.png" alt="Logo" width="50%" className="opacity-75"></td>-->
                     </tr>`
                 );
                 setFeilds();

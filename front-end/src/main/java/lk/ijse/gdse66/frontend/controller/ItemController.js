@@ -41,7 +41,7 @@ btnItemSave.click(function (event){
                             <td>${itemName.val()}</td>
                             <td>${itemPrice.val()}</td>
                             <td>${itemQuantity.val()}</td>
-                            <td style="width: 10%"><img class="itemDelete" src="../../CSS_Framework/POS/assets/icons8-delete-96.png" alt="Logo" width="50%" className="opacity-75"></td>
+<!--                            <td style="width: 10%"><img class="itemDelete" src="../../CSS_Framework/POS/assets/icons8-delete-96.png" alt="Logo" width="50%" className="opacity-75"></td>-->
                         </tr>`
                 );
                 deleteDetail();
@@ -111,7 +111,7 @@ function getAll() {
             <td>${itemDetail[i].name}</td>
             <td>${itemDetail[i].price}</td>
             <td>${itemDetail[i].quantity}</td>
-            <td style="width: 10%"><img class="itemDelete" src="../../CSS_Framework/POS/assets/icons8-delete-96.png" alt="Logo" width="50%" className="opacity-75"></td>
+<!--            <td style="width: 10%"><img class="itemDelete" src="../../CSS_Framework/POS/assets/icons8-delete-96.png" alt="Logo" width="50%" className="opacity-75"></td>-->
             </tr>`);
         deleteDetail();
         setFeilds();
@@ -178,7 +178,7 @@ $('#itemSearch').click(function (){
                 <td>${itemDetail[i].name}</td>
                 <td>${itemDetail[i].price}</td>
                 <td>${itemDetail[i].quantity}</td>
-                <td style="width: 10%"><img class="itemDelete" src="../../CSS_Framework/POS/assets/icons8-delete-96.png" alt="Logo" width="50%" className="opacity-75"></td>
+<!--                <td style="width: 10%"><img class="itemDelete" src="../../CSS_Framework/POS/assets/icons8-delete-96.png" alt="Logo" width="50%" className="opacity-75"></td>-->
                 </tr>`);
                 deleteDetail();
                 setFeilds();

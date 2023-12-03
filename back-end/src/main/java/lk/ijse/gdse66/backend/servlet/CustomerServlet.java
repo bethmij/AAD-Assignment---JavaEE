@@ -1,9 +1,6 @@
 package lk.ijse.gdse66.backend.servlet;
 
-import jakarta.json.Json;
-import jakarta.json.JsonArray;
-import jakarta.json.JsonArrayBuilder;
-import jakarta.json.JsonObjectBuilder;
+import jakarta.json.*;
 
 import javax.annotation.Resource;
 import javax.servlet.ServletException;
@@ -33,7 +30,7 @@ public class CustomerServlet extends HttpServlet {
                 String id = resultSet.getString(1);
                 String name = resultSet.getString(2);
                 String address = resultSet.getString(3);
-                String salary = resultSet.getString(4);
+                double salary = resultSet.getDouble(4);
 
                 JsonObjectBuilder builder = Json.createObjectBuilder();
                 builder.add("cusID",id);
@@ -41,11 +38,11 @@ public class CustomerServlet extends HttpServlet {
                 builder.add("cusAddress",address);
                 builder.add("cusSalary",salary);
                 arrayBuilder.add(builder.build());
-            }
 
+            }
             sendMsg(resp, arrayBuilder.build(),"Got the Customer",200);
         } catch (SQLException e) {
-            e.printStackTrace();
+            sendMsg(resp,null, e.getLocalizedMessage(), 400);
         }
     }
 
@@ -69,12 +66,12 @@ public class CustomerServlet extends HttpServlet {
             boolean isAdded = pst.executeUpdate() > 0;
 
             if(isAdded){
-                sendMsg(resp, "", "Customer Added Successfully", 200);
+                sendMsg(resp, null, "Customer Added Successfully", 200);
             }else {
-                sendMsg(resp, "", "Customer Addition Failed", 400);
+                sendMsg(resp, null, "Customer Addition Failed", 400);
             }
         } catch (SQLException e) {
-            sendMsg(resp, "", e.getLocalizedMessage(), 400);
+            sendMsg(resp, null, e.getLocalizedMessage(), 400);
         }
 
     }
@@ -94,10 +91,10 @@ public class CustomerServlet extends HttpServlet {
         super.doOptions(req, resp);
     }
 
-    public <T extends JsonArray> void sendMsg(HttpServletResponse resp, T data, String message, int status) throws IOException {
+    public <T> void sendMsg(HttpServletResponse resp, JsonArray data, String message, int status) throws IOException {
         resp.setStatus(200);
         JsonObjectBuilder builder = Json.createObjectBuilder();
-        builder.add("data",(T)data);
+        builder.add("data",data);
         builder.add("message",message);
         builder.add("status",status);
         resp.getWriter().println(builder.build());

@@ -26,6 +26,15 @@ btnCustomerSave.click(function (event){
         success: function (resp){
             if(resp.status===200){
                 alert(resp.message);
+                $('#cusTBody').append(
+                    `<tr>
+                        <th scope="row">${cusId.val()}</th>
+                        <td>${cusName.val()}</td>
+                        <td>${cusAddress.val()}</td>
+                        <td>${cusSalary.val()}</td>
+<!--                        <td style="width: 10%"><img class="delete opacity-75" src="../../../../../../resources/assests/img/icons8-delete-96.png" alt="Logo" width="50%" ></td>-->
+                    </tr>`
+                );
             }else {
                 alert(resp.message);
             }
@@ -120,6 +129,24 @@ $('#getAll').click(function (){
 })
 
 function getAll() {
+    $.ajax({
+        url: "http://localhost:8080/java-pos/customer",
+        method: "GET",
+        success: function (resp) {
+            if(resp.status===200){
+                for (let respElement of resp.data) {
+                    tBody.append(`<tr>
+                        <th scope="row">${respElement.cusID}</th>
+                        <td>${respElement.cusName}</td>
+                        <td>${respElement.cusAddress}</td>
+                        <td>${respElement.cusSalary}</td>
+<!--                        <td style="width: 10%"><img class="delete opacity-75" src="../../../../../../resources/assests/img/icons8-delete-96.png" alt="Logo" width="50%" ></td>-->
+                </tr>`);
+                }
+
+            }
+        }
+    })
     let tBody = $('#cusTBody')
     tBody.empty();
 
@@ -129,7 +156,7 @@ function getAll() {
             <td>${customerDetail[i].name}</td>
             <td>${customerDetail[i].address}</td>
             <td>${customerDetail[i].salary}</td>
-            <td style="width: 10%"><img class="delete" src="../../CSS_Framework/POS/assets/icons8-delete-96.png" alt="Logo" width="50%" className="opacity-75"></td>
+<!--            <td style="width: 10%"><img class="delete" src="../../../../../../resources/assests/img/icons8-delete-96.png" alt="Logo" width="50%" className="opacity-75"></td>-->
             </tr>`);
         deleteDetail();
         setFeilds();
@@ -194,7 +221,7 @@ $('#btnSearch').click(function (){
                 <td>${customerDetail[i].name}</td>
                 <td>${customerDetail[i].address}</td>
                 <td>${customerDetail[i].salary}</td>
-                <td style="width: 10%"><img class="delete" src="../../CSS_Framework/POS/assets/icons8-delete-96.png" alt="Logo" width="50%" className="opacity-75"></td>
+<!--                <td style="width: 10%"><img class="delete" src="../../../../../../resources/assests/img/icons8-delete-96.png" alt="Logo" width="50%" className="opacity-75"></td>-->
                 </tr>`);
                 deleteDetail();
                 setFeilds();
