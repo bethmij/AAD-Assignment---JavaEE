@@ -1,6 +1,6 @@
 <component name="ArtifactManager">
   <artifact type="exploded-war" name="back-end:war exploded">
-    <output-path>$PROJECT_DIR$/back-end/target/back-end-1.0-SNAPSHOT</output-path>
+    <output-path>$PROJECT_DIR$/back-end/target/back-end-1.0.0T</output-path>
     <properties id="maven-jee-properties">
       <options>
         <exploded>true</exploded>
@@ -13,9 +13,13 @@
         <element id="directory" name="classes">
           <element id="module-output" name="back-end" />
         </element>
+        <element id="directory" name="lib">
+          <element id="library" level="project" name="Maven: com.mysql:mysql-connector-j:8.1.0" />
+          <element id="library" level="project" name="Maven: com.google.protobuf:protobuf-java:3.21.9" />
+        </element>
       </element>
       <element id="directory" name="META-INF">
-        <element id="file-copy" path="$PROJECT_DIR$/back-end/target/back-end-1.0-SNAPSHOT/META-INF/MANIFEST.MF" />
+        <element id="file-copy" path="$PROJECT_DIR$/back-end/target/back-end-1.0.0T/META-INF/MANIFEST.MF" />
       </element>
       <element id="javaee-facet-resources" facet="back-end/web/Web" />
     </root>
