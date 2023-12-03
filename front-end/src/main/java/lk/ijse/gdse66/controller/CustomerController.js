@@ -35,7 +35,7 @@ btnCustomerSave.click(function (event){
 <!--                        <td style="width: 10%"><img class="delete opacity-75" src="../../../../../../resources/assests/img/icons8-delete-96.png" alt="Logo" width="50%" ></td>-->
                     </tr>`
                     );
-                } else {
+                } else if (resp.status === 400){
                     alert(resp.message);
                 }
             },
@@ -44,14 +44,19 @@ btnCustomerSave.click(function (event){
             }
         });
     }else if(btnCustomerSave.text()==="Update "){
-        let customer = {"cusID":cusId.val(), "cusName":cusName, "cusAddress":cusAddress, "cusSalary":cusSalary}
+        let customer = {"cusID":cusId.val(), "cusName":cusName.val(), "cusAddress":cusAddress.val(), "cusSalary":cusSalary.val()}
 
         $.ajax({
             url: "http://localhost:8080/java-pos/customer",
             method: "PUT",
+            contentType: "application/json",
             data: JSON.stringify(customer),
             success: function (resp) {
-
+                if(resp.status===200){
+                    alert(resp.message);
+                }else if (resp.status === 200){
+                    alert(resp.message);
+                }
             }
         })
     }
@@ -159,6 +164,8 @@ function getAll() {
                     setFeilds();
                 }
 
+            }else if (resp.status === 200){
+                alert(resp.message);
             }
         }
     })
@@ -183,6 +190,7 @@ deleteDetail();
 
 function deleteDetail() {
 
+
     let btnDelete = $('.delete');
     btnDelete.on("mouseover", function (){
         $(this).css("cursor", "pointer");}
@@ -193,14 +201,17 @@ function deleteDetail() {
 
         if (userChoice) {
             $(this).parents('tr').remove();
-            let tableCode = $(this).parents('tr').children(':nth-child(1)');
+            let cusID = $(this).parents('tr').children(':nth-child(1)');
 
-            for (let i = 0; i < customerDetail.length; i++) {
-                if($(tableCode[0]).text() ==customerDetail[i].id){
-                    customerDetail.splice(i,1);
-                    console.log(customerDetail);
-                }
-            }
+            $.ajax({
+                url:"http://localhost:8080/java-pos/"
+            });
+            // for (let i = 0; i < customerDetail.length; i++) {
+            //     if($(tableCode[0]).text() ==customerDetail[i].id){
+            //         customerDetail.splice(i,1);
+            //         console.log(customerDetail);
+            //     }
+            // }
             setCusID();
         }
     })

@@ -20,7 +20,6 @@ public class CustomerServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        resp.addHeader("Access-Control-Allow-Origin", "*");
         resp.setContentType("application/json");
         JsonArrayBuilder arrayBuilder = Json.createArrayBuilder();
         try (Connection connection = source.getConnection()) {
@@ -42,13 +41,12 @@ public class CustomerServlet extends HttpServlet {
             }
             sendMsg(resp, arrayBuilder.build(),"Got the Customer",200);
         } catch (SQLException e) {
-            sendMsg(resp,null, e.getLocalizedMessage(), 400);
+            sendMsg(resp,JsonValue.EMPTY_JSON_ARRAY, e.getLocalizedMessage(), 400);
         }
     }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        resp.addHeader("Access-Control-Allow-Origin", "*");
         resp.setContentType("application/json");
         String id = req.getParameter("cusID");
         String name = req.getParameter("cusName");
@@ -67,19 +65,18 @@ public class CustomerServlet extends HttpServlet {
             boolean isAdded = pst.executeUpdate() > 0;
 
             if(isAdded){
-                sendMsg(resp, null, "Customer Added Successfully", 200);
+                sendMsg(resp, JsonValue.EMPTY_JSON_ARRAY, "Customer Added Successfully", 200);
             }else {
-                sendMsg(resp, null, "Customer Addition Failed", 400);
+                sendMsg(resp, JsonValue.EMPTY_JSON_ARRAY, "Customer Addition Failed", 400);
             }
         } catch (SQLException e) {
-            sendMsg(resp, null, e.getLocalizedMessage(), 400);
+            sendMsg(resp, JsonValue.EMPTY_JSON_ARRAY, e.getLocalizedMessage(), 400);
         }
 
     }
 
     @Override
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        resp.addHeader("Access-Control-Allow-Origin", "*");
         resp.setContentType("application/json");
         JsonReader reader = Json.createReader(req.getReader());
         JsonObject jsonObject = reader.readObject();
@@ -87,7 +84,28 @@ public class CustomerServlet extends HttpServlet {
         String cusName = jsonObject.getString("cusName");
         String cusAddress = jsonObject.getString("cusAddress");
         String cusSalary = jsonObject.getString("cusSalary");
-        System.out.println(cusID+" "+cusName+" "+cusAddress+" "+cusSalary );
+
+        try (Connection connection = source.getConnection()){
+            PreparedStatement pst = connection.prepareStatement(
+                    "UPDATE customer SET name=?, address=?, salary=? WHERE id=?");
+            pst.setString(1,cusName);
+            pst.setString(2,cusAddress);
+            pst.setString(3,cusSalary);
+            pst.setString(4,cusID);
+
+            boolean is_updated = pst.executeUpdate() > 0;
+            if(is_updated)
+                sendMsg(resp,JsonValue.EMPTY_JSON_ARRAY,"Customer Updated Successfully", 200);
+            else
+                sendMsg(resp,JsonValue.EMPTY_JSON_ARRAY,"Customer Update Failed", 400);
+        } catch (SQLException e) {
+            sendMsg(resp,JsonValue.EMPTY_JSON_ARRAY, e.getLocalizedMessage(), 400);
+        }
+    }
+
+    @Override
+    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        resp.setContentType("application/json");
         try (Connection connection = source.getConnection()){
 
         } catch (SQLException e) {
@@ -95,20 +113,8 @@ public class CustomerServlet extends HttpServlet {
         }
     }
 
-    @Override
-    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        super.doDelete(req, resp);
-    }
 
-    @Override
-    protected void doOptions(HttpServletRequest req, HttpServletResponse response) throws ServletException, IOException {
-        response.addHeader("Access-Control-Allow-Methods", "DELETE");
-        response.addHeader("Access-Control-Allow-Methods", "PUT");
-        response.addHeader("Access-Control-Allow-Origin", "*");
-        response.addHeader("Access-Control-Allow-Headers", "Context-Type");
-    }
-
-    public <T> void sendMsg(HttpServletResponse resp, JsonArray data, String message, int status) throws IOException {
+    public  void sendMsg(HttpServletResponse resp, JsonArray data, String message, int status) throws IOException {
         resp.setStatus(200);
         JsonObjectBuilder builder = Json.createObjectBuilder();
         builder.add("data",data);
