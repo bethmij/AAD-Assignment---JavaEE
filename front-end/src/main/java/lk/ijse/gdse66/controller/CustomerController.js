@@ -7,6 +7,7 @@ let cusName = $('#txtCusName');
 let cusAddress = $('#txtCusAddress');
 let cusSalary = $('#txtCusSalary');
 let btnCustomerSave = $('#btnSave');
+let cusIdList = [];
 
 $(document).on('keydown', function(event) {
     if (event.keyCode === 9) {
@@ -14,104 +15,82 @@ $(document).on('keydown', function(event) {
     }
 });
 
+
+
 btnCustomerSave.click(function (event){
-
     if(btnCustomerSave.text()==="Save ") {
-        let customer = $("#cusForm").serialize();
+        event.preventDefault();
+        const userChoice = window.confirm("Do you want to save the customer?")
+        if (userChoice) {
+            getCusIDList( function (IDList) {
 
-        $.ajax({
-            url: "http://localhost:8080/java-pos/customer",
-            method: "POST",
-            data: customer,
-            success: function (resp) {
-                if (resp.status === 200) {
-                    alert(resp.message);
-                    $('#cusTBody').append(
-                        `<tr>
-                        <th scope="row">${cusId.val()}</th>
-                        <td>${cusName.val()}</td>
-                        <td>${cusAddress.val()}</td>
-                        <td>${cusSalary.val()}</td>
-<!--                        <td style="width: 10%"><img class="delete opacity-75" src="../../../../../../resources/assests/img/icons8-delete-96.png" alt="Logo" width="50%" ></td>-->
-                    </tr>`
-                    );
-                } else if (resp.status === 400){
-                    alert(resp.message);
+                if (!(IDList.includes(cusId.val()))) {
+                    let customer = $("#cusForm").serialize();
+                    $.ajax({
+                        url: "http://localhost:8080/java-pos/customer",
+                        method: "POST",
+                        data: customer,
+                        success: function (resp) {
+                            if (resp.status === 200) {
+                                alert(resp.message);
+                                $('#cusTBody').append(
+                                    `<tr>
+                                        <th scope="row">${cusId.val()}</th>
+                                        <td>${cusName.val()}</td>
+                                        <td>${cusAddress.val()}</td>
+                                        <td>${cusSalary.val()}</td>
+                                        <td style="width: 10%"><img class="delete opacity-75" src="../resources/assests/img/icons8-delete-96.png" alt="Logo" width="50%" ></td>
+                                     </tr>`
+                                );
+                                deleteDetail();
+                                setFeilds();
+                                clearAll(event);
+                                setCusID();
+                                btnCustomerSave.attr("disabled", true);
+                            } else if (resp.status === 400) {
+                                alert(resp.message);
+                            }
+                        },
+                        error: function (resp) {
+                            alert(resp.message);
+                        }
+                    });
+                } else {
+                    alert("Duplicate customer ID!");
                 }
-            },
-            error: function (resp) {
-                alert(resp.message);
-            }
-        });
-    }else if(btnCustomerSave.text()==="Update "){
-        let customer = {"cusID":cusId.val(), "cusName":cusName.val(), "cusAddress":cusAddress.val(), "cusSalary":cusSalary.val()}
+            });
+        }
 
-        $.ajax({
-            url: "http://localhost:8080/java-pos/customer",
-            method: "PUT",
-            contentType: "application/json",
-            data: JSON.stringify(customer),
-            success: function (resp) {
-                if(resp.status===200){
-                    alert(resp.message);
-                }else if (resp.status === 200){
-                    alert(resp.message);
-                }
+    }else if(btnCustomerSave.text()==="Update ") {
+        const userChoice = window.confirm("Do you want to save the customer?");
+        if (userChoice) {
+            let customer = {
+                "cusID": cusId.val(),
+                "cusName": cusName.val(),
+                "cusAddress": cusAddress.val(),
+                "cusSalary": cusSalary.val()
             }
-        })
+
+            $.ajax({
+                url: "http://localhost:8080/java-pos/customer",
+                method: "PUT",
+                contentType: "application/json",
+                data: JSON.stringify(customer),
+                success: function (resp) {
+                    if (resp.status === 200) {
+                        alert(resp.message);
+                        getAll();
+                        clearAll(event);
+                        btnCustomerSave.text("Save ");
+                        btnCustomerSave.attr("disabled", true);
+                        cusId.attr("disabled", false);
+                    } else if (resp.status === 200) {
+                        alert(resp.message);
+                    }
+                }
+            });
+        }
     }
-    // if(btnCustomerSave.text()=="Save ") {
-    //     let count = 0;
-    //     var userChoice = window.confirm("Do you want to save the customer?");
-    //
-    //     if (userChoice) {
-    //         for (let i = 0; i < customerDetail.length; i++) {
-    //             if(customerDetail[i].id!=cusId.val()) {
-    //                 count++;
-    //             }
-    //         }
-    //         if(count==customerDetail.length) {
-    //         let newCustomerDetails = Object.assign({}, customer);
-    //             newCustomerDetails.id = cusId.val();
-    //             newCustomerDetails.name = cusName.val();
-    //             newCustomerDetails.address = cusAddress.val();
-    //             newCustomerDetails.salary = cusSalary.val();
-    //
-    //             customerDetail.push(newCustomerDetails);
-    //
-    //             $('#cusTBody').append(
-    //                 `<tr>
-    //                     <th scope="row">${cusId.val()}</th>
-    //                     <td>${cusName.val()}</td>
-    //                     <td>${cusAddress.val()}</td>
-    //                     <td>${cusSalary.val()}</td>
-    //                     <td style="width: 10%"><img class="delete" src="../../CSS_Framework/POS/assets/icons8-delete-96.png" alt="Logo" width="50%" className="opacity-75"></td>
-    //                 </tr>`
-    //             );
-    //             deleteDetail();
-    //             setFeilds();
-    //             clearAll(event);
-    //             setCusID();
-    //             btnCustomerSave.attr("disabled", true);
-    //         }else {
-    //             alert("Duplicate customer ID!");
-    //         }
-    //     }
-    // }else if(btnCustomerSave.text()=="Update ") {
-    //     for (let i = 0; i < customerDetail.length; i++) {
-    //
-    //         if(customerDetail[i].id == $('#txtCusID').val()){
-    //             customerDetail[i].name = $('#txtCusName').val();
-    //             customerDetail[i].address = $('#txtCusAddress').val();
-    //             customerDetail[i].salary = $('#txtCusSalary').val();
-    //             getAll();
-    //             clearAll(event);
-    //             btnCustomerSave.text("Save ");
-    //             btnCustomerSave.attr("disabled", true);
-    //             cusId.attr("disabled", false);
-    //         }
-    //     }
-    // }
     event.preventDefault();
 })
 
@@ -147,7 +126,7 @@ $('#getAll').click(function (){
 
 function getAll() {
     $.ajax({
-        url: "http://localhost:8080/java-pos/customer",
+        url: "http://localhost:8080/java-pos/customer?option=GET",
         method: "GET",
         success: function (resp) {
             if(resp.status===200){
@@ -189,8 +168,6 @@ function setFeilds() {
 deleteDetail();
 
 function deleteDetail() {
-
-
     let btnDelete = $('.delete');
     btnDelete.on("mouseover", function (){
         $(this).css("cursor", "pointer");}
@@ -201,49 +178,80 @@ function deleteDetail() {
 
         if (userChoice) {
             $(this).parents('tr').remove();
-            let cusID = $(this).parents('tr').children(':nth-child(1)');
+            let cusID = $( $(this).parents('tr').children(':nth-child(1)')).text();
 
             $.ajax({
-                url:"http://localhost:8080/java-pos/"
+                url: "http://localhost:8080/java-pos/customer?cusID="+cusID,
+                method: "DELETE",
+                success: function (resp){
+                    if(resp.status===200){
+                        alert(resp.message);
+                    }else if(resp.status===400){
+                        alert(resp.message);
+                    }
+                },
+                error: function (resp) {
+
+                }
             });
-            // for (let i = 0; i < customerDetail.length; i++) {
-            //     if($(tableCode[0]).text() ==customerDetail[i].id){
-            //         customerDetail.splice(i,1);
-            //         console.log(customerDetail);
-            //     }
-            // }
             setCusID();
         }
     })
 }
 
 $('#btnSearch').click(function (){
+
     let id = $('#txtSearch').val();
     let tbody = $('#cusTBody');
     let count = 0;
+    if(id.length!==0) {
+        getCusIDList(function (IDList) {
+            if (IDList.includes(id)) {
+                $.ajax({
+                    url: "http://localhost:8080/java-pos/customer?option=SEARCH&cusID=" + id,
+                    method: "GET",
+                    success: function (resp) {
+                        if (resp.status === 200) {
+                            tbody.empty();
+                            tbody.append(`<tr>
+                    <th scope="row">${resp.data[0].cusID}</th>
+                        <td>${resp.data[0].cusName}</td>
+                        <td>${resp.data[0].cusAddress}</td>
+                        <td>${resp.data[0].cusSalary}</td>
+                        <td style="width: 10%"><img class="delete" src="../resources/assests/img/icons8-delete-96.png" alt="Logo" width="50%" class="opacity-75"></td>
+                   </tr>`);
+                            deleteDetail();
+                            setFeilds();
+                        } else if (resp.status === 400) {
+                            alert(resp.message);
+                        }
+                    },
+                    error: function () {
 
-    if(id.length!=0) {
-        for (let i = 0; i < customerDetail.length; i++) {
-            if (customerDetail[i].id == id) {
-                count++;
-                tbody.empty();
-
-                tbody.append(`<tr>
-                <th scope="row">${customerDetail[i].id}</th>
-                <td>${customerDetail[i].name}</td>
-                <td>${customerDetail[i].address}</td>
-                <td>${customerDetail[i].salary}</td>
-<!--                <td style="width: 10%"><img class="delete" src="../../../../../../resources/assests/img/icons8-delete-96.png" alt="Logo" width="50%" className="opacity-75"></td>-->
-                </tr>`);
-                deleteDetail();
-                setFeilds();
+                    }
+                });
+            } else {
+                alert("No such Customer..please check the ID");
             }
-        }
-        if (count != 1) {
-            alert("No such Customer..please check the ID");
-        }
+        });
     }else {
         alert("Please enter the ID");
     }
-})
+});
+
+function getCusIDList(callback) {
+    $.ajax({
+        url: "http://localhost:8080/java-pos/customer?option=ID",
+        method: "GET",
+        success: function (resp) {
+            for (let respElement of resp.data) {
+                 cusIdList.push(respElement);
+            }
+            callback(cusIdList);
+        },
+        error:function (resp){
+            alert(resp);
+        }
+    });
+}
 

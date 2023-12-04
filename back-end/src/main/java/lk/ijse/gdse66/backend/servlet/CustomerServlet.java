@@ -21,27 +21,70 @@ public class CustomerServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         resp.setContentType("application/json");
-        JsonArrayBuilder arrayBuilder = Json.createArrayBuilder();
-        try (Connection connection = source.getConnection()) {
-            PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM customer");
-            ResultSet resultSet = preparedStatement.executeQuery();
-            while (resultSet.next()) {
-                String id = resultSet.getString(1);
-                String name = resultSet.getString(2);
-                String address = resultSet.getString(3);
-                double salary = resultSet.getDouble(4);
+        String option = req.getParameter("option");
 
-                JsonObjectBuilder builder = Json.createObjectBuilder();
-                builder.add("cusID",id);
-                builder.add("cusName",name);
-                builder.add("cusAddress",address);
-                builder.add("cusSalary",salary);
-                arrayBuilder.add(builder.build());
+        if (option.equals("GET")) {
+            JsonArrayBuilder arrayBuilder = Json.createArrayBuilder();
+            try (Connection connection = source.getConnection()) {
+                PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM customer");
+                ResultSet resultSet = preparedStatement.executeQuery();
+                while (resultSet.next()) {
+                    String id = resultSet.getString(1);
+                    String name = resultSet.getString(2);
+                    String address = resultSet.getString(3);
+                    double salary = resultSet.getDouble(4);
 
+                    JsonObjectBuilder builder = Json.createObjectBuilder();
+                    builder.add("cusID", id);
+                    builder.add("cusName", name);
+                    builder.add("cusAddress", address);
+                    builder.add("cusSalary", salary);
+                    arrayBuilder.add(builder.build());
+
+                }
+                sendMsg(resp, arrayBuilder.build(), "Got the Customer", 200);
+            } catch (SQLException e) {
+                sendMsg(resp, JsonValue.EMPTY_JSON_ARRAY, e.getLocalizedMessage(), 400);
             }
-            sendMsg(resp, arrayBuilder.build(),"Got the Customer",200);
-        } catch (SQLException e) {
-            sendMsg(resp,JsonValue.EMPTY_JSON_ARRAY, e.getLocalizedMessage(), 400);
+        }else if(option.equals("SEARCH")){
+            String cusID = req.getParameter("cusID");
+
+            JsonArrayBuilder arrayBuilder = Json.createArrayBuilder();
+            try (Connection connection = source.getConnection()) {
+                PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM customer WHERE id=?");
+                preparedStatement.setString(1,cusID);
+                ResultSet resultSet = preparedStatement.executeQuery();
+                if (resultSet.next()) {
+                    String id = resultSet.getString(1);
+                    String name = resultSet.getString(2);
+                    String address = resultSet.getString(3);
+                    double salary = resultSet.getDouble(4);
+
+                    JsonObjectBuilder builder = Json.createObjectBuilder();
+                    builder.add("cusID", id);
+                    builder.add("cusName", name);
+                    builder.add("cusAddress", address);
+                    builder.add("cusSalary", salary);
+                    arrayBuilder.add(builder.build());
+
+                }
+                sendMsg(resp, arrayBuilder.build(), "Got the Customer", 200);
+            } catch (SQLException e) {
+                sendMsg(resp, JsonValue.EMPTY_JSON_ARRAY, e.getLocalizedMessage(), 400);
+            }
+        }else if(option.equals("ID")){
+            try (Connection connection = source.getConnection()){
+                PreparedStatement preparedStatement = connection.prepareStatement("SELECT id FROM customer");
+                ResultSet resultSet = preparedStatement.executeQuery();
+                JsonArrayBuilder cusIDList = Json.createArrayBuilder();
+
+                while (resultSet.next()){
+                    cusIDList.add(resultSet.getString(1));
+                }
+               sendMsg(resp, cusIDList.build(), "Got the list",200);
+            } catch (SQLException e) {
+                sendMsg(resp, JsonValue.EMPTY_JSON_ARRAY, e.getLocalizedMessage(),400);
+            }
         }
     }
 
@@ -52,7 +95,7 @@ public class CustomerServlet extends HttpServlet {
         String name = req.getParameter("cusName");
         String address = req.getParameter("cusAddress");
         String salary = req.getParameter("cusSalary");
-        System.out.println(id+" "+name+" "+address+" "+salary);
+
 
 
         try (Connection connection = source.getConnection()) {
@@ -106,10 +149,20 @@ public class CustomerServlet extends HttpServlet {
     @Override
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         resp.setContentType("application/json");
+        String cusID = req.getParameter("cusID");
         try (Connection connection = source.getConnection()){
-
+            PreparedStatement pst = connection.prepareStatement(
+                    "DELETE FROM customer WHERE id=?"
+            );
+            pst.setString(1,cusID);
+            boolean isDeleted = pst.executeUpdate() > 0;
+            if(isDeleted){
+                sendMsg(resp, JsonValue.EMPTY_JSON_ARRAY, "Customer Deleted Successfully", 200);
+            }else {
+                sendMsg(resp, JsonValue.EMPTY_JSON_ARRAY, "Customer Delete Failed", 400);
+            }
         } catch (SQLException e) {
-            e.printStackTrace();
+            sendMsg(resp, JsonValue.EMPTY_JSON_ARRAY, e.getLocalizedMessage(), 400);
         }
     }
 
