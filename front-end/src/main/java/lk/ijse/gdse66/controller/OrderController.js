@@ -64,38 +64,60 @@ function setOrderID() {
 
 selectCusOp.change(function () {
     let cusID = selectCusOp.val();
-    for (let i = 0; i < customerDetail.length; i++) {
-        if (customerDetail[i].id == cusID) {
-            $('#cusName').val(`Customer Name : ${customerDetail[i].name}`);
-            $('#cusAddress').val(`Customer Address : ${customerDetail[i].address}`);
-            $('#cusSalary').val(`Customer Salary : ${customerDetail[i].salary}`);
-        }else if(cusID == "Customer ID" ){
-            $('#cusName').val(`Customer Name : `);
-            $('#cusAddress').val(`Customer Address : `);
-            $('#cusSalary').val(`Customer Salary : `);
-            btnSave.attr("disabled", true);
+    $.ajax({
+        url:"http://localhost:8080/java-pos/customer?option=SEARCH&cusID="+cusID,
+        method: "GET",
+        success: function (resp) {
+            if(resp.status===200){
+                if(cusID !== "Customer ID" ) {
+                    $('#cusName').val(`Customer Name : ${resp.data[0].cusName}`);
+                    $('#cusAddress').val(`Customer Address : ${resp.data[0].cusAddress}`);
+                    $('#cusSalary').val(`Customer Salary : ${resp.data[0].cusSalary}`);
+                }else {
+                    $('#cusName').val(`Customer Name : `);
+                    $('#cusAddress').val(`Customer Address : `);
+                    $('#cusSalary').val(`Customer Salary : `);
+                    btnSave.attr("disabled", true);
+                }
+            }else if(resp.status===400){
+                alert(resp.message);
+            }
+        },
+        error:function (resp) {
+            alert(resp);
         }
-    }
+    });
 })
 
 
 
 selectItemOp.change(function () {
     let itemCode = selectItemOp.val();
-    for (let i = 0; i < itemDetail.length; i++) {
-        if (itemDetail[i].code == itemCode) {
-            txtItemName.val(`Item Name : ${itemDetail[i].name}`);
-            txtItemPrice.val(`Item Price : ${itemDetail[i].price}`);
-            txtItemQty.val(`Item Quantity : ${itemDetail[i].quantity}`);
-        }else if(itemCode == "Item Code" ){
-            txtItemName.val(`Item Name : `);
-            txtItemPrice.val(`Item Price : `);
-            txtItemQty.val(`Item Quantity : `);
-            txtOrderQty.val("");
-            txtOrderQty.css("border", "1px solid white");
-            btnSave.attr("disabled", true);
+    $.ajax({
+        url:"http://localhost:8080/java-pos/item?option=SEARCH&code="+itemCode,
+        method: "GET",
+        success: function (resp) {
+            if(resp.status===200){
+                if(cusID !== "Item Code" ) {
+                    txtItemName.val(`Item Name : ${resp.data[0].description}`);
+                    txtItemPrice.val(`Item Price : ${resp.data[0].uPrice}`);
+                    txtItemQty.val(`Item Quantity : ${resp.data[0].quantity}`);
+                }else {
+                    txtItemName.val(`Item Name : `);
+                    txtItemPrice.val(`Item Price : `);
+                    txtItemQty.val(`Item Quantity : `);
+                    txtOrderQty.val("");
+                    txtOrderQty.css("border", "1px solid white");
+                    btnSave.attr("disabled", true);
+                }
+            }else if(resp.status===400){
+                alert(resp.message);
+            }
+        },
+        error:function (resp) {
+            alert(resp);
         }
-    }
+    });
 })
 
 
