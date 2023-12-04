@@ -50,41 +50,41 @@ public class ItemServlet extends HttpServlet {
                 sendMsg(resp, JsonValue.EMPTY_JSON_ARRAY, e.getLocalizedMessage(), 400);
             }
         }else if(option.equals("SEARCH")){
-            String code = req.getParameter("code");
+            String itemCode = req.getParameter("code");
 
             JsonArrayBuilder arrayBuilder = Json.createArrayBuilder();
             try (Connection connection = source.getConnection()) {
-                PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM customer WHERE code=?");
-                preparedStatement.setString(1,code);
+                PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM item WHERE code=?");
+                preparedStatement.setString(1,itemCode);
                 ResultSet resultSet = preparedStatement.executeQuery();
                 if (resultSet.next()) {
-                    String id = resultSet.getString(1);
-                    String name = resultSet.getString(2);
-                    String address = resultSet.getString(3);
-                    double salary = resultSet.getDouble(4);
+                    String code = resultSet.getString(1);
+                    String description = resultSet.getString(2);
+                    int qtyOnHand = resultSet.getInt(3);
+                    double uPrice = resultSet.getDouble(4);
 
                     JsonObjectBuilder builder = Json.createObjectBuilder();
-                    builder.add("cusID", id);
-                    builder.add("cusName", name);
-                    builder.add("cusAddress", address);
-                    builder.add("cusSalary", salary);
+                    builder.add("cusID", code);
+                    builder.add("cusName", description);
+                    builder.add("cusAddress", qtyOnHand);
+                    builder.add("cusSalary", uPrice);
                     arrayBuilder.add(builder.build());
 
                 }
-                sendMsg(resp, arrayBuilder.build(), "Got the Customer", 200);
+                sendMsg(resp, arrayBuilder.build(), "Got the Item", 200);
             } catch (SQLException e) {
                 sendMsg(resp, JsonValue.EMPTY_JSON_ARRAY, e.getLocalizedMessage(), 400);
             }
         }else if(option.equals("ID")){
             try (Connection connection = source.getConnection()){
-                PreparedStatement preparedStatement = connection.prepareStatement("SELECT id FROM customer");
+                PreparedStatement preparedStatement = connection.prepareStatement("SELECT code FROM item");
                 ResultSet resultSet = preparedStatement.executeQuery();
-                JsonArrayBuilder cusIDList = Json.createArrayBuilder();
+                JsonArrayBuilder itemCodeList = Json.createArrayBuilder();
 
                 while (resultSet.next()){
-                    cusIDList.add(resultSet.getString(1));
+                    itemCodeList.add(resultSet.getString(1));
                 }
-                sendMsg(resp, cusIDList.build(), "Got the list",200);
+                sendMsg(resp, itemCodeList.build(), "Got the list",200);
             } catch (SQLException e) {
                 sendMsg(resp, JsonValue.EMPTY_JSON_ARRAY, e.getLocalizedMessage(),400);
             }
