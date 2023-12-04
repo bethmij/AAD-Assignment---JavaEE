@@ -1,12 +1,13 @@
 import {item} from "../model/Item.js";
 import {customerDetail, itemDetail} from "../db/DB.js";
-import {setCusID, setItemCode} from "./OrderController.js";
+import {setItemCode} from "./OrderController.js";
 
 let itemCode = $('#txtItemCode');
 let itemName = $('#txtItemName');
-let itemPrice = $('#txtItemPrice');
 let itemQuantity = $('#txtItemQuantity');
-let btnItemSave = $('#itemSave');
+let itemPrice = $('#txtItemPrice');
+let btnItemSave = $('#btnSave');
+let itemCodeList = [];
 
 $(document).on('keydown', function(event) {
     if (event.keyCode === 9) {
@@ -14,121 +15,150 @@ $(document).on('keydown', function(event) {
     }
 });
 
+
+
 btnItemSave.click(function (event){
+    if(btnItemSave.text()==="Save ") {
 
-    if(btnItemSave.text()=="Save ") {
-        let count = 0;
-        var userChoice = window.confirm("Do you want to save the item?");
-
+        const userChoice = window.confirm("Do you want to save the item?")
         if (userChoice) {
-            for (let i = 0; i < itemDetail.length; i++) {
-                if(itemDetail[i].code!=itemCode.val()) {
-                    count++;
+            getCusIDList( function (IDList) {
+
+                if (!(IDList.includes(itemCode.val()))) {
+                    let item = $("#itemForm").serialize();
+                    $.ajax({
+                        url: "http://localhost:8080/java-pos/item",
+                        method: "POST",
+                        data: item,
+                        success: function (resp) {
+                            if (resp.status === 200) {
+                                alert(resp.message);
+                                $('#cusTBody').append(
+                                    `<tr>
+                                        <th scope="row">${itemCode.val()}</th>
+                                        <td>${itemName.val()}</td>
+                                        <td>${itemPrice.val()}</td>
+                                        <td>${itemQuantity.val()}</td>
+                                        <td style="width: 10%"><img class="delete opacity-75" src="../resources/assests/img/icons8-delete-96.png" alt="Logo" width="50%" ></td>
+                                     </tr>`
+                                );
+                                deleteDetail();
+                                setFeilds();
+                                clearAll(event);
+                                setItemCode();
+                                btnItemSave.attr("disabled", true);
+                            } else if (resp.status === 400) {
+                                alert(resp.message);
+                            }
+                        },
+                        error: function (resp) {
+                            alert(resp.message);
+                        }
+                    });
+                } else {
+                    alert("Duplicate item code!");
                 }
-            }
-            if(count==itemDetail.length){
-                let newItemDetails = Object.assign({}, item);
-                newItemDetails.code = itemCode.val();
-                newItemDetails.name = itemName.val();
-                newItemDetails.price = itemPrice.val();
-                newItemDetails.quantity = itemQuantity.val();
-
-                itemDetail.push(newItemDetails);
-
-                $('#itemBody').append(
-                    `<tr>
-                         <th scope="row">${itemCode.val()}</th>
-                            <td>${itemName.val()}</td>
-                            <td>${itemPrice.val()}</td>
-                            <td>${itemQuantity.val()}</td>
-<!--                            <td style="width: 10%"><img class="itemDelete" src="../../CSS_Framework/POS/assets/icons8-delete-96.png" alt="Logo" width="50%" className="opacity-75"></td>-->
-                        </tr>`
-                );
-                deleteDetail();
-                setFeilds();
-                clearAll(event);
-                setItemCode();
-                btnItemSave.attr("disabled", true);
-            } else {
-                alert("Duplicate item code!");
-            }
+            });
         }
-    }else if(btnItemSave.text()=="Update ") {
-        for (let i = 0; i < itemDetail.length; i++) {
 
-            if(itemDetail[i].code == $('#txtItemCode').val()){
-                itemDetail[i].name = $('#txtItemName').val();
-                itemDetail[i].price = $('#txtItemPrice').val();
-                itemDetail[i].quantity = $('#txtItemQuantity').val();
-                getAll();
-                clearAll(event);
-                btnItemSave.text("Save ");
-                btnItemSave.attr("disabled", true);
-                itemCode.attr("disabled", false);
+    }else if(btnItemSave.text()==="Update ") {
+        const userChoice = window.confirm("Do you want to update the item?");
+        if (userChoice) {
+            let item = {
+                "code": itemCode.val(),
+                "description": itemName.val(),
+                "qtyOnHand": itemQuantity.val(),
+                "uPrice": itemPrice.val()
             }
+
+            $.ajax({
+                url: "http://localhost:8080/java-pos/item",
+                method: "PUT",
+                contentType: "application/json",
+                data: JSON.stringify(item),
+                success: function (resp) {
+                    if (resp.status === 200) {
+                        alert(resp.message);
+                        getAll();
+                        clearAll(event);
+                        btnItemSave.text("Save ");
+                        btnItemSave.attr("disabled", true);
+                        itemCode.attr("disabled", false);
+                    } else if (resp.status === 200) {
+                        alert(resp.message);
+                    }
+                }
+            });
         }
     }
     event.preventDefault();
 })
 
-$('#itemClear').click(function (event){
+$('#clear').click(function (event){
     clearAll(event);
 })
 
 function clearAll(event) {
     itemCode.val("");
     itemName.val("");
-    itemPrice.val("");
     itemQuantity.val("");
-    $('#txtItemCode').css("border", "1px solid white");
+    itemPrice.val("");
+    $('#txtItemCode').css("border","1px solid white");
     $('#itemCodePara').text("");
-    $('#txtItemName').css("border", "1px solid white");
+    $('#txtItemName').css("border","1px solid white");;
     $('#itemNamePara').text("");
-    $('#txtItemPrice').css("border", "1px solid white");
-    $('#itemPricePara').text("");
-    $('#txtItemQuantity').css("border", "1px solid white");
+    $('#txtItemQuantity').css("border","1px solid white");;
     $('#itemQtyPara').text("");
+    $('#txtItemPrice').css("border","1px solid white");;
+    $('#itemPricePara').text("");
     btnItemSave.text("Save ");
     btnItemSave.attr("disabled", true);
-    itemCode.attr("disabled", false);
     event.preventDefault();
+    itemCode.attr("disabled", false);
 }
 
 
 
-$('#itemGetAll').click(function (){
+$('#getAll').click(function (){
     getAll();
 
 })
 
 function getAll() {
-    let tBody = $('#itemBody')
-    tBody.empty();
+    $.ajax({
+        url: "http://localhost:8080/java-pos/customer?option=GET",
+        method: "GET",
+        success: function (resp) {
+            if(resp.status===200){
+                $("#cusTBody").empty();
+                for (let respElement of resp.data) {
+                    $("#cusTBody").append(`<tr>
+                        <th scope="row">${respElement.cusID}</th>
+                        <td>${respElement.cusName}</td>
+                        <td>${respElement.cusAddress}</td>
+                        <td>${respElement.cusSalary}</td>
+                        <td style="width: 10%"><img  class="delete"  src="../resources/assests/img/icons8-delete-96.png" alt="Logo" width="50%" class="opacity-75"></td>
+                </tr>`);
+                    deleteDetail();
+                    setFeilds();
+                }
 
-    for (let i = 0; i < itemDetail.length; i++) {
-        tBody.append(`<tr>
-            <th scope="row">${itemDetail[i].code}</th>
-            <td>${itemDetail[i].name}</td>
-            <td>${itemDetail[i].price}</td>
-            <td>${itemDetail[i].quantity}</td>
-<!--            <td style="width: 10%"><img class="itemDelete" src="../../CSS_Framework/POS/assets/icons8-delete-96.png" alt="Logo" width="50%" className="opacity-75"></td>-->
-            </tr>`);
-        deleteDetail();
-        setFeilds();
-    }
-    ;
+            }else if (resp.status === 200){
+                alert(resp.message);
+            }
+        }
+    })
+
 }
-
-
 
 setFeilds();
 
 function setFeilds() {
-    $('#itemBody>tr').click(function () {
+    $('#cusTBody>tr').click(function () {
         itemCode.val($(this).children(':eq(0)').text());
         itemName.val($(this).children(':eq(1)').text());
-        itemPrice.val($(this).children(':eq(2)').text());
-        itemQuantity.val($(this).children(':eq(3)').text());
+        itemQuantity.val($(this).children(':eq(2)').text());
+        itemPrice.val($(this).children(':eq(3)').text());
         btnItemSave.text("Update ");
         btnItemSave.attr("disabled", false);
         itemCode.attr("disabled", true);
@@ -138,7 +168,7 @@ function setFeilds() {
 deleteDetail();
 
 function deleteDetail() {
-    let btnDelete = $('.itemDelete');
+    let btnDelete = $('.delete');
     btnDelete.on("mouseover", function (){
         $(this).css("cursor", "pointer");}
     )
@@ -148,46 +178,80 @@ function deleteDetail() {
 
         if (userChoice) {
             $(this).parents('tr').remove();
-            let tableCode = $(this).parents('tr').children(':nth-child(1)');
+            let code = $( $(this).parents('tr').children(':nth-child(1)')).text();
 
-            for (let i = 0; i < itemDetail.length; i++) {
-                if($(tableCode[0]).text() == itemDetail[i].code){
-                    itemDetail.splice(i,1);
-                    console.log(itemDetail);
+            $.ajax({
+                url: "http://localhost:8080/java-pos/item?code="+code,
+                method: "DELETE",
+                success: function (resp){
+                    if(resp.status===200){
+                        alert(resp.message);
+                    }else if(resp.status===400){
+                        alert(resp.message);
+                    }
+                },
+                error: function (resp) {
+
                 }
-            }
+            });
             setItemCode();
         }
     })
 }
 
-$('#itemSearch').click(function (){
+$('#btnSearch').click(function (){
 
-    let code = $('#txtItemSearch').val();
-    let tbody = $('#itemBody');
+    let id = $('#txtSearch').val();
+    let tbody = $('#cusTBody');
     let count = 0;
+    if(id.length!==0) {
+        getCusIDList(function (IDList) {
+            if (IDList.includes(id)) {
+                $.ajax({
+                    url: "http://localhost:8080/java-pos/customer?option=SEARCH&cusID=" + id,
+                    method: "GET",
+                    success: function (resp) {
+                        if (resp.status === 200) {
+                            tbody.empty();
+                            tbody.append(`<tr>
+                    <th scope="row">${resp.data[0].cusID}</th>
+                        <td>${resp.data[0].cusName}</td>
+                        <td>${resp.data[0].cusAddress}</td>
+                        <td>${resp.data[0].cusSalary}</td>
+                        <td style="width: 10%"><img class="delete" src="../resources/assests/img/icons8-delete-96.png" alt="Logo" width="50%" class="opacity-75"></td>
+                   </tr>`);
+                            deleteDetail();
+                            setFeilds();
+                        } else if (resp.status === 400) {
+                            alert(resp.message);
+                        }
+                    },
+                    error: function () {
 
-    if(code.length!=0) {
-        for (let i = 0; i < itemDetail.length; i++) {
-            if (itemDetail[i].code == code) {
-                count++;
-                tbody.empty();
-
-                tbody.append(`<tr>
-                <th scope="row">${itemDetail[i].code}</th>
-                <td>${itemDetail[i].name}</td>
-                <td>${itemDetail[i].price}</td>
-                <td>${itemDetail[i].quantity}</td>
-<!--                <td style="width: 10%"><img class="itemDelete" src="../../CSS_Framework/POS/assets/icons8-delete-96.png" alt="Logo" width="50%" className="opacity-75"></td>-->
-                </tr>`);
-                deleteDetail();
-                setFeilds();
+                    }
+                });
+            } else {
+                alert("No such Customer..please check the ID");
             }
-        }
-        if (count != 1) {
-            alert("No such Item..please check the code");
-        }
+        });
     }else {
-        alert("Please enter the code");
+        alert("Please enter the ID");
     }
-})
+});
+
+function getCusIDList(callback) {
+    $.ajax({
+        url: "http://localhost:8080/java-pos/customer?option=ID",
+        method: "GET",
+        success: function (resp) {
+            for (let respElement of resp.data) {
+                cusIdList.push(respElement);
+            }
+            callback(cusIdList);
+        },
+        error:function (resp){
+            alert(resp);
+        }
+    });
+}
+

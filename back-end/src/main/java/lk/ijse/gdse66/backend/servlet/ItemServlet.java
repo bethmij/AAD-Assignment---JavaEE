@@ -126,24 +126,24 @@ public class ItemServlet extends HttpServlet {
         resp.setContentType("application/json");
         JsonReader reader = Json.createReader(req.getReader());
         JsonObject jsonObject = reader.readObject();
-        String cusID = jsonObject.getString("cusID");
-        String cusName = jsonObject.getString("cusName");
-        String cusAddress = jsonObject.getString("cusAddress");
-        String cusSalary = jsonObject.getString("cusSalary");
+        String code = jsonObject.getString("code");
+        String description = jsonObject.getString("description");
+        String qtyOnHand = jsonObject.getString("qtyOnHand");
+        String uPrice = jsonObject.getString("uPrice");
 
         try (Connection connection = source.getConnection()){
             PreparedStatement pst = connection.prepareStatement(
-                    "UPDATE customer SET name=?, address=?, salary=? WHERE id=?");
-            pst.setString(1,cusName);
-            pst.setString(2,cusAddress);
-            pst.setString(3,cusSalary);
-            pst.setString(4,cusID);
+                    "UPDATE item SET description=?, qtyOnHand=?, unitPrice=? WHERE code=?");
+            pst.setString(1,code);
+            pst.setString(2,description);
+            pst.setString(3,qtyOnHand);
+            pst.setString(4,uPrice);
 
             boolean is_updated = pst.executeUpdate() > 0;
             if(is_updated)
-                sendMsg(resp,JsonValue.EMPTY_JSON_ARRAY,"Customer Updated Successfully", 200);
+                sendMsg(resp,JsonValue.EMPTY_JSON_ARRAY,"Item Updated Successfully", 200);
             else
-                sendMsg(resp,JsonValue.EMPTY_JSON_ARRAY,"Customer Update Failed", 400);
+                sendMsg(resp,JsonValue.EMPTY_JSON_ARRAY,"Item Update Failed", 400);
         } catch (SQLException e) {
             sendMsg(resp,JsonValue.EMPTY_JSON_ARRAY, e.getLocalizedMessage(), 400);
         }
