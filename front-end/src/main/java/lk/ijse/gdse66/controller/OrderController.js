@@ -25,6 +25,7 @@ setCusID();
 setOrderID();
 setItemCode();
 
+
 export function setCusID() {
     selectCusOp.empty();
     selectCusOp.append(`<option class="text-white">Customer ID</option>`);
@@ -49,14 +50,16 @@ export function setItemCode() {
 
 function setOrderID() {
     let orderID = $('#orderID');
-    if(orders.length===0){
-        orderID.val(`Order ID : OR00-1`);
-    }else{
-        let id = orders[orders.length-1].oid;
-        let num = id.split("OR00-");
-        let nextID = parseInt(num[1])+1;
-        orderID.val(`Order ID : OR00-${nextID}`);
-    }
+    getOrderIDList(function (orderList) {
+        orderList.sort((a, b) => b - a);
+        if(orderList.length===0){
+            orderID.val(`Order ID : OR00-1`);
+        }else {
+            let id = orderList[0];
+            let num = id.split("OR00-");
+            orderID.val(`Order ID : OR00-${parseInt(num[1])+1}`);
+        }
+    });
 }
 
 selectCusOp.change(function () {
@@ -400,5 +403,30 @@ $('#orderSearch').click(function (){
 
         }
 })
+
+function getOrderIDList(callback) {
+    let orderList = []
+    $.ajax({
+        url: "http://localhost:8080/java-pos/order?option=ID",
+        method: "GET",
+        success: function (resp) {
+            if (resp.status === 200) {
+                if(resp.data.length !== 0) {
+                    for (const respElement of resp.data) {
+                        orderList.push(respElement);
+                        callback(orderList);
+                    }
+                }else {
+                    callback(orderList);
+                }
+            }else if(resp.status === 400){
+                alert(resp.message);
+            }
+        },
+        error: function (resp) {
+            alert(resp);
+        }
+    })
+}
 
 
