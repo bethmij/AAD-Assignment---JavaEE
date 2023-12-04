@@ -1,11 +1,9 @@
-import {customer} from "../model/Customer.js";
-import {customerDetail, itemDetail} from "../db/DB.js";
 import {setCusID} from "./OrderController.js";
 
-let cusId = $('#txtCusID');
-let cusName = $('#txtCusName');
-let cusAddress = $('#txtCusAddress');
-let cusSalary = $('#txtCusSalary');
+let cusId = $("#txtCusID");
+let cusName = $("#txtCusName");
+let cusAddress = $("#txtCusAddress");
+let cusSalary = $("#txtCusSalary");
 let btnCustomerSave = $('#btnSave');
 let cusIdList = [];
 
@@ -15,7 +13,7 @@ $(document).on('keydown', function(event) {
     }
 });
 
-
+getAll();
 
 btnCustomerSave.click(function (event){
     if(btnCustomerSave.text()==="Save ") {
@@ -105,11 +103,11 @@ function clearAll(event) {
     cusSalary.val("");
     $('#txtCusID').css("border","1px solid white");
     $('#cusIDPara').text("");
-    $('#txtCusName').css("border","1px solid white");;
+    $('#txtCusName').css("border","1px solid white");
     $('#cusNamePara').text("");
-    $('#txtCusAddress').css("border","1px solid white");;
+    $('#txtCusAddress').css("border","1px solid white");
     $('#cusAddressPara').text("");
-    $('#txtCusSalary').css("border","1px solid white");;
+    $('#txtCusSalary').css("border","1px solid white");
     $('#cusSalaryPara').text("");
     btnCustomerSave.text("Save ");
     btnCustomerSave.attr("disabled", true);
@@ -130,9 +128,10 @@ function getAll() {
         method: "GET",
         success: function (resp) {
             if(resp.status===200){
-                $("#cusTBody").empty();
+                let cusBody = $("#cusTBody");
+                cusBody.empty();
                 for (let respElement of resp.data) {
-                    $("#cusTBody").append(`<tr>
+                    cusBody.append(`<tr>
                         <th scope="row">${respElement.cusID}</th>
                         <td>${respElement.cusName}</td>
                         <td>${respElement.cusAddress}</td>
@@ -203,7 +202,7 @@ $('#btnSearch').click(function (){
 
     let id = $('#txtSearch').val();
     let tbody = $('#cusTBody');
-    let count = 0;
+
     if(id.length!==0) {
         getCusIDList(function (IDList) {
             if (IDList.includes(id)) {
@@ -212,6 +211,7 @@ $('#btnSearch').click(function (){
                     method: "GET",
                     success: function (resp) {
                         if (resp.status === 200) {
+
                             tbody.empty();
                             tbody.append(`<tr>
                     <th scope="row">${resp.data[0].cusID}</th>
@@ -239,7 +239,7 @@ $('#btnSearch').click(function (){
     }
 });
 
-function getCusIDList(callback) {
+export function getCusIDList(callback) {
     $.ajax({
         url: "http://localhost:8080/java-pos/customer?option=ID",
         method: "GET",

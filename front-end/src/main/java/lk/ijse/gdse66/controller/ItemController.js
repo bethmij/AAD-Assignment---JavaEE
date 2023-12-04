@@ -1,11 +1,9 @@
-import {item} from "../model/Item.js";
-import {customerDetail, itemDetail} from "../db/DB.js";
 import {setItemCode} from "./OrderController.js";
 
-let itemCode = $('#txtItemCode');
-let itemName = $('#txtItemName');
-let itemQuantity = $('#txtItemQuantity');
-let itemPrice = $('#txtItemPrice');
+let itemCode = $("#txtItemCode");
+let itemName = $("#txtItemName");
+let itemQuantity = $("#txtItemQuantity");
+let itemPrice = $("#txtItemPrice");
 let btnItemSave = $('#itemSave');
 let itemCodeList = [];
 
@@ -15,14 +13,15 @@ $(document).on('keydown', function(event) {
     }
 });
 
-
+getAll();
 
 btnItemSave.click(function (event){
+
     if(btnItemSave.text()==="Save ") {
 
         const userChoice = window.confirm("Do you want to save the item?")
         if (userChoice) {
-            getCusIDList( function (IDList) {
+            getItemCodeList( function (IDList) {
 
                 if (!(IDList.includes(itemCode.val()))) {
                     let item = $("#itemForm").serialize();
@@ -33,7 +32,7 @@ btnItemSave.click(function (event){
                         success: function (resp) {
                             if (resp.status === 200) {
                                 alert(resp.message);
-                                $('#cusTBody').append(
+                                $('#itemBody').append(
                                     `<tr>
                                         <th scope="row">${itemCode.val()}</th>
                                         <td>${itemName.val()}</td>
@@ -105,11 +104,11 @@ function clearAll(event) {
     itemPrice.val("");
     $('#txtItemCode').css("border","1px solid white");
     $('#itemCodePara').text("");
-    $('#txtItemName').css("border","1px solid white");;
+    $('#txtItemName').css("border","1px solid white");
     $('#itemNamePara').text("");
-    $('#txtItemQuantity').css("border","1px solid white");;
+    $('#txtItemQuantity').css("border","1px solid white");
     $('#itemQtyPara').text("");
-    $('#txtItemPrice').css("border","1px solid white");;
+    $('#txtItemPrice').css("border","1px solid white");
     $('#itemPricePara').text("");
     btnItemSave.text("Save ");
     btnItemSave.attr("disabled", true);
@@ -126,17 +125,18 @@ $('#itemGetAll').click(function (){
 
 function getAll() {
     $.ajax({
-        url: "http://localhost:8080/java-pos/customer?option=GET",
+        url: "http://localhost:8080/java-pos/item?option=GET",
         method: "GET",
         success: function (resp) {
             if(resp.status===200){
-                $("#cusTBody").empty();
+                let itemBody = $("#itemBody");
+                itemBody.empty();
                 for (let respElement of resp.data) {
-                    $("#cusTBody").append(`<tr>
-                        <th scope="row">${respElement.cusID}</th>
-                        <td>${respElement.cusName}</td>
-                        <td>${respElement.cusAddress}</td>
-                        <td>${respElement.cusSalary}</td>
+                    itemBody.append(`<tr>
+                        <th scope="row">${respElement.code}</th>
+                        <td>${respElement.description}</td>
+                        <td>${respElement.qtyOnHand}</td>
+                        <td>${respElement.uPrice}</td>
                         <td style="width: 10%"><img  class="delete"  src="../resources/assests/img/icons8-delete-96.png" alt="Logo" width="50%" class="opacity-75"></td>
                 </tr>`);
                     deleteDetail();
@@ -154,7 +154,7 @@ function getAll() {
 setFeilds();
 
 function setFeilds() {
-    $('#cusTBody>tr').click(function () {
+    $('#itemBody>tr').click(function () {
         itemCode.val($(this).children(':eq(0)').text());
         itemName.val($(this).children(':eq(1)').text());
         itemQuantity.val($(this).children(':eq(2)').text());
@@ -205,9 +205,9 @@ $('#itemSearch').click(function (){
 
     if(code.length!==0) {
         getItemCodeList(function (IDList) {
-            if (IDList.includes(id)) {
+            if (IDList.includes(code)) {
                 $.ajax({
-                    url: "http://localhost:8080/java-pos/item?option=SEARCH&code=" + code,
+                    url: "http://localhost:8080/java-pos/item?option=SEARCH&code="+code,
                     method: "GET",
                     success: function (resp) {
                         if (resp.status === 200) {
@@ -238,7 +238,7 @@ $('#itemSearch').click(function (){
     }
 });
 
-function getItemCodeList(callback) {
+export function getItemCodeList(callback) {
     $.ajax({
         url: "http://localhost:8080/java-pos/item?option=ID",
         method: "GET",

@@ -1,8 +1,9 @@
-import {customer} from "../model/Customer.js";
 import {order} from "../model/Order.js";
 import {orderDetails} from "../model/OrderDetail.js";
 import {customerDetail, itemDetail, orders, orderDetail} from "../db/DB.js";
-import {item} from "../model/Item.js";
+import {getCusIDList} from "./CustomerController.js";
+import {getItemCodeList} from "./ItemController.js";
+
 let selectCusOp = $('#cusID');
 let selectItemOp = $('#itemCode');
 let btnSave = $('#btnAddCart');
@@ -10,12 +11,12 @@ let txtItemName = $('#itemName');
 let txtItemPrice = $('#itemPrice');
 let txtItemQty = $('#itemQuantity');
 let txtOrderQty = $('#orderQuantity');
-let totalTxt = $('#total-text').text().split("Total : ");
-let subTotalTxt = $('#subTotal-text');
+let totalTxt = $("#total-text").text().split("Total : ");
+let subTotalTxt = $("#subTotal-text");
 let total = totalTxt[1].split(".");
 let total1 = parseInt(total[0]);
-let cash = $('#cash');
-let discount = $('#discount');
+let cash = $("#cash");
+let discount = $("#discount");
 let btnOrder = $('#btnPlaceOrder');
 let tbRow, tblQty, tblPrice, currOID, orderID;
 
@@ -24,17 +25,26 @@ setCusID();
 setOrderID();
 setItemCode();
 
-// for (let i = 0; i < customerDetail.length; i++) {
-//     console.log(customerDetail[i].id);
-// }
-
 export function setCusID() {
     selectCusOp.empty();
     selectCusOp.append(`<option class="text-white">Customer ID</option>`);
 
-    for (let i = 0; i < customerDetail.length; i++) {
-        selectCusOp.append(`<option class="text-white">${customerDetail[i].id}</option>`);
-    }
+    getCusIDList(function (IDList) {
+        for (const id of IDList) {
+            selectCusOp.append(`<option class="text-white">${id}</option>`);
+        }
+    });
+}
+
+export function setItemCode() {
+    selectItemOp.empty();
+    selectItemOp.append(`<option class="text-white">Item Code</option>`);
+
+    getItemCodeList(function (IDList) {
+        for (const id of IDList) {
+            selectItemOp.append(`<option class="text-white">${id}</option>`);
+        }
+    });
 }
 
 function setOrderID() {
@@ -65,14 +75,7 @@ selectCusOp.change(function () {
     }
 })
 
-export function setItemCode() {
-    selectItemOp.empty();
-    selectItemOp.append(`<option class="text-white">Item Code</option>`);
 
-    for (let i = 0; i < itemDetail.length; i++) {
-        selectItemOp.append(`<option class="text-white">${itemDetail[i].code}</option>`);
-    }
-}
 
 selectItemOp.change(function () {
     let itemCode = selectItemOp.val();

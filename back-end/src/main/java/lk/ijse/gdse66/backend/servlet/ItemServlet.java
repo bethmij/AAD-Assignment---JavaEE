@@ -100,7 +100,6 @@ public class ItemServlet extends HttpServlet {
         String uPrice = req.getParameter("uPrice");
 
 
-
         try (Connection connection = source.getConnection()) {
             PreparedStatement pst = connection.prepareStatement(
                     "INSERT INTO company.item (code, description, qtyOnHand, unitPrice) VALUES (?,?,?,?)");
@@ -130,14 +129,15 @@ public class ItemServlet extends HttpServlet {
         String description = jsonObject.getString("description");
         String qtyOnHand = jsonObject.getString("qtyOnHand");
         String uPrice = jsonObject.getString("uPrice");
+//        System.out.println(code+" "+description+" "+qtyOnHand+" "+uPrice );
 
         try (Connection connection = source.getConnection()){
             PreparedStatement pst = connection.prepareStatement(
                     "UPDATE item SET description=?, qtyOnHand=?, unitPrice=? WHERE code=?");
-            pst.setString(1,code);
-            pst.setString(2,description);
-            pst.setString(3,qtyOnHand);
-            pst.setString(4,uPrice);
+            pst.setString(1,description);
+            pst.setString(2,qtyOnHand);
+            pst.setString(3,uPrice);
+            pst.setString(4,code);
 
             boolean is_updated = pst.executeUpdate() > 0;
             if(is_updated)
