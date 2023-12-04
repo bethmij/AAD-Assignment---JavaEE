@@ -1,4 +1,5 @@
 import {setItemCode} from "./OrderController.js";
+import {item} from "../model/Item.js";
 
 let itemCode = $("#txtItemCode");
 let itemName = $("#txtItemName");
@@ -63,18 +64,17 @@ btnItemSave.click(function (event){
     }else if(btnItemSave.text()==="Update ") {
         const userChoice = window.confirm("Do you want to update the item?");
         if (userChoice) {
-            let item = {
-                "code": itemCode.val(),
-                "description": itemName.val(),
-                "qtyOnHand": itemQuantity.val(),
-                "uPrice": itemPrice.val()
-            }
+            let newItem = Object.assign({}, item);
+            newItem.code = itemCode.val();
+            newItem.description = itemName.val();
+            newItem.uPrice = itemPrice.val();
+            newItem.qtyOnHand = itemQuantity.val();
 
             $.ajax({
                 url: "http://localhost:8080/java-pos/item",
                 method: "PUT",
                 contentType: "application/json",
-                data: JSON.stringify(item),
+                data: JSON.stringify(newItem),
                 success: function (resp) {
                     if (resp.status === 200) {
                         alert(resp.message);

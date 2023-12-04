@@ -98,10 +98,10 @@ selectItemOp.change(function () {
         method: "GET",
         success: function (resp) {
             if(resp.status===200){
-                if(cusID !== "Item Code" ) {
+                if(itemCode !== "Item Code" ) {
                     txtItemName.val(`Item Name : ${resp.data[0].description}`);
                     txtItemPrice.val(`Item Price : ${resp.data[0].uPrice}`);
-                    txtItemQty.val(`Item Quantity : ${resp.data[0].quantity}`);
+                    txtItemQty.val(`Item Quantity : ${resp.data[0].qtyOnHand}`);
                 }else {
                     txtItemName.val(`Item Name : `);
                     txtItemPrice.val(`Item Price : `);
@@ -127,29 +127,24 @@ btnSave.click(function (event){
     let itemPrice = txtItemPrice.val().split("Item Price : ");
     if(btnSave.text().includes("Add to Cart")) {
         let itemQty = txtItemQty.val().split("Item Quantity : ");
-        let tableCode = $('#orderTbody').children('tr').children(':first-child').text();
 
         if (parseInt(itemQty[1]) >= parseInt(txtOrderQty.val())) {
-            // if (tableCode.indexOf(selectItemOp.val()) == -1) {
                 $('#orderTbody').append(
                     `<tr>
                         <th scope="row">${selectItemOp.val()}</th>
                         <td>${itemName[1]}</td>
                         <td>${itemPrice[1]}</td>
                         <td>${txtOrderQty.val()}</td>
-<!--                        <td style="width: 10%"><img class="orderDelete" src="../../CSS_Framework/POS/assets/icons8-delete-96.png" alt="Logo" width="50%" className="opacity-75"></td>-->
+                        <td style="width: 10%"><img class="orderDelete" src="../resources/assests/img/icons8-delete-96.png" alt="Logo" width="50%" class="opacity-75"></td>
                     </tr>`
                 );
                 setFeilds();
                 deleteDetail();
                 calcTotal(itemPrice[1], txtOrderQty.val());
-            // } else {
-            //     alert("duplicate item!");
-            // }
         } else {
             alert("Stock unavailable!");
         }
-    }else if(btnSave.text()=="Update "){
+    }else if(btnSave.text()==="Update "){
         tbRow.children(':eq(1)').text(itemName[1]);
         tbRow.children(':eq(2)').text(itemPrice[1]);
         tbRow.children(':eq(3)').text(txtOrderQty.val());
@@ -173,7 +168,7 @@ function deleteDetail() {
     )
 
     btnDelete.click(function () {
-        var userChoice = window.confirm("Do you want to delete the item?");
+        const userChoice = window.confirm("Do you want to delete the item?");
 
         if (userChoice) {
             $(this).parents('tr').remove();
@@ -181,7 +176,7 @@ function deleteDetail() {
             let tableQty = $(this).parents('tr').children(':nth-child(4)').text();
             total1 -= (tablePrice*tableQty);
             $('#total-text').text(`Total : ${total1.toFixed(2)}`);
-            $('#subTotal-text').text(`Sub Total : ${total1.toFixed(2)}`);
+            subTotalTxt.text(`Sub Total : ${total1.toFixed(2)}`);
         }
     })
 }
@@ -190,7 +185,7 @@ function calcTotal(price, qty) {
     let tot = price*qty;
     total1 += tot;
     $('#total-text').text(`Total : ${total1.toFixed(2)}`);
-    $('#subTotal-text').text(`Sub Total : ${total1.toFixed(2)}`);
+    subTotalTxt.text(`Sub Total : ${total1.toFixed(2)}`);
 }
 
 cash.change(function (){
@@ -200,37 +195,41 @@ cash.change(function (){
 
 cash.keyup(function (){
     let balance = (parseInt( cash.val()) - total1).toFixed(2);
-    $('#balance').val(`Balance : ${balance}`);
-    if(cash.val()==""){
+    $("#balance").val(`Balance : ${balance}`);
+    if(cash.val()===""){
         $('#balance').val(`Balance : 0.00`);
     }
 })
 
 discount.change(function (){
     let dis = total1 - ((total1*parseInt(discount.val()))/100).toFixed(2);
-    $('#subTotal-text').text(`Sub Total : ${dis}`);
+    subTotalTxt.text(`Sub Total : ${dis}`);
 })
 
 discount.keyup(function (){
     let dis = total1 - ((total1*parseInt(discount.val()))/100).toFixed(2);
-    $('#subTotal-text').text(`Sub Total : ${dis}`);
-    if(discount.val()==""){
-        $('#subTotal-text').text(`Sub Total : 0.00`);
+    subTotalTxt.text(`Sub Total : ${dis}`);
+    if(discount.val()===""){
+        subTotalTxt.text(`Sub Total : 0.00`);
     }
 })
-
+// let orderDetailArray = []
+// let order = []
 function setOrderArray(orderID, newOrderDetailArray, oID, currDate) {
-    let tableCode = $('#orderTbody').children('tr').children(':nth-child(1)');
-    let tablePrice = $('#orderTbody').children('tr').children(':nth-child(3)');
-    let tableQty = $('#orderTbody').children('tr').children(':nth-child(4)');
+
+    let tableCode = $("#orderTbody").children('tr').children(':nth-child(1)');
+    let tablePrice = $("#orderTbody").children('tr').children(':nth-child(3)');
+    let tableQty = $("#orderTbody").children('tr').children(':nth-child(4)');
 
     for (let i = 1; i < tableCode.length; i++) {
         let newOrderDetails = Object.assign({}, orderDetails);
+        // let orderDetail = { oid:orderID, code:$(tableCode[i]).text(),
+        //     unitPrice:parseInt($(tablePrice[i]).text()), qty:parseInt($(tableQty[i]).text())}
         newOrderDetails.oid = orderID;
         newOrderDetails.code = $(tableCode[i]).text();
         newOrderDetails.unitPrice = parseInt($(tablePrice[i]).text());
         newOrderDetails.qty = parseInt($(tableQty[i]).text());
-
+        // orderDetailArray.push(orderDetail);
         newOrderDetailArray.push(newOrderDetails);
     }
 
@@ -245,7 +244,7 @@ function setOrderArray(orderID, newOrderDetailArray, oID, currDate) {
 
 btnOrder.click(function (event){
     let tableCode = $('#orderTbody').children('tr').children(':nth-child(1)');
-    if($(tableCode[1]).text()!=0) {
+    if($(tableCode[1]).text()!==0) {
         var userChoice = window.confirm("Do you want to continue?");
 
         if (userChoice) {

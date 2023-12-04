@@ -1,14 +1,8 @@
 export var item = {
     code : '',
-    name: '',
-    price : '',
-    quantity : '',
+    description: '',
+    uPrice : '',
+    qtyOnHand : '',
 
-    addValue(code, name, price, quantity) {
-        this.code += code;
-        this.name += name;
-        this.price += price;
-        this.quantity += quantity;
-    }
 }
 

@@ -1,4 +1,5 @@
 import {setCusID} from "./OrderController.js";
+import {customer} from "../model/Customer.js";
 
 let cusId = $("#txtCusID");
 let cusName = $("#txtCusName");
@@ -62,18 +63,17 @@ btnCustomerSave.click(function (event){
     }else if(btnCustomerSave.text()==="Update ") {
         const userChoice = window.confirm("Do you want to save the customer?");
         if (userChoice) {
-            let customer = {
-                "cusID": cusId.val(),
-                "cusName": cusName.val(),
-                "cusAddress": cusAddress.val(),
-                "cusSalary": cusSalary.val()
-            }
+            let newCustomer = Object.assign({}, customer);
+            newCustomer.cusID = cusId.val();
+            newCustomer.cusName = cusName.val();
+            newCustomer.cusAddress = cusAddress.val();
+            newCustomer.cusSalary = cusSalary.val();
 
             $.ajax({
                 url: "http://localhost:8080/java-pos/customer",
                 method: "PUT",
                 contentType: "application/json",
-                data: JSON.stringify(customer),
+                data: JSON.stringify(newCustomer),
                 success: function (resp) {
                     if (resp.status === 200) {
                         alert(resp.message);
