@@ -38,10 +38,10 @@ public class ItemServlet extends HttpServlet {
                     double uPrice = resultSet.getDouble(4);
 
                     JsonObjectBuilder builder = Json.createObjectBuilder();
-                    builder.add("cusID", code);
-                    builder.add("cusName", description);
-                    builder.add("cusAddress", qtyOnHand);
-                    builder.add("cusSalary", uPrice);
+                    builder.add("code", code);
+                    builder.add("description", description);
+                    builder.add("qtyOnHand", qtyOnHand);
+                    builder.add("uPrice", uPrice);
                     arrayBuilder.add(builder.build());
 
                 }
@@ -64,10 +64,10 @@ public class ItemServlet extends HttpServlet {
                     double uPrice = resultSet.getDouble(4);
 
                     JsonObjectBuilder builder = Json.createObjectBuilder();
-                    builder.add("cusID", code);
-                    builder.add("cusName", description);
-                    builder.add("cusAddress", qtyOnHand);
-                    builder.add("cusSalary", uPrice);
+                    builder.add("code", code);
+                    builder.add("description", description);
+                    builder.add("qtyOnHand", qtyOnHand);
+                    builder.add("uPrice", uPrice);
                     arrayBuilder.add(builder.build());
 
                 }
@@ -152,17 +152,17 @@ public class ItemServlet extends HttpServlet {
     @Override
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         resp.setContentType("application/json");
-        String cusID = req.getParameter("cusID");
+        String code = req.getParameter("code");
         try (Connection connection = source.getConnection()){
             PreparedStatement pst = connection.prepareStatement(
-                    "DELETE FROM customer WHERE id=?"
+                    "DELETE FROM item WHERE code=?"
             );
-            pst.setString(1,cusID);
+            pst.setString(1,code);
             boolean isDeleted = pst.executeUpdate() > 0;
             if(isDeleted){
-                sendMsg(resp, JsonValue.EMPTY_JSON_ARRAY, "Customer Deleted Successfully", 200);
+                sendMsg(resp, JsonValue.EMPTY_JSON_ARRAY, "Item Deleted Successfully", 200);
             }else {
-                sendMsg(resp, JsonValue.EMPTY_JSON_ARRAY, "Customer Delete Failed", 400);
+                sendMsg(resp, JsonValue.EMPTY_JSON_ARRAY, "Item Delete Failed", 400);
             }
         } catch (SQLException e) {
             sendMsg(resp, JsonValue.EMPTY_JSON_ARRAY, e.getLocalizedMessage(), 400);

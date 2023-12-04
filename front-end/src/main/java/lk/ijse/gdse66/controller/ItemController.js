@@ -6,7 +6,7 @@ let itemCode = $('#txtItemCode');
 let itemName = $('#txtItemName');
 let itemQuantity = $('#txtItemQuantity');
 let itemPrice = $('#txtItemPrice');
-let btnItemSave = $('#btnSave');
+let btnItemSave = $('#itemSave');
 let itemCodeList = [];
 
 $(document).on('keydown', function(event) {
@@ -94,7 +94,7 @@ btnItemSave.click(function (event){
     event.preventDefault();
 })
 
-$('#clear').click(function (event){
+$('#itemClear').click(function (event){
     clearAll(event);
 })
 
@@ -119,7 +119,7 @@ function clearAll(event) {
 
 
 
-$('#getAll').click(function (){
+$('#itemGetAll').click(function (){
     getAll();
 
 })
@@ -199,25 +199,24 @@ function deleteDetail() {
     })
 }
 
-$('#btnSearch').click(function (){
+$('#itemSearch').click(function (){
+    let code = $('#txtItemSearch').val();
+    let tbody = $('#itemBody');
 
-    let id = $('#txtSearch').val();
-    let tbody = $('#cusTBody');
-    let count = 0;
-    if(id.length!==0) {
-        getCusIDList(function (IDList) {
+    if(code.length!==0) {
+        getItemCodeList(function (IDList) {
             if (IDList.includes(id)) {
                 $.ajax({
-                    url: "http://localhost:8080/java-pos/customer?option=SEARCH&cusID=" + id,
+                    url: "http://localhost:8080/java-pos/item?option=SEARCH&code=" + code,
                     method: "GET",
                     success: function (resp) {
                         if (resp.status === 200) {
                             tbody.empty();
                             tbody.append(`<tr>
-                    <th scope="row">${resp.data[0].cusID}</th>
-                        <td>${resp.data[0].cusName}</td>
-                        <td>${resp.data[0].cusAddress}</td>
-                        <td>${resp.data[0].cusSalary}</td>
+                    <th scope="row">${resp.data[0].code}</th>
+                        <td>${resp.data[0].description}</td>
+                        <td>${resp.data[0].qtyOnHand}</td>
+                        <td>${resp.data[0].uPrice}</td>
                         <td style="width: 10%"><img class="delete" src="../resources/assests/img/icons8-delete-96.png" alt="Logo" width="50%" class="opacity-75"></td>
                    </tr>`);
                             deleteDetail();
@@ -231,23 +230,23 @@ $('#btnSearch').click(function (){
                     }
                 });
             } else {
-                alert("No such Customer..please check the ID");
+                alert("No such Item..please check the Code");
             }
         });
     }else {
-        alert("Please enter the ID");
+        alert("Please enter the Code");
     }
 });
 
-function getCusIDList(callback) {
+function getItemCodeList(callback) {
     $.ajax({
-        url: "http://localhost:8080/java-pos/customer?option=ID",
+        url: "http://localhost:8080/java-pos/item?option=ID",
         method: "GET",
         success: function (resp) {
             for (let respElement of resp.data) {
-                cusIdList.push(respElement);
+                itemCodeList.push(respElement);
             }
-            callback(cusIdList);
+            callback(itemCodeList);
         },
         error:function (resp){
             alert(resp);
