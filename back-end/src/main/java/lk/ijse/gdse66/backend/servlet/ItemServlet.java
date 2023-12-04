@@ -94,26 +94,26 @@ public class ItemServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         resp.setContentType("application/json");
-        String id = req.getParameter("cusID");
-        String name = req.getParameter("cusName");
-        String address = req.getParameter("cusAddress");
-        String salary = req.getParameter("cusSalary");
+        String code = req.getParameter("code");
+        String description = req.getParameter("description");
+        String qtyOnHand = req.getParameter("qtyOnHand");
+        String uPrice = req.getParameter("uPrice");
 
 
 
         try (Connection connection = source.getConnection()) {
             PreparedStatement pst = connection.prepareStatement(
-                    "INSERT INTO company.customer (id, name, address, salary) VALUES (?,?,?,?)");
-            pst.setString(1,id);
-            pst.setString(2,name);
-            pst.setString(3,address);
-            pst.setString(4,salary);
+                    "INSERT INTO company.item (code, description, qtyOnHand, unitPrice) VALUES (?,?,?,?)");
+            pst.setString(1,code);
+            pst.setString(2,description);
+            pst.setString(3,qtyOnHand);
+            pst.setString(4,uPrice);
             boolean isAdded = pst.executeUpdate() > 0;
 
             if(isAdded){
-                sendMsg(resp, JsonValue.EMPTY_JSON_ARRAY, "Customer Added Successfully", 200);
+                sendMsg(resp, JsonValue.EMPTY_JSON_ARRAY, "Item Added Successfully", 200);
             }else {
-                sendMsg(resp, JsonValue.EMPTY_JSON_ARRAY, "Customer Addition Failed", 400);
+                sendMsg(resp, JsonValue.EMPTY_JSON_ARRAY, "item Addition Failed", 400);
             }
         } catch (SQLException e) {
             sendMsg(resp, JsonValue.EMPTY_JSON_ARRAY, e.getLocalizedMessage(), 400);
