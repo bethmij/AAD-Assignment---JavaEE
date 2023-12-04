@@ -10,10 +10,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
+import java.time.LocalDate;
 
 @WebServlet (urlPatterns = "/order")
 public class PlaceOrderServlet extends HttpServlet {
@@ -44,13 +42,137 @@ public class PlaceOrderServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        super.doPost(req, resp);
+        resp.setContentType("application/json");
+        JsonObject jsonObject = Json.createReader(req.getReader()).readObject();
+        String oid = jsonObject.getString("oid");
+        String date = jsonObject.getString("date");
+        String customerID = jsonObject.getString("customerID");
+        JsonArray orderDetailsList = jsonObject.getJsonArray("orderDetails");
+//        System.out.println(oid+" "+date+" "+customerID+" "+orderDetailsList);
+
+        Connection connection = null;
+        try {
+            connection = source.getConnection();
+            connection.setAutoCommit(false);
+
+            PreparedStatement preparedStatement = connection.prepareStatement(
+                    "INSERT INTO orders (oid, date, customerID) VALUES (?,?,?)");
+            preparedStatement.setString(1, oid);
+            preparedStatement.setDate(2, Date.valueOf(date));
+            preparedStatement.setString(3, customerID);
+            boolean isOrderAdded = preparedStatement.executeUpdate() > 0;
+
+            boolean isOrderDetailsAdded = false;
+            if (isOrderAdded) {
+
+                for (JsonValue jsonValue : orderDetailsList) {
+                    JsonObject orderDetails = jsonValue.asJsonObject();
+                    String oid1 = jsonObject.getString("oid");
+                    String code = orderDetails.getString("code");
+                    int qty = orderDetails.getInt("qty");
+                    double unitPrice = orderDetails.getInt("unitPrice");
+//                    System.out.println(code+" "+qty+" "+unitPrice);
+                    PreparedStatement pst = connection.prepareStatement(
+                            "INSERT INTO orderdetails (oid, itemCode, qty, unitPrice) VALUES (?,?,?,?)");
+                    pst.setString(1, oid1);
+                    pst.setString(2, code);
+                    pst.setInt(3, qty);
+                    pst.setDouble(4, unitPrice);
+                    isOrderDetailsAdded = pst.executeUpdate() > 0;
+                }
+
+                if (isOrderDetailsAdded) {
+                    sendMsg(resp, JsonValue.EMPTY_JSON_ARRAY, "Order Placed Successfully", 200);
+                    connection.commit();
+                }
+            }
+        } catch (SQLException e) {
+            try {
+                assert connection != null;
+                connection.rollback();
+            } catch (SQLException ex) {
+                System.out.println(ex.getMessage());
+                sendMsg(resp, JsonValue.EMPTY_JSON_ARRAY, ex.getLocalizedMessage(), 400);
+            }
+            System.out.println(e.getMessage());
+            sendMsg(resp, JsonValue.EMPTY_JSON_ARRAY, e.getLocalizedMessage(), 400);
+        }finally {
+            try {
+                assert connection != null;
+                connection.setAutoCommit(true);
+                connection.close();
+            } catch (SQLException e) {
+                sendMsg(resp, JsonValue.EMPTY_JSON_ARRAY, e.getLocalizedMessage(), 400);
+            }
+        }
     }
 
     @Override
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        super.doPut(req, resp);
+        resp.setContentType("application/json");
+        JsonObject jsonObject = Json.createReader(req.getReader()).readObject();
+        String oid = jsonObject.getString("oid");
+        String date = jsonObject.getString("date");
+        String customerID = jsonObject.getString("customerID");
+        JsonArray orderDetailsList = jsonObject.getJsonArray("orderDetails");
+
+        Connection connection = null;
+        try {
+            connection = source.getConnection();
+            connection.setAutoCommit(false);
+
+            PreparedStatement preparedStatement = connection.prepareStatement(
+                    "UPDATE  orders SET date=?, customerID=? WHERE oid=?");
+            preparedStatement.setString(3, oid);
+            preparedStatement.setDate(1, Date.valueOf(date));
+            preparedStatement.setString(2, customerID);
+            boolean isOrderUpdated = preparedStatement.executeUpdate() > 0;
+
+            boolean isOrderDetailsUpdated = false;
+            if (isOrderUpdated) {
+
+                for (JsonValue jsonValue : orderDetailsList) {
+                    JsonObject orderDetails = jsonValue.asJsonObject();
+                    String oid1 = jsonObject.getString("oid");
+                    String code = orderDetails.getString("code");
+                    int qty = orderDetails.getInt("qty");
+                    double unitPrice = orderDetails.getInt("unitPrice");
+
+                    PreparedStatement pst = connection.prepareStatement(
+                            "UPDATE orderdetails SET itemCode=?, qty=?, unitPrice=? WHERE oid=?");
+                    pst.setString(4, oid1);
+                    pst.setString(1, code);
+                    pst.setInt(2, qty);
+                    pst.setDouble(3, unitPrice);
+                    isOrderDetailsUpdated = pst.executeUpdate() > 0;
+                }
+
+                if (isOrderDetailsUpdated) {
+                    sendMsg(resp, JsonValue.EMPTY_JSON_ARRAY, "Order Updated Successfully", 200);
+                    connection.commit();
+                }
+            }
+        } catch (SQLException e) {
+            try {
+                assert connection != null;
+                connection.rollback();
+            } catch (SQLException ex) {
+                System.out.println(ex.getMessage());
+                sendMsg(resp, JsonValue.EMPTY_JSON_ARRAY, ex.getLocalizedMessage(), 400);
+            }
+            System.out.println(e.getMessage());
+            sendMsg(resp, JsonValue.EMPTY_JSON_ARRAY, e.getLocalizedMessage(), 400);
+        }finally {
+            try {
+                assert connection != null;
+                connection.setAutoCommit(true);
+                connection.close();
+            } catch (SQLException e) {
+                sendMsg(resp, JsonValue.EMPTY_JSON_ARRAY, e.getLocalizedMessage(), 400);
+            }
+        }
     }
+
 
     @Override
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {

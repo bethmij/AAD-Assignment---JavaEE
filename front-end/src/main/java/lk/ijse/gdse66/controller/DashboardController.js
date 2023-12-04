@@ -110,7 +110,10 @@ window.addEventListener("load", function(event) {
 
 function setDate() {
     let currentDate = new Date();
-    let formattedDate = currentDate.getDate() + '/' + (parseInt(currentDate.getMonth())+1) + '/' + currentDate.getFullYear();
+    let year = currentDate.getFullYear();
+    let month = (currentDate.getMonth() + 1).toString().padStart(2, '0');
+    let day = currentDate.getDate().toString().padStart(2, '0');
+    let formattedDate = year + '-' + month + '-' + day;
     $('#currDate').text(`Date : ${formattedDate}`);
 }
 

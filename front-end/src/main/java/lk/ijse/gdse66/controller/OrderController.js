@@ -213,33 +213,32 @@ discount.keyup(function (){
         subTotalTxt.text(`Sub Total : 0.00`);
     }
 })
-// let orderDetailArray = []
-// let order = []
-function setOrderArray(orderID, newOrderDetailArray, oID, currDate) {
+
+function setOrderArray(orderID, oID, currDate) {
 
     let tableCode = $("#orderTbody").children('tr').children(':nth-child(1)');
     let tablePrice = $("#orderTbody").children('tr').children(':nth-child(3)');
     let tableQty = $("#orderTbody").children('tr').children(':nth-child(4)');
+    let newOrderDetailArray = []
 
     for (let i = 1; i < tableCode.length; i++) {
         let newOrderDetails = Object.assign({}, orderDetails);
-        // let orderDetail = { oid:orderID, code:$(tableCode[i]).text(),
-        //     unitPrice:parseInt($(tablePrice[i]).text()), qty:parseInt($(tableQty[i]).text())}
         newOrderDetails.oid = orderID;
         newOrderDetails.code = $(tableCode[i]).text();
         newOrderDetails.unitPrice = parseInt($(tablePrice[i]).text());
         newOrderDetails.qty = parseInt($(tableQty[i]).text());
-        // orderDetailArray.push(orderDetail);
         newOrderDetailArray.push(newOrderDetails);
-    }
 
+    }
+    console.log(newOrderDetailArray)
     let newOrder = Object.assign({}, order);
     newOrder.oid = oID[1];
     newOrder.date = currDate[1];
     newOrder.customerID = selectCusOp.val();
     newOrder.orderDetails = newOrderDetailArray;
+    return newOrder;
 
-    orders.push(newOrder);
+
 }
 
 btnOrder.click(function (event){
@@ -248,20 +247,30 @@ btnOrder.click(function (event){
         var userChoice = window.confirm("Do you want to continue?");
 
         if (userChoice) {
-            let oID = $('#orderID').val().split("Order ID : ");
+            let oID = $("#orderID").val().split("Order ID : ");
             let orderID = oID[1];
             let currDate = $('#currDate').text().split("Date : ");
-            let newOrderDetailArray = Object.assign([], orderDetail);
 
             if (btnOrder.text().includes("Place Order")) {
-                if (cash.val() != "") {
+                if (cash.val() !== "") {
                     if (!(parseInt(cash.val()) < total1)) {
-                        setOrderArray(orderID, newOrderDetailArray, oID, currDate);
-                        clearItemSelect();
-                        clearCusDetail();
-                        clearTotal();
-                        setOrderID();
-                        console.log(orders);
+                        let order = setOrderArray(orderID, oID, currDate);
+                        $.ajax({
+                           url: "http://localhost:8080/java-pos/order",
+                            method: "POST",
+                            data: JSON.stringify(order),
+                            success: function (resp) {
+                                if (resp.status === 200) {
+                                    alert(resp.message);
+                                    clearItemSelect();
+                                    clearCusDetail();
+                                    clearTotal();
+                                    setOrderID();
+                                }else  if (resp.status === 400){
+                                    alert(resp.message);
+                                }
+                            }
+                        });
                     } else {
                         alert("Insufficient payment amount")
                     }
@@ -269,24 +278,46 @@ btnOrder.click(function (event){
                     alert("Please add ur payment")
                 }
             } else if (btnOrder.text().includes("Update Order")) {
-                for (let i = 0; i < orders.length; i++) {
-                    if (orders[i].oid == orderID) {
-                        orders.splice(i, 1);
-                        setOrderArray(orderID, newOrderDetailArray, oID, currDate);
+                let order = setOrderArray(orderID, oID, currDate);
+                $.ajax({
+                    url:"http://localhost:8080/java-pos/order",
+                    method: "PUT",
+                    data: JSON.stringify(order),
+                    success:function (){
                         clearItemSelect();
                         clearCusDetail();
                         clearTotal();
                         $('#orderID').val(`Order ID : ${currOID[1]}`);
                         btnOrder.text("");
-                        btnOrder.append(`<img src="../../CSS_Framework/POS/assets/Screenshot__550_-removebg-preview.png" alt="Logo" width="25vw" class="opacity-50 me-2">Place Order`);
+                        btnOrder.append(`<img src="../resources/assests/img/Screenshot__550_-removebg-preview.png" alt="Logo" width="25vw" class="opacity-50 me-2">Place Order`);
                         cash.attr("disabled", false);
                         discount.attr("disabled", false);
                         $('#txtOrderSearch').val("");
-                        $('#orderSearch').removeClass('btn-outline-danger').addClass('btn-outline-success');
+                        $("#orderSearch").removeClass('btn-outline-danger').addClass('btn-outline-success');
                         $('#orderSearch').text("Search");
-                        console.log(orders);
+                    },
+                    error:function (resp){
+                        alert(resp);
                     }
-                }
+                })
+                // for (let i = 0; i < orders.length; i++) {
+                //     if (orders[i].oid == orderID) {
+                //         orders.splice(i, 1);
+                //         setOrderArray(orderID, newOrderDetailArray, oID, currDate);
+                //         clearItemSelect();
+                //         clearCusDetail();
+                //         clearTotal();
+                //         $('#orderID').val(`Order ID : ${currOID[1]}`);
+                //         btnOrder.text("");
+                //         btnOrder.append(`<img src="../resources/assests/img/Screenshot__550_-removebg-preview.png" alt="Logo" width="25vw" class="opacity-50 me-2">Place Order`);
+                //         cash.attr("disabled", false);
+                //         discount.attr("disabled", false);
+                //         $('#txtOrderSearch').val("");
+                //         $('#orderSearch').removeClass('btn-outline-danger').addClass('btn-outline-success');
+                //         $('#orderSearch').text("Search");
+                //         console.log(orders);
+                //     }
+                // }
             }
 
         }

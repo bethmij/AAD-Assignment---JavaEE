@@ -51,7 +51,8 @@ public class CustomerServlet extends HttpServlet {
 
             JsonArrayBuilder arrayBuilder = Json.createArrayBuilder();
             try (Connection connection = source.getConnection()) {
-                PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM customer WHERE id=?");
+                PreparedStatement preparedStatement = connection.prepareStatement(
+                        "SELECT * FROM customer WHERE id=?");
                 preparedStatement.setString(1,cusID);
                 ResultSet resultSet = preparedStatement.executeQuery();
                 if (resultSet.next()) {
