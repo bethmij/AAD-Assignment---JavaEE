@@ -198,6 +198,19 @@ function deleteDetail() {
     })
 }
 
+export function getCustomerList(id, callback) {
+    $.ajax({
+        url: "http://localhost:8080/java-pos/customer?option=SEARCH&cusID=" + id,
+        method: "GET",
+        success: function (resp) {
+            callback(resp);
+        },
+        error: function (resp) {
+            alert(resp);
+        }
+    });
+}
+
 $('#btnSearch').click(function (){
 
     let id = $('#txtSearch').val();
@@ -206,28 +219,20 @@ $('#btnSearch').click(function (){
     if(id.length!==0) {
         getCusIDList(function (IDList) {
             if (IDList.includes(id)) {
-                $.ajax({
-                    url: "http://localhost:8080/java-pos/customer?option=SEARCH&cusID=" + id,
-                    method: "GET",
-                    success: function (resp) {
-                        if (resp.status === 200) {
-
-                            tbody.empty();
-                            tbody.append(`<tr>
+                getCustomerList(id, function (resp) {
+                    if (resp.status === 200) {
+                        tbody.empty();
+                        tbody.append(`<tr>
                     <th scope="row">${resp.data[0].cusID}</th>
                         <td>${resp.data[0].cusName}</td>
                         <td>${resp.data[0].cusAddress}</td>
                         <td>${resp.data[0].cusSalary}</td>
                         <td style="width: 10%"><img class="delete" src="../resources/assests/img/icons8-delete-96.png" alt="Logo" width="50%" class="opacity-75"></td>
                    </tr>`);
-                            deleteDetail();
-                            setFeilds();
-                        } else if (resp.status === 400) {
-                            alert(resp.message);
-                        }
-                    },
-                    error: function () {
-
+                        deleteDetail();
+                        setFeilds();
+                    } else if (resp.status === 400) {
+                        alert(resp.message);
                     }
                 });
             } else {

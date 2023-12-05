@@ -26,25 +26,30 @@ public class PlaceOrderServlet extends HttpServlet {
 
         if(option.equals("SEARCH")){
             String id = req.getParameter("id");
-            JsonArrayBuilder orderDetails = Json.createArrayBuilder();
-            JsonArrayBuilder itemList = Json.createArrayBuilder();
-            JsonObjectBuilder order = Json.createObjectBuilder();;
+            JsonArrayBuilder orderList = Json.createArrayBuilder();
+            JsonArrayBuilder orderDetailList = Json.createArrayBuilder();
+            JsonObjectBuilder order = Json.createObjectBuilder();
+            JsonObjectBuilder orderDetail = Json.createObjectBuilder();
 
             try (Connection connection = source.getConnection()){
                 PreparedStatement pst = connection.prepareStatement(
-                        "SELECT o.*, od.itemCode FROM orders o JOIN orderdetails od on o.oid = od.oid WHERE o.oid=?"
+                    "SELECT o.*, od.itemCode, od.qty, od.unitPrice FROM orders o JOIN orderdetails od on o.oid = od.oid WHERE o.oid=?"
                 );
                 pst.setString(1,id);
                 ResultSet resultSet = pst.executeQuery();
                 while (resultSet.next()) {
-                    order = Json.createObjectBuilder();
+//                    order = Json.createObjectBuilder();
+//                    orderDetail = Json.createObjectBuilder();
                     order.add("oid", resultSet.getString(1));
-                    order.add("date", (JsonValue) resultSet.getDate(2));
+                    order.add("date", resultSet.getString(2));
                     order.add("customerID", resultSet.getString(3));
-                    itemList.add(resultSet.getString(4));
+                    orderDetail.add("code",resultSet.getString(4));
+                    orderDetail.add("qty",resultSet.getString(5));
+                    orderDetail.add("uPrice",resultSet.getString(6));
+                    orderDetailList.add(orderDetail.build());
                 }
-                order.add("items",itemList.build());
-                sendMsg(resp,orderDetails.add(order.build()).build(), "Got the details", 200);
+                order.add("items",orderDetailList.build());
+                sendMsg(resp,orderList.add(order.build()).build(), "Got the details", 200);
 
             } catch (SQLException e) {
                 sendMsg(resp,JsonValue.EMPTY_JSON_ARRAY,e.getLocalizedMessage(),400);

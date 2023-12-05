@@ -3,6 +3,9 @@ import {orderDetails} from "../model/OrderDetail.js";
 import {customerDetail, itemDetail, orders} from "../db/DB.js";
 import {getCusIDList} from "./CustomerController.js";
 import {getItemCodeList} from "./ItemController.js";
+import {getCustomerList} from "./CustomerController.js";
+import {getItemList} from "./ItemController.js";
+import {customer} from "../model/Customer.js";
 
 let selectCusOp = $('#cusID');
 let selectItemOp = $('#itemCode');
@@ -19,6 +22,7 @@ let cash = $("#cash");
 let discount = $("#discount");
 let btnOrder = $('#btnPlaceOrder');
 let tbRow, tblQty, tblPrice, currOID, orderID;
+let orderList = [];
 
 
 setCusID();
@@ -57,7 +61,7 @@ function setOrderID() {
             return parseInt(numB) - parseInt(numA);
         });
 
-        console.log(orderList)
+
         if(orderList.length===0){
             orderID.val(`Order ID : OR00-1`);
         }else {
@@ -348,11 +352,11 @@ function setFeilds() {
         selectItemOp.val(itemCode);
         selectItemOp.attr("disabled", true);
 
-        for (let i = 0; i <itemDetail.length ; i++) {
-            if(itemDetail[i].code==itemCode){
-                txtItemQty.val(`Item Quantity : ${itemDetail[i].quantity}`);
+        getItemList(itemCode,function (resp) {
+            if(resp.status===200){
+                txtItemQty.val(`Item Quantity : ${resp.data[0].qtyOnHand}`);
             }
-        }
+        });
         setFeilds();
         btnSave.text("Update ");
         btnSave.attr("disabled", false);
@@ -405,61 +409,109 @@ $('#orderSearch').click(function (){
     let id = $('#txtOrderSearch').val();
     let count = 0;
     let tbody = $('#orderTbody');
-
-        if (id.length != 0) {
-            for (let i = 0; i < orders.length; i++) {
-                if (orders[i].oid == id) {
-                    orderID = orders[i].oid;
-                    currOID = $('#orderID').val().split("Order ID : ");
-                    $('#orderID').val("Order ID : " + orders[i].oid);
-                    count++;
-                    total1 = 0;
-                    cash.attr("disabled", true);
-                    discount.attr("disabled", true);
-                    if (orders[i].customerID == customerDetail[i].id) {
-                        selectCusOp.val(customerDetail[i].id);
-                        $('#cusName').val(`Customer Name : ${customerDetail[i].name}`);
-                        $('#cusAddress').val(`Customer Address : ${customerDetail[i].address}`);
-                        $('#cusSalary').val(`Customer Salary : ${customerDetail[i].salary}`);
-                    }
-
-                    tbody.empty();
-                    tbody.append(`<tr >
+        let isAvailable = function () {
+            getOrderIDList(function (orderID) {
+                
+            })
+        }
+            getOrderList(id, function (order) {
+                $('#orderID').val("Order ID : " + order.oid);
+                getCustomerList(order.customerID, function (resp) {
+                    if(resp.status===200){
+                        selectCusOp.val(resp.data[0].cusID);
+                        $('#cusName').val(`Customer Name : ${resp.data[0].cusName}`);
+                        $('#cusAddress').val(`Customer Address : ${resp.data[0].cusAddress}`);
+                        $('#cusSalary').val(`Customer Salary : ${resp.data[0].cusSalary}`);
+                        tbody.empty();
+                        tbody.append(`<tr >
                                     <th scope="col">Code</th>
                                     <th scope="col">Name</th>
                                     <th scope="col">Price</th>
                                     <th scope="col">Order Qty</th>
                                     <th scope="col"></th>
                              </tr> `);
-
-                    for (let j = 0; j < orders[i].orderDetails.length; j++) {
-                        if (orders[i].orderDetails[j].code == itemDetail[j].code) {
-
-                            tbody.append(
-                                `<tr>
-                        <th scope="row">${orders[i].orderDetails[j].code}</th>
-                        <td>${itemDetail[j].name}</td>
-                        <td>${orders[i].orderDetails[j].unitPrice}</td>
-                        <td>${orders[i].orderDetails[j].qty}</td>                        
-                        <td style="width: 10%"><img class="orderDelete" src="../resources/assests/img/icons8-delete-96.png" alt="Logo" width="50%" className="opacity-75"></td>
-                    </tr>`
-                            );
-                            setFeilds();
-                            deleteDetail();
-                            calcTotal(orders[i].orderDetails[j].unitPrice, orders[i].orderDetails[j].qty);
-                            btnOrder.text("");
-                            btnOrder.append(`<img src="../resources/assests/img/Screenshot__550_-removebg-preview.png" alt="Logo" width="25vw" class="opacity-50 me-2">Update Order`);
+                        for (const item of order.orderDetails) {
+                            getItemList(item.code, function (resp) {
+                                if(resp.status===200) {
+                                    tbody.append(
+                                        `<tr>
+                                        <th scope="row">${resp.data[0].code}</th>
+                                        <td>${resp.data[0].description}</td>
+                                        <td>${resp.data[0].uPrice}</td>
+                                        <td>${item.qty}</td>                        
+                                        <td style="width: 10%"><img class="orderDelete" src="../resources/assests/img/icons8-delete-96.png"
+                                                                        alt="Logo" width="50%" className="opacity-75"></td>
+                                    </tr>`)
+                                    setFeilds();
+                                    deleteDetail();
+                                    calcTotal(resp.data[0].uPrice, item.qty);
+                                    btnOrder.text("");
+                                    btnOrder.append(`<img src="../resources/assests/img/Screenshot__550_-removebg-preview.png" 
+                                                             alt="Logo" width="25vw" class="opacity-50 me-2">Update Order`);
+                                }else if(resp.status===400){
+                                    alert(resp.message);
+                                }
+                            });
                         }
-                    }
-                }
-            }
-            if (count != 1) {
-                alert("No such Order..please check the order ID");
-            }
-        } else {
-            alert("Please enter the order ID");
 
-        }
+                    }else if(resp.status===400){
+                        alert(resp.message);
+                    }
+                })
+            });
+            // for (let i = 0; i < orders.length; i++) {
+            //     if (orders[i].oid == id) {
+            //         orderID = orders[i].oid;
+            //         currOID = $('#orderID').val().split("Order ID : ");
+            //         $('#orderID').val("Order ID : " + orders[i].oid);
+            //         count++;
+            //         total1 = 0;
+            //         cash.attr("disabled", true);
+            //         discount.attr("disabled", true);
+            //         if (orders[i].customerID == customerDetail[i].id) {
+            //             selectCusOp.val(customerDetail[i].id);
+            //             $('#cusName').val(`Customer Name : ${customerDetail[i].name}`);
+            //             $('#cusAddress').val(`Customer Address : ${customerDetail[i].address}`);
+            //             $('#cusSalary').val(`Customer Salary : ${customerDetail[i].salary}`);
+            //         }
+            //
+            //         tbody.empty();
+            //         tbody.append(`<tr >
+            //                         <th scope="col">Code</th>
+            //                         <th scope="col">Name</th>
+            //                         <th scope="col">Price</th>
+            //                         <th scope="col">Order Qty</th>
+            //                         <th scope="col"></th>
+            //                  </tr> `);
+            //
+            //         for (let j = 0; j < orders[i].orderDetails.length; j++) {
+            //             if (orders[i].orderDetails[j].code == itemDetail[j].code) {
+            //
+            //                 tbody.append(
+            //                     `<tr>
+            //             <th scope="row">${orders[i].orderDetails[j].code}</th>
+            //             <td>${itemDetail[j].name}</td>
+            //             <td>${orders[i].orderDetails[j].unitPrice}</td>
+            //             <td>${orders[i].orderDetails[j].qty}</td>
+            //             <td style="width: 10%"><img class="orderDelete" src="../resources/assests/img/icons8-delete-96.png" alt="Logo" width="50%" className="opacity-75"></td>
+            //         </tr>`
+            //                 );
+            //                 setFeilds();
+            //                 deleteDetail();
+            //                 calcTotal(orders[i].orderDetails[j].unitPrice, orders[i].orderDetails[j].qty);
+            //                 btnOrder.text("");
+            //                 btnOrder.append(`<img src="../resources/assests/img/Screenshot__550_-removebg-preview.png" alt="Logo" width="25vw" class="opacity-50 me-2">Update Order`);
+            //             }
+            //         }
+            //     }
+            // }
+        //     if (count != 1) {
+        //         alert("No such Order..please check the order ID");
+        //     }
+        // } else {
+        //     alert("Please enter the order ID");
+        //
+        // }
 })
 
 function getOrderIDList(callback) {
@@ -487,21 +539,24 @@ function getOrderIDList(callback) {
     })
 }
 
-function getOrderList(callback) {
-    let orderList = []
+function getOrderList(id,callback) {
+    let orderDetail = [];
     $.ajax({
         url: "http://localhost:8080/java-pos/order?option=SEARCH&id="+id,
         method: "GET",
         success: function (resp) {
             if (resp.status === 200) {
-                if(resp.data.length !== 0) {
-                    for (const respElement of resp.data) {
-                        orderList.push(respElement);
-                        callback(orderList);
-                    }
-                }else {
-                    callback(orderList);
+
+                for (const item of resp.data[0].items) {
+                    orderDetail.push(item);
                 }
+                let newOrder = Object.assign({}, order);
+                newOrder.oid = resp.data[0].oid;
+                newOrder.date = resp.data[0].date;
+                newOrder.customerID = resp.data[0].customerID;
+                newOrder.orderDetails = orderDetail;
+                callback(newOrder);
+
             }else if(resp.status === 400){
                 alert(resp.message);
             }

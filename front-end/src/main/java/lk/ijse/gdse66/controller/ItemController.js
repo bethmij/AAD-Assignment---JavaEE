@@ -199,6 +199,19 @@ function deleteDetail() {
     })
 }
 
+export function getItemList(code, callback) {
+    $.ajax({
+        url: "http://localhost:8080/java-pos/item?option=SEARCH&code=" + code,
+        method: "GET",
+        success: function (resp) {
+            callback(resp);
+        },
+        error: function (resp) {
+            alert(resp);
+        }
+    });
+}
+
 $('#itemSearch').click(function (){
     let code = $('#txtItemSearch').val();
     let tbody = $('#itemBody');
@@ -206,29 +219,23 @@ $('#itemSearch').click(function (){
     if(code.length!==0) {
         getItemCodeList(function (IDList) {
             if (IDList.includes(code)) {
-                $.ajax({
-                    url: "http://localhost:8080/java-pos/item?option=SEARCH&code="+code,
-                    method: "GET",
-                    success: function (resp) {
-                        if (resp.status === 200) {
-                            tbody.empty();
-                            tbody.append(`<tr>
+                getItemList(code, function (resp) {
+                    if (resp.status === 200) {
+                        tbody.empty();
+                        tbody.append(`<tr>
                     <th scope="row">${resp.data[0].code}</th>
                         <td>${resp.data[0].description}</td>
                         <td>${resp.data[0].qtyOnHand}</td>
                         <td>${resp.data[0].uPrice}</td>
                         <td style="width: 10%"><img class="delete" src="../resources/assests/img/icons8-delete-96.png" alt="Logo" width="50%" class="opacity-75"></td>
                    </tr>`);
-                            deleteDetail();
-                            setFeilds();
-                        } else if (resp.status === 400) {
-                            alert(resp.message);
-                        }
-                    },
-                    error: function () {
-
+                        deleteDetail();
+                        setFeilds();
+                    } else if (resp.status === 400) {
+                        alert(resp.message);
                     }
                 });
+
             } else {
                 alert("No such Item..please check the Code");
             }
