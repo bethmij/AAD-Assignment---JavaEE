@@ -1,6 +1,6 @@
 import {order} from "../model/Order.js";
 import {orderDetails} from "../model/OrderDetail.js";
-import {customerDetail, itemDetail, orders, orderDetail} from "../db/DB.js";
+import {customerDetail, itemDetail, orders} from "../db/DB.js";
 import {getCusIDList} from "./CustomerController.js";
 import {getItemCodeList} from "./ItemController.js";
 
@@ -51,7 +51,13 @@ export function setItemCode() {
 function setOrderID() {
     let orderID = $('#orderID');
     getOrderIDList(function (orderList) {
-        orderList.sort((a, b) => b - a);
+        orderList.sort((a, b) => {
+            const [, numA] = a.match(/(\d+)$/);
+            const [, numB] = b.match(/(\d+)$/);
+            return parseInt(numB) - parseInt(numA);
+        });
+
+        console.log(orderList)
         if(orderList.length===0){
             orderID.val(`Order ID : OR00-1`);
         }else {
@@ -366,7 +372,7 @@ function clearItemSelect(){
     txtOrderQty.val("");
     txtOrderQty.css("border", "1px solid white");
     btnSave.text("");
-    btnSave.append(`<img src="../../CSS_Framework/POS/assets/Screenshot__543_-removebg-preview.png" alt="Logo" width="25vw" class="opacity-50 me-3">Add to Cart`);
+    btnSave.append(`<img src="../resources/assests/img/Screenshot__543_-removebg-preview.png" alt="Logo" width="25vw" class="opacity-50 me-3">Add to Cart`);
     btnSave.attr("disabled", true);
 }
 
@@ -435,14 +441,14 @@ $('#orderSearch').click(function (){
                         <td>${itemDetail[j].name}</td>
                         <td>${orders[i].orderDetails[j].unitPrice}</td>
                         <td>${orders[i].orderDetails[j].qty}</td>                        
-                        <td style="width: 10%"><img class="orderDelete" src="../../CSS_Framework/POS/assets/icons8-delete-96.png" alt="Logo" width="50%" className="opacity-75"></td>
+                        <td style="width: 10%"><img class="orderDelete" src="../resources/assests/img/icons8-delete-96.png" alt="Logo" width="50%" className="opacity-75"></td>
                     </tr>`
                             );
                             setFeilds();
                             deleteDetail();
                             calcTotal(orders[i].orderDetails[j].unitPrice, orders[i].orderDetails[j].qty);
                             btnOrder.text("");
-                            btnOrder.append(`<img src="../../CSS_Framework/POS/assets/Screenshot__550_-removebg-preview.png" alt="Logo" width="25vw" class="opacity-50 me-2">Update Order`);
+                            btnOrder.append(`<img src="../resources/assests/img/Screenshot__550_-removebg-preview.png" alt="Logo" width="25vw" class="opacity-50 me-2">Update Order`);
                         }
                     }
                 }
@@ -457,9 +463,34 @@ $('#orderSearch').click(function (){
 })
 
 function getOrderIDList(callback) {
-    let orderList = []
+    let orderIDList = []
     $.ajax({
         url: "http://localhost:8080/java-pos/order?option=ID",
+        method: "GET",
+        success: function (resp) {
+            if (resp.status === 200) {
+                if(resp.data.length !== 0) {
+                    for (const respElement of resp.data) {
+                        orderIDList.push(respElement);
+                        callback(orderIDList);
+                    }
+                }else {
+                    callback(orderIDList);
+                }
+            }else if(resp.status === 400){
+                alert(resp.message);
+            }
+        },
+        error: function (resp) {
+            alert(resp);
+        }
+    })
+}
+
+function getOrderList(callback) {
+    let orderList = []
+    $.ajax({
+        url: "http://localhost:8080/java-pos/order?option=SEARCH&id="+id,
         method: "GET",
         success: function (resp) {
             if (resp.status === 200) {

@@ -24,7 +24,33 @@ public class PlaceOrderServlet extends HttpServlet {
         resp.setContentType("application/json");
         String option = req.getParameter("option");
 
-        if(option.equals("ID")){
+        if(option.equals("SEARCH")){
+            String id = req.getParameter("id");
+            JsonArrayBuilder orderDetails = Json.createArrayBuilder();
+            JsonArrayBuilder itemList = Json.createArrayBuilder();
+            JsonObjectBuilder order = Json.createObjectBuilder();;
+
+            try (Connection connection = source.getConnection()){
+                PreparedStatement pst = connection.prepareStatement(
+                        "SELECT o.*, od.itemCode FROM orders o JOIN orderdetails od on o.oid = od.oid WHERE o.oid=?"
+                );
+                pst.setString(1,id);
+                ResultSet resultSet = pst.executeQuery();
+                while (resultSet.next()) {
+                    order = Json.createObjectBuilder();
+                    order.add("oid", resultSet.getString(1));
+                    order.add("date", (JsonValue) resultSet.getDate(2));
+                    order.add("customerID", resultSet.getString(3));
+                    itemList.add(resultSet.getString(4));
+                }
+                order.add("items",itemList.build());
+                sendMsg(resp,orderDetails.add(order.build()).build(), "Got the details", 200);
+
+            } catch (SQLException e) {
+                sendMsg(resp,JsonValue.EMPTY_JSON_ARRAY,e.getLocalizedMessage(),400);
+            }
+
+        }else if(option.equals("ID")){
             try (Connection connection = source.getConnection()){
                 PreparedStatement pst = connection.prepareStatement("SELECT oid FROM orders");
                 ResultSet resultSet = pst.executeQuery();
