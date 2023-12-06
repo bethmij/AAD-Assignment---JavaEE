@@ -3,14 +3,16 @@ package lk.ijse.gdse66.backend.servlet;
 import jakarta.json.*;
 
 import javax.annotation.Resource;
-import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 import java.io.IOException;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 @WebServlet(urlPatterns = "/customer")
 public class CustomerServlet extends HttpServlet {
@@ -19,78 +21,84 @@ public class CustomerServlet extends HttpServlet {
     DataSource source;
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         resp.setContentType("application/json");
         String option = req.getParameter("option");
 
-        if (option.equals("GET")) {
-            JsonArrayBuilder arrayBuilder = Json.createArrayBuilder();
-            try (Connection connection = source.getConnection()) {
-                PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM customer");
-                ResultSet resultSet = preparedStatement.executeQuery();
-                while (resultSet.next()) {
-                    String id = resultSet.getString(1);
-                    String name = resultSet.getString(2);
-                    String address = resultSet.getString(3);
-                    double salary = resultSet.getDouble(4);
+        switch (option) {
+            case "GET": {
+                JsonArrayBuilder arrayBuilder = Json.createArrayBuilder();
+                try (Connection connection = source.getConnection()) {
+                    PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM customer");
+                    ResultSet resultSet = preparedStatement.executeQuery();
+                    while (resultSet.next()) {
+                        String id = resultSet.getString(1);
+                        String name = resultSet.getString(2);
+                        String address = resultSet.getString(3);
+                        double salary = resultSet.getDouble(4);
 
-                    JsonObjectBuilder builder = Json.createObjectBuilder();
-                    builder.add("cusID", id);
-                    builder.add("cusName", name);
-                    builder.add("cusAddress", address);
-                    builder.add("cusSalary", salary);
-                    arrayBuilder.add(builder.build());
+                        JsonObjectBuilder builder = Json.createObjectBuilder();
+                        builder.add("cusID", id);
+                        builder.add("cusName", name);
+                        builder.add("cusAddress", address);
+                        builder.add("cusSalary", salary);
+                        arrayBuilder.add(builder.build());
 
+                    }
+                    sendMsg(resp, arrayBuilder.build(), "Got the Customer", 200);
+                } catch (SQLException e) {
+                    sendMsg(resp, JsonValue.EMPTY_JSON_ARRAY, e.getLocalizedMessage(), 400);
                 }
-                sendMsg(resp, arrayBuilder.build(), "Got the Customer", 200);
-            } catch (SQLException e) {
-                sendMsg(resp, JsonValue.EMPTY_JSON_ARRAY, e.getLocalizedMessage(), 400);
+                break;
             }
-        }else if(option.equals("SEARCH")){
-            String cusID = req.getParameter("cusID");
+            case "SEARCH": {
+                String cusID = req.getParameter("cusID");
 
-            JsonArrayBuilder arrayBuilder = Json.createArrayBuilder();
-            try (Connection connection = source.getConnection()) {
-                PreparedStatement preparedStatement = connection.prepareStatement(
-                        "SELECT * FROM customer WHERE id=?");
-                preparedStatement.setString(1,cusID);
-                ResultSet resultSet = preparedStatement.executeQuery();
-                if (resultSet.next()) {
-                    String id = resultSet.getString(1);
-                    String name = resultSet.getString(2);
-                    String address = resultSet.getString(3);
-                    double salary = resultSet.getDouble(4);
+                JsonArrayBuilder arrayBuilder = Json.createArrayBuilder();
+                try (Connection connection = source.getConnection()) {
+                    PreparedStatement preparedStatement = connection.prepareStatement(
+                            "SELECT * FROM customer WHERE id=?");
+                    preparedStatement.setString(1, cusID);
+                    ResultSet resultSet = preparedStatement.executeQuery();
+                    if (resultSet.next()) {
+                        String id = resultSet.getString(1);
+                        String name = resultSet.getString(2);
+                        String address = resultSet.getString(3);
+                        double salary = resultSet.getDouble(4);
 
-                    JsonObjectBuilder builder = Json.createObjectBuilder();
-                    builder.add("cusID", id);
-                    builder.add("cusName", name);
-                    builder.add("cusAddress", address);
-                    builder.add("cusSalary", salary);
-                    arrayBuilder.add(builder.build());
+                        JsonObjectBuilder builder = Json.createObjectBuilder();
+                        builder.add("cusID", id);
+                        builder.add("cusName", name);
+                        builder.add("cusAddress", address);
+                        builder.add("cusSalary", salary);
+                        arrayBuilder.add(builder.build());
 
+                    }
+                    sendMsg(resp, arrayBuilder.build(), "Got the Customer", 200);
+                } catch (SQLException e) {
+                    sendMsg(resp, JsonValue.EMPTY_JSON_ARRAY, e.getLocalizedMessage(), 400);
                 }
-                sendMsg(resp, arrayBuilder.build(), "Got the Customer", 200);
-            } catch (SQLException e) {
-                sendMsg(resp, JsonValue.EMPTY_JSON_ARRAY, e.getLocalizedMessage(), 400);
+                break;
             }
-        }else if(option.equals("ID")){
-            try (Connection connection = source.getConnection()){
-                PreparedStatement preparedStatement = connection.prepareStatement("SELECT id FROM customer");
-                ResultSet resultSet = preparedStatement.executeQuery();
-                JsonArrayBuilder cusIDList = Json.createArrayBuilder();
+            case "ID":
+                try (Connection connection = source.getConnection()) {
+                    PreparedStatement preparedStatement = connection.prepareStatement("SELECT id FROM customer");
+                    ResultSet resultSet = preparedStatement.executeQuery();
+                    JsonArrayBuilder cusIDList = Json.createArrayBuilder();
 
-                while (resultSet.next()){
-                    cusIDList.add(resultSet.getString(1));
+                    while (resultSet.next()) {
+                        cusIDList.add(resultSet.getString(1));
+                    }
+                    sendMsg(resp, cusIDList.build(), "Got the list", 200);
+                } catch (SQLException e) {
+                    sendMsg(resp, JsonValue.EMPTY_JSON_ARRAY, e.getLocalizedMessage(), 400);
                 }
-               sendMsg(resp, cusIDList.build(), "Got the list",200);
-            } catch (SQLException e) {
-                sendMsg(resp, JsonValue.EMPTY_JSON_ARRAY, e.getLocalizedMessage(),400);
-            }
+                break;
         }
     }
 
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         resp.setContentType("application/json");
         String id = req.getParameter("cusID");
         String name = req.getParameter("cusName");
@@ -120,7 +128,7 @@ public class CustomerServlet extends HttpServlet {
     }
 
     @Override
-    protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         resp.setContentType("application/json");
         JsonReader reader = Json.createReader(req.getReader());
         JsonObject jsonObject = reader.readObject();
@@ -148,7 +156,7 @@ public class CustomerServlet extends HttpServlet {
     }
 
     @Override
-    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         resp.setContentType("application/json");
         String cusID = req.getParameter("cusID");
         try (Connection connection = source.getConnection()){

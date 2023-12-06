@@ -3,7 +3,6 @@ package lk.ijse.gdse66.backend.servlet;
 import jakarta.json.*;
 
 import javax.annotation.Resource;
-import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -22,77 +21,83 @@ public class ItemServlet extends HttpServlet {
     DataSource source;
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         resp.setContentType("application/json");
         String option = req.getParameter("option");
 
-        if (option.equals("GET")) {
-            JsonArrayBuilder arrayBuilder = Json.createArrayBuilder();
-            try (Connection connection = source.getConnection()) {
-                PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM item");
-                ResultSet resultSet = preparedStatement.executeQuery();
-                while (resultSet.next()) {
-                    String code = resultSet.getString(1);
-                    String description = resultSet.getString(2);
-                    int qtyOnHand = resultSet.getInt(3);
-                    double uPrice = resultSet.getDouble(4);
+        switch (option) {
+            case "GET": {
+                JsonArrayBuilder arrayBuilder = Json.createArrayBuilder();
+                try (Connection connection = source.getConnection()) {
+                    PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM item");
+                    ResultSet resultSet = preparedStatement.executeQuery();
+                    while (resultSet.next()) {
+                        String code = resultSet.getString(1);
+                        String description = resultSet.getString(2);
+                        int qtyOnHand = resultSet.getInt(3);
+                        double uPrice = resultSet.getDouble(4);
 
-                    JsonObjectBuilder builder = Json.createObjectBuilder();
-                    builder.add("code", code);
-                    builder.add("description", description);
-                    builder.add("qtyOnHand", qtyOnHand);
-                    builder.add("uPrice", uPrice);
-                    arrayBuilder.add(builder.build());
+                        JsonObjectBuilder builder = Json.createObjectBuilder();
+                        builder.add("code", code);
+                        builder.add("description", description);
+                        builder.add("qtyOnHand", qtyOnHand);
+                        builder.add("uPrice", uPrice);
+                        arrayBuilder.add(builder.build());
 
+                    }
+                    sendMsg(resp, arrayBuilder.build(), "Got the Item", 200);
+                } catch (SQLException e) {
+                    sendMsg(resp, JsonValue.EMPTY_JSON_ARRAY, e.getLocalizedMessage(), 400);
                 }
-                sendMsg(resp, arrayBuilder.build(), "Got the Item", 200);
-            } catch (SQLException e) {
-                sendMsg(resp, JsonValue.EMPTY_JSON_ARRAY, e.getLocalizedMessage(), 400);
+                break;
             }
-        }else if(option.equals("SEARCH")){
-            String itemCode = req.getParameter("code");
+            case "SEARCH": {
+                String itemCode = req.getParameter("code");
 
-            JsonArrayBuilder arrayBuilder = Json.createArrayBuilder();
-            try (Connection connection = source.getConnection()) {
-                PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM item WHERE code=?");
-                preparedStatement.setString(1,itemCode);
-                ResultSet resultSet = preparedStatement.executeQuery();
-                if (resultSet.next()) {
-                    String code = resultSet.getString(1);
-                    String description = resultSet.getString(2);
-                    int qtyOnHand = resultSet.getInt(3);
-                    double uPrice = resultSet.getDouble(4);
+                JsonArrayBuilder arrayBuilder = Json.createArrayBuilder();
+                try (Connection connection = source.getConnection()) {
+                    PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM item WHERE code=?");
+                    preparedStatement.setString(1, itemCode);
+                    ResultSet resultSet = preparedStatement.executeQuery();
+                    if (resultSet.next()) {
+                        String code = resultSet.getString(1);
+                        String description = resultSet.getString(2);
+                        int qtyOnHand = resultSet.getInt(3);
+                        double uPrice = resultSet.getDouble(4);
 
-                    JsonObjectBuilder builder = Json.createObjectBuilder();
-                    builder.add("code", code);
-                    builder.add("description", description);
-                    builder.add("qtyOnHand", qtyOnHand);
-                    builder.add("uPrice", uPrice);
-                    arrayBuilder.add(builder.build());
+                        JsonObjectBuilder builder = Json.createObjectBuilder();
+                        builder.add("code", code);
+                        builder.add("description", description);
+                        builder.add("qtyOnHand", qtyOnHand);
+                        builder.add("uPrice", uPrice);
+                        arrayBuilder.add(builder.build());
 
+                    }
+                    sendMsg(resp, arrayBuilder.build(), "Got the Item", 200);
+                } catch (SQLException e) {
+                    sendMsg(resp, JsonValue.EMPTY_JSON_ARRAY, e.getLocalizedMessage(), 400);
                 }
-                sendMsg(resp, arrayBuilder.build(), "Got the Item", 200);
-            } catch (SQLException e) {
-                sendMsg(resp, JsonValue.EMPTY_JSON_ARRAY, e.getLocalizedMessage(), 400);
+                break;
             }
-        }else if(option.equals("ID")){
-            try (Connection connection = source.getConnection()){
-                PreparedStatement preparedStatement = connection.prepareStatement("SELECT code FROM item");
-                ResultSet resultSet = preparedStatement.executeQuery();
-                JsonArrayBuilder itemCodeList = Json.createArrayBuilder();
+            case "ID":
+                try (Connection connection = source.getConnection()) {
+                    PreparedStatement preparedStatement = connection.prepareStatement("SELECT code FROM item");
+                    ResultSet resultSet = preparedStatement.executeQuery();
+                    JsonArrayBuilder itemCodeList = Json.createArrayBuilder();
 
-                while (resultSet.next()){
-                    itemCodeList.add(resultSet.getString(1));
+                    while (resultSet.next()) {
+                        itemCodeList.add(resultSet.getString(1));
+                    }
+                    sendMsg(resp, itemCodeList.build(), "Got the list", 200);
+                } catch (SQLException e) {
+                    sendMsg(resp, JsonValue.EMPTY_JSON_ARRAY, e.getLocalizedMessage(), 400);
                 }
-                sendMsg(resp, itemCodeList.build(), "Got the list",200);
-            } catch (SQLException e) {
-                sendMsg(resp, JsonValue.EMPTY_JSON_ARRAY, e.getLocalizedMessage(),400);
-            }
+                break;
         }
     }
 
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         resp.setContentType("application/json");
         String code = req.getParameter("code");
         String description = req.getParameter("description");
@@ -121,7 +126,7 @@ public class ItemServlet extends HttpServlet {
     }
 
     @Override
-    protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         resp.setContentType("application/json");
         JsonReader reader = Json.createReader(req.getReader());
         JsonObject jsonObject = reader.readObject();
@@ -150,7 +155,7 @@ public class ItemServlet extends HttpServlet {
     }
 
     @Override
-    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         resp.setContentType("application/json");
         String code = req.getParameter("code");
         try (Connection connection = source.getConnection()){

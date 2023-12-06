@@ -11,7 +11,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 import java.io.IOException;
 import java.sql.*;
-import java.time.LocalDate;
 
 @WebServlet (urlPatterns = "/order")
 public class PlaceOrderServlet extends HttpServlet {
@@ -20,7 +19,7 @@ public class PlaceOrderServlet extends HttpServlet {
     DataSource source;
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         resp.setContentType("application/json");
         String option = req.getParameter("option");
 
@@ -38,8 +37,6 @@ public class PlaceOrderServlet extends HttpServlet {
                 pst.setString(1,id);
                 ResultSet resultSet = pst.executeQuery();
                 while (resultSet.next()) {
-//                    order = Json.createObjectBuilder();
-//                    orderDetail = Json.createObjectBuilder();
                     order.add("oid", resultSet.getString(1));
                     order.add("date", resultSet.getString(2));
                     order.add("customerID", resultSet.getString(3));
@@ -72,7 +69,7 @@ public class PlaceOrderServlet extends HttpServlet {
     }
 
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         resp.setContentType("application/json");
         JsonObject jsonObject = Json.createReader(req.getReader()).readObject();
         String oid = jsonObject.getString("oid");
@@ -139,13 +136,14 @@ public class PlaceOrderServlet extends HttpServlet {
     }
 
     @Override
-    protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         resp.setContentType("application/json");
         JsonObject jsonObject = Json.createReader(req.getReader()).readObject();
         String oid = jsonObject.getString("oid");
         String date = jsonObject.getString("date");
         String customerID = jsonObject.getString("customerID");
         JsonArray orderDetailsList = jsonObject.getJsonArray("orderDetails");
+        System.out.println(oid+" "+date+" "+customerID);
 
         Connection connection = null;
         try {
@@ -168,13 +166,15 @@ public class PlaceOrderServlet extends HttpServlet {
                     String code = orderDetails.getString("code");
                     int qty = orderDetails.getInt("qty");
                     double unitPrice = orderDetails.getInt("unitPrice");
+                    System.out.println(oid1+" "+code+" "+qty+" "+unitPrice);
 
                     PreparedStatement pst = connection.prepareStatement(
-                            "UPDATE orderdetails SET itemCode=?, qty=?, unitPrice=? WHERE oid=?");
-                    pst.setString(4, oid1);
-                    pst.setString(1, code);
-                    pst.setInt(2, qty);
-                    pst.setDouble(3, unitPrice);
+                            "UPDATE orderdetails SET qty=?, unitPrice=? WHERE oid=? AND itemCode=?");
+
+                    pst.setInt(1, qty);
+                    pst.setDouble(2, unitPrice);
+                    pst.setString(3, oid1);
+                    pst.setString(4, code);
                     isOrderDetailsUpdated = pst.executeUpdate() > 0;
                 }
 
