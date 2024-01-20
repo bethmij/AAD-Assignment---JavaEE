@@ -26,7 +26,7 @@ btnCustomerSave.click(function (event){
                 if (!(IDList.includes(cusId.val()))) {
                     let customer = $("#cusForm").serialize();
                     $.ajax({
-                        url: "http://localhost:8080/java-pos/customer",
+                        url: "http://localhost:8000/java-pos/customer",
                         method: "POST",
                         data: customer,
                         success: function (resp) {
@@ -70,7 +70,7 @@ btnCustomerSave.click(function (event){
             newCustomer.cusSalary = cusSalary.val();
 
             $.ajax({
-                url: "http://localhost:8080/java-pos/customer",
+                url: "http://localhost:8000/java-pos/customer",
                 method: "PUT",
                 contentType: "application/json",
                 data: JSON.stringify(newCustomer),
@@ -124,7 +124,7 @@ $('#getAll').click(function (){
 
 function getAll() {
     $.ajax({
-        url: "http://localhost:8080/java-pos/customer?option=GET",
+        url: "http://localhost:8000/java-pos/customer?option=GET",
         method: "GET",
         success: function (resp) {
             if(resp.status===200){
@@ -180,7 +180,7 @@ function deleteDetail() {
             let cusID = $( $(this).parents('tr').children(':nth-child(1)')).text();
 
             $.ajax({
-                url: "http://localhost:8080/java-pos/customer?cusID="+cusID,
+                url: "http://localhost:8000/java-pos/customer?cusID="+cusID,
                 method: "DELETE",
                 success: function (resp){
                     if(resp.status===200){
@@ -200,7 +200,7 @@ function deleteDetail() {
 
 export function getCustomerList(id, callback) {
     $.ajax({
-        url: "http://localhost:8080/java-pos/customer?option=SEARCH&cusID=" + id,
+        url: "http://localhost:8000/java-pos/customer?option=SEARCH&cusID=" + id,
         method: "GET",
         success: function (resp) {
             callback(resp);
@@ -246,7 +246,7 @@ $('#btnSearch').click(function (){
 
 export function getCusIDList(callback) {
     $.ajax({
-        url: "http://localhost:8080/java-pos/customer?option=ID",
+        url: "http://localhost:8000/java-pos/customer?option=ID",
         method: "GET",
         success: function (resp) {
             for (let respElement of resp.data) {

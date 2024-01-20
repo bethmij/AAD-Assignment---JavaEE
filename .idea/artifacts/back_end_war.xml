@@ -7,8 +7,18 @@
         <packaging>war</packaging>
       </options>
     </properties>
-    <root id="archive" name="back-end-1.0.0T.war">
+    <root id="archive" name="back-end-1.0.0.war">
       <element id="artifact" artifact-name="back-end:war exploded" />
+      <element id="directory" name="WEB-INF">
+        <element id="directory" name="lib">
+          <element id="library" level="project" name="Java EE 6-Java EE 6" />
+        </element>
+        <element id="directory" name="classes">
+          <element id="module-output" name="front-end" />
+        </element>
+      </element>
+      <element id="javaee-facet-resources" facet="front-end/web/Web" />
+      <element id="artifact" artifact-name="front-end:war" />
     </root>
   </artifact>
 </component>

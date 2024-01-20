@@ -1,7 +1,9 @@
 package lk.ijse.gdse66.backend.util;
 
 
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
+
+
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;

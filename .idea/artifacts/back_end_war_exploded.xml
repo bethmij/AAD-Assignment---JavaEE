@@ -1,6 +1,6 @@
 <component name="ArtifactManager">
   <artifact type="exploded-war" name="back-end:war exploded">
-    <output-path>$PROJECT_DIR$/back-end/target/back-end-1.0.0T</output-path>
+    <output-path>$PROJECT_DIR$/back-end/target/back-end-1.0.0</output-path>
     <properties id="maven-jee-properties">
       <options>
         <exploded>true</exploded>
@@ -12,22 +12,26 @@
       <element id="directory" name="WEB-INF">
         <element id="directory" name="classes">
           <element id="module-output" name="back-end" />
+          <element id="module-output" name="front-end" />
         </element>
         <element id="directory" name="lib">
+          <element id="library" level="project" name="Maven: jakarta.json.bind:jakarta.json.bind-api:3.0.0" />
+          <element id="library" level="project" name="Maven: org.eclipse:yasson:3.0.3" />
+          <element id="library" level="project" name="Maven: jakarta.json:jakarta.json-api:2.1.0" />
+          <element id="library" level="project" name="Maven: org.eclipse.parsson:parsson:1.1.0" />
+          <element id="library" level="project" name="Maven: org.projectlombok:lombok:1.18.26" />
           <element id="library" level="project" name="Maven: com.mysql:mysql-connector-j:8.1.0" />
           <element id="library" level="project" name="Maven: com.google.protobuf:protobuf-java:3.21.9" />
-          <element id="library" level="project" name="Maven: jakarta.json:jakarta.json-api:2.1.3" />
-          <element id="library" level="project" name="Maven: org.glassfish:jakarta.json:2.0.1" />
-          <element id="library" level="project" name="Maven: com.fasterxml.jackson.core:jackson-databind:2.15.2" />
-          <element id="library" level="project" name="Maven: com.fasterxml.jackson.core:jackson-annotations:2.15.2" />
-          <element id="library" level="project" name="Maven: com.fasterxml.jackson.core:jackson-core:2.15.2" />
-          <element id="library" level="project" name="Maven: org.projectlombok:lombok:1.18.30" />
+          <element id="library" level="project" name="Maven: org.apache.commons:commons-pool2:2.12.0" />
+          <element id="library" level="project" name="Java EE 6-Java EE 6" />
         </element>
       </element>
       <element id="directory" name="META-INF">
-        <element id="file-copy" path="$PROJECT_DIR$/back-end/target/back-end-1.0.0T/META-INF/MANIFEST.MF" />
+        <element id="file-copy" path="$PROJECT_DIR$/back-end/target/back-end-1.0.0/META-INF/MANIFEST.MF" />
       </element>
       <element id="javaee-facet-resources" facet="back-end/web/Web" />
+      <element id="javaee-facet-resources" facet="front-end/web/Web" />
+      <element id="artifact" artifact-name="front-end:war" />
     </root>
   </artifact>
 </component>

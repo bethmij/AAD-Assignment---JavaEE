@@ -1,27 +1,32 @@
 package lk.ijse.gdse66.backend.util.filter;
 
-import javax.servlet.*;
-import javax.servlet.annotation.WebFilter;
-import javax.servlet.http.HttpServletResponse;
+
+import jakarta.servlet.*;
+import jakarta.servlet.annotation.WebFilter;
+import jakarta.servlet.http.HttpFilter;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
 import java.io.IOException;
 
-@WebFilter (urlPatterns = "/*")
-public class MyFilter implements Filter {
+@WebFilter(urlPatterns = "/*")
+public class MyFilter extends HttpFilter {
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
-
+        System.out.println("filter called");
     }
 
     @Override
-    public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
-        filterChain.doFilter(servletRequest, servletResponse);
+    protected void doFilter(HttpServletRequest req, HttpServletResponse res, FilterChain chain) throws IOException, ServletException {
+        System.out.println("filter");
 
-        HttpServletResponse response = (HttpServletResponse) servletResponse;
-        response.addHeader("Access-Control-Allow-Methods", "DELETE");
-        response.addHeader("Access-Control-Allow-Methods", "PUT");
-        response.addHeader("Access-Control-Allow-Origin", "*");
-        response.addHeader("Access-Control-Allow-Headers", "Content-Type");
+        res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+        res.addHeader("Access-Control-Allow-Origin", "*");
+        res.addHeader("Access-Control-Allow-Headers", "Content-Type");
+
+        chain.doFilter(req,res);
     }
+
 
     @Override
     public void destroy() {
