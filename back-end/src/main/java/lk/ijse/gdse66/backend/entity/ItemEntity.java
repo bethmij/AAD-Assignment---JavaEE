@@ -4,17 +4,14 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.*;
-
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class OrderDetails {
+public class ItemEntity {
 
-   private int ordeDetailId;
-   private int qty;
-   private double unitPrice;
-   private double totalPrice;
-
+    private String code;
+    private String description;
+    private int qtyOnHand;
+    private double unitPrice;
 
 }

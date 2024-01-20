@@ -4,14 +4,15 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
-
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class Order {
+public class OrderDetailsEntity {
 
-    private int orderId;
-    private LocalDate orderDate;
+   private String ordeDetailId;
+   private String itemCode;
+   private int qty;
+   private double unitPrice;
+
 
 }

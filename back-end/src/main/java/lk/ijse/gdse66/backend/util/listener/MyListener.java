@@ -5,7 +5,6 @@ import jakarta.servlet.ServletContextEvent;
 import jakarta.servlet.ServletContextListener;
 import jakarta.servlet.annotation.WebListener;
 import org.apache.commons.dbcp.BasicDataSource;
-//import org.apache.commons.dbcp.BasicDataSource;
 
 @WebListener
 public class MyListener implements ServletContextListener {
@@ -25,4 +24,7 @@ public class MyListener implements ServletContextListener {
     }
 
     @Override
-    public void contextDestroyed
+    public void contextDestroyed(ServletContextEvent sce) {
+        ServletContextListener.super.contextDestroyed(sce);
+    }
+}

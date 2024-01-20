@@ -2,6 +2,7 @@ package lk.ijse.gdse66.backend.util;
 
 
 import jakarta.servlet.http.HttpServletResponse;
+import org.apache.commons.dbcp.BasicDataSource;
 
 
 import java.io.IOException;
@@ -11,16 +12,10 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 public class CrudUtil {
-    static String url = "jdbc:mysql://localhost:3306/company";
-    static String username = "root";
-    static String password = "1234";
-    
-    public static <T> T execute (String sql, HttpServletResponse response, Object...params) {
 
-        Connection connection = null;
-        try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            connection = DriverManager.getConnection(url, username, password);
+    public static <T> T execute(String sql, BasicDataSource source,  Object... params){
+
+        try (Connection connection = source.getConnection()) {
             PreparedStatement pstm = connection.prepareStatement(sql);
 
             for (int i = 0; i < params.length; i++) {
@@ -31,16 +26,10 @@ public class CrudUtil {
                 return (T) pstm.executeQuery();
             else
                 return (T) (Boolean) (pstm.executeUpdate() > 0);
-        } catch (ClassNotFoundException | SQLException e) {
-            e.printStackTrace();
-            try {
-                response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getLocalizedMessage());
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
+
+        } catch (SQLException e) {
+            return null;
         }
-        return null;
     }
-
-
 }
+

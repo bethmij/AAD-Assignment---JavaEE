@@ -1,10 +1,16 @@
 package lk.ijse.gdse66.backend.api;
 
 import jakarta.json.*;
+import jakarta.json.bind.Jsonb;
+import jakarta.json.bind.JsonbBuilder;
+import jakarta.servlet.ServletContext;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lk.ijse.gdse66.backend.entity.CustomerEntity;
+import lk.ijse.gdse66.backend.util.CrudUtil;
+import org.apache.commons.dbcp.BasicDataSource;
 
 import javax.annotation.Resource;
 import javax.sql.DataSource;
@@ -13,6 +19,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 @WebServlet(urlPatterns = "/customer")
 public class CustomerServlet extends HttpServlet {
@@ -24,60 +32,63 @@ public class CustomerServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         resp.setContentType("application/json");
         String option = req.getParameter("option");
-        System.out.println("sfasfasfsfsfs");
+
+        BasicDataSource source = (BasicDataSource) req.getServletContext().getAttribute("bds");
+
+
 
         switch (option) {
             case "GET": {
-                JsonArrayBuilder arrayBuilder = Json.createArrayBuilder();
-                try (Connection connection = source.getConnection()) {
-                    PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM customer");
-                    ResultSet resultSet = preparedStatement.executeQuery();
+                List<CustomerEntity> customerList = new ArrayList<>();
+                CustomerEntity customer;
+
+                    String sql = "SELECT * FROM customer";
+                    ResultSet resultSet = CrudUtil.execute(sql, source,resp);
+
+                    try {
+                        while (resultSet.next()) {
+                        String id = resultSet.getString(1);
+                        String name = resultSet.getString(2);
+                        String address = resultSet.getString(3);
+                        double salary = resultSet.getDouble(4);
+
+                        customer = new CustomerEntity(id, name, address, salary);
+                        customerList.add(customer);
+                    }
+                        Jsonb jsonb = JsonbBuilder.create();
+                        jsonb.toJson(customerList, resp.getWriter());
+
+                    } catch (SQLException e) {
+                        resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                        resp.getWriter().println("Server Error! Please Try Again");
+                    }
+                    break;
+            }
+            case "SEARCH": {
+                String cusID = req.getParameter("cusID");
+
+                List<CustomerEntity> customerList = new ArrayList<>();
+                CustomerEntity customer;
+
+                String sql = "SELECT * FROM customer";
+                ResultSet resultSet = CrudUtil.execute(sql, source,resp);
+
+                try {
                     while (resultSet.next()) {
                         String id = resultSet.getString(1);
                         String name = resultSet.getString(2);
                         String address = resultSet.getString(3);
                         double salary = resultSet.getDouble(4);
 
-                        JsonObjectBuilder builder = Json.createObjectBuilder();
-                        builder.add("cusID", id);
-                        builder.add("cusName", name);
-                        builder.add("cusAddress", address);
-                        builder.add("cusSalary", salary);
-                        arrayBuilder.add(builder.build());
-
+                        customer = new CustomerEntity(id, name, address, salary);
+                        customerList.add(customer);
                     }
-                    sendMsg(resp, arrayBuilder.build(), "Got the Customer", 200);
+                    Jsonb jsonb = JsonbBuilder.create();
+                    jsonb.toJson(customerList, resp.getWriter());
+
                 } catch (SQLException e) {
-                    sendMsg(resp, JsonValue.EMPTY_JSON_ARRAY, e.getLocalizedMessage(), 400);
-                }
-                break;
-            }
-            case "SEARCH": {
-                String cusID = req.getParameter("cusID");
-
-                JsonArrayBuilder arrayBuilder = Json.createArrayBuilder();
-                try (Connection connection = source.getConnection()) {
-                    PreparedStatement preparedStatement = connection.prepareStatement(
-                            "SELECT * FROM customer WHERE id=?");
-                    preparedStatement.setString(1, cusID);
-                    ResultSet resultSet = preparedStatement.executeQuery();
-                    if (resultSet.next()) {
-                        String id = resultSet.getString(1);
-                        String name = resultSet.getString(2);
-                        String address = resultSet.getString(3);
-                        double salary = resultSet.getDouble(4);
-
-                        JsonObjectBuilder builder = Json.createObjectBuilder();
-                        builder.add("cusID", id);
-                        builder.add("cusName", name);
-                        builder.add("cusAddress", address);
-                        builder.add("cusSalary", salary);
-                        arrayBuilder.add(builder.build());
-
-                    }
-                    sendMsg(resp, arrayBuilder.build(), "Got the Customer", 200);
-                } catch (SQLException e) {
-                    sendMsg(resp, JsonValue.EMPTY_JSON_ARRAY, e.getLocalizedMessage(), 400);
+                    resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                    resp.getWriter().println("Server Error! Please Try Again");
                 }
                 break;
             }
