@@ -61,7 +61,7 @@ btnCustomerSave.click(function (event){
         }
 
     }else if(btnCustomerSave.text()==="Update ") {
-        const userChoice = window.confirm("Do you want to save the customer?");
+        const userChoice = window.confirm("Do you want to update the customer?");
         if (userChoice) {
             let newCustomer = Object.assign({}, customer);
             newCustomer.cusID = cusId.val();
