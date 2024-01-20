@@ -1,4 +1,4 @@
-package lk.ijse.gdse66.backend.filter;
+package lk.ijse.gdse66.backend.util.filter;
 
 import javax.servlet.*;
 import javax.servlet.annotation.WebFilter;

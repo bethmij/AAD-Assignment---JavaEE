@@ -1,4 +1,4 @@
-package lk.ijse.gdse66.backend.servlet;
+package lk.ijse.gdse66.backend.api;
 
 import jakarta.json.*;
 
