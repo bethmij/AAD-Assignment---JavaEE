@@ -1,97 +1,44 @@
 package lk.ijse.gdse66.backend.api;
 
-import jakarta.json.*;
+import jakarta.json.bind.Jsonb;
+import jakarta.json.bind.JsonbBuilder;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-
-import javax.annotation.Resource;
-import javax.sql.DataSource;
+import lk.ijse.gdse66.backend.dto.ItemDTO;
+import lk.ijse.gdse66.backend.entity.CustomerEntity;
+import lk.ijse.gdse66.backend.entity.ItemEntity;
+import lk.ijse.gdse66.backend.util.CrudUtil;
+import org.apache.commons.dbcp.BasicDataSource;
 import java.io.IOException;
 import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 @WebServlet(urlPatterns = "/item")
 public class ItemServlet extends HttpServlet {
-
-    @Resource(name = "java:comp/env/jdbc/pool")
-    DataSource source;
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         resp.setContentType("application/json");
         String option = req.getParameter("option");
 
+        BasicDataSource source = (BasicDataSource) req.getServletContext().getAttribute("bds");
+
         switch (option) {
             case "GET": {
-                JsonArrayBuilder arrayBuilder = Json.createArrayBuilder();
-                try (Connection connection = source.getConnection()) {
-                    PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM item");
-                    ResultSet resultSet = preparedStatement.executeQuery();
-                    while (resultSet.next()) {
-                        String code = resultSet.getString(1);
-                        String description = resultSet.getString(2);
-                        int qtyOnHand = resultSet.getInt(3);
-                        double uPrice = resultSet.getDouble(4);
-
-                        JsonObjectBuilder builder = Json.createObjectBuilder();
-                        builder.add("code", code);
-                        builder.add("description", description);
-                        builder.add("qtyOnHand", qtyOnHand);
-                        builder.add("uPrice", uPrice);
-                        arrayBuilder.add(builder.build());
-
-                    }
-                    sendMsg(resp, arrayBuilder.build(), "Got the Item", 200);
-                } catch (SQLException e) {
-                    sendMsg(resp, JsonValue.EMPTY_JSON_ARRAY, e.getLocalizedMessage(), 400);
-                }
+                getAllItem(resp, source);
                 break;
             }
             case "SEARCH": {
-                String itemCode = req.getParameter("code");
-
-                JsonArrayBuilder arrayBuilder = Json.createArrayBuilder();
-                try (Connection connection = source.getConnection()) {
-                    PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM item WHERE code=?");
-                    preparedStatement.setString(1, itemCode);
-                    ResultSet resultSet = preparedStatement.executeQuery();
-                    if (resultSet.next()) {
-                        String code = resultSet.getString(1);
-                        String description = resultSet.getString(2);
-                        int qtyOnHand = resultSet.getInt(3);
-                        double uPrice = resultSet.getDouble(4);
-
-                        JsonObjectBuilder builder = Json.createObjectBuilder();
-                        builder.add("code", code);
-                        builder.add("description", description);
-                        builder.add("qtyOnHand", qtyOnHand);
-                        builder.add("uPrice", uPrice);
-                        arrayBuilder.add(builder.build());
-
-                    }
-                    sendMsg(resp, arrayBuilder.build(), "Got the Item", 200);
-                } catch (SQLException e) {
-                    sendMsg(resp, JsonValue.EMPTY_JSON_ARRAY, e.getLocalizedMessage(), 400);
-                }
+                getItemById(req, resp, source);
                 break;
             }
             case "ID":
-                try (Connection connection = source.getConnection()) {
-                    PreparedStatement preparedStatement = connection.prepareStatement("SELECT code FROM item");
-                    ResultSet resultSet = preparedStatement.executeQuery();
-                    JsonArrayBuilder itemCodeList = Json.createArrayBuilder();
-
-                    while (resultSet.next()) {
-                        itemCodeList.add(resultSet.getString(1));
-                    }
-                    sendMsg(resp, itemCodeList.build(), "Got the list", 200);
-                } catch (SQLException e) {
-                    sendMsg(resp, JsonValue.EMPTY_JSON_ARRAY, e.getLocalizedMessage(), 400);
-                }
+                getItemIDList(resp, source);
                 break;
         }
     }
@@ -99,88 +46,145 @@ public class ItemServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         resp.setContentType("application/json");
-        String code = req.getParameter("code");
-        String description = req.getParameter("description");
-        String qtyOnHand = req.getParameter("qtyOnHand");
-        String uPrice = req.getParameter("uPrice");
+        BasicDataSource source = (BasicDataSource) req.getServletContext().getAttribute("bds");
 
+        ItemEntity item = JsonbBuilder.create().fromJson(req.getReader(),ItemEntity.class);
+        String code = item.getCode();
+        String description = item.getDescription();
+        int qtyOnHand = item.getQtyOnHand();
+        double unitPrice = item.getUnit_price();
 
         try (Connection connection = source.getConnection()) {
-            PreparedStatement pst = connection.prepareStatement(
-                    "INSERT INTO company.item (code, description, qtyOnHand, unitPrice) VALUES (?,?,?,?)");
-            pst.setString(1,code);
-            pst.setString(2,description);
-            pst.setString(3,qtyOnHand);
-            pst.setString(4,uPrice);
-            boolean isAdded = pst.executeUpdate() > 0;
+            String sql = "INSERT INTO item (code, description, qtyOnHand, unitPrice) VALUES (?,?,?,?)";
+            boolean isSaved = CrudUtil.execute(sql, connection, code, description, qtyOnHand, unitPrice);
 
-            if(isAdded){
-                sendMsg(resp, JsonValue.EMPTY_JSON_ARRAY, "Item Added Successfully", 200);
+            if(isSaved){
+                sendServerMsg(resp, HttpServletResponse.SC_OK, "Item Saved Successfully!");
             }else {
-                sendMsg(resp, JsonValue.EMPTY_JSON_ARRAY, "item Addition Failed", 400);
+                sendServerMsg(resp, HttpServletResponse.SC_BAD_REQUEST, "Item Save Failed!");
             }
         } catch (SQLException e) {
-            sendMsg(resp, JsonValue.EMPTY_JSON_ARRAY, e.getLocalizedMessage(), 400);
+            sendServerMsg(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Internal Server Error! Please try again");
         }
 
     }
 
     @Override
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        resp.setContentType("application/json");
-        JsonReader reader = Json.createReader(req.getReader());
-        JsonObject jsonObject = reader.readObject();
-        String code = jsonObject.getString("code");
-        String description = jsonObject.getString("description");
-        String qtyOnHand = jsonObject.getString("qtyOnHand");
-        String uPrice = jsonObject.getString("uPrice");
-//        System.out.println(code+" "+description+" "+qtyOnHand+" "+uPrice );
+        BasicDataSource source = (BasicDataSource) req.getServletContext().getAttribute("bds");
+
+        CustomerEntity customer = JsonbBuilder.create().fromJson(req.getReader(), ItemEntity.class);
+        String id = customer.getId();
+        String name = customer.getName();
+        String address = customer.getAddress();
+        double salary = customer.getSalary();
 
         try (Connection connection = source.getConnection()){
-            PreparedStatement pst = connection.prepareStatement(
-                    "UPDATE item SET description=?, qtyOnHand=?, unitPrice=? WHERE code=?");
-            pst.setString(1,description);
-            pst.setString(2,qtyOnHand);
-            pst.setString(3,uPrice);
-            pst.setString(4,code);
+            String sql = "UPDATE customer SET name=?, address=?, salary=? WHERE id=?";
+            boolean isUpdated = CrudUtil.execute(sql, connection, name, address, salary, id);
 
-            boolean is_updated = pst.executeUpdate() > 0;
-            if(is_updated)
-                sendMsg(resp,JsonValue.EMPTY_JSON_ARRAY,"Item Updated Successfully", 200);
+            if(isUpdated)
+                sendServerMsg(resp,HttpServletResponse.SC_OK,"Customer Updated Successfully!");
             else
-                sendMsg(resp,JsonValue.EMPTY_JSON_ARRAY,"Item Update Failed", 400);
+                sendServerMsg(resp,HttpServletResponse.SC_BAD_REQUEST,"Customer Update Failed!");
         } catch (SQLException e) {
-            sendMsg(resp,JsonValue.EMPTY_JSON_ARRAY, e.getLocalizedMessage(), 400);
+            sendServerMsg(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Internal Server Error! Please try again");
         }
     }
 
     @Override
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         resp.setContentType("application/json");
-        String code = req.getParameter("code");
+        String cusID = req.getParameter("cusID");
+        BasicDataSource source = (BasicDataSource) req.getServletContext().getAttribute("bds");
+
         try (Connection connection = source.getConnection()){
-            PreparedStatement pst = connection.prepareStatement(
-                    "DELETE FROM item WHERE code=?"
-            );
-            pst.setString(1,code);
-            boolean isDeleted = pst.executeUpdate() > 0;
+            String sql = "DELETE FROM customer WHERE id=?";
+            boolean isDeleted = CrudUtil.execute(sql, connection, cusID);
+
             if(isDeleted){
-                sendMsg(resp, JsonValue.EMPTY_JSON_ARRAY, "Item Deleted Successfully", 200);
+                sendServerMsg(resp, HttpServletResponse.SC_OK, "Customer Deleted Successfully!");
             }else {
-                sendMsg(resp, JsonValue.EMPTY_JSON_ARRAY, "Item Delete Failed", 400);
+                sendServerMsg(resp, HttpServletResponse.SC_BAD_REQUEST, "Customer Delete Failed!");
             }
         } catch (SQLException e) {
-            sendMsg(resp, JsonValue.EMPTY_JSON_ARRAY, e.getLocalizedMessage(), 400);
+            sendServerMsg(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Internal Internal Server Error! Please try again");
+        }
+    }
+
+    private void getAllItem(HttpServletResponse resp, BasicDataSource source) throws IOException {
+        List<CustomerEntity> customerList = new ArrayList<>();
+        CustomerEntity customer;
+
+        try (Connection connection = source.getConnection()){
+            String sql = "SELECT * FROM customer";
+            ResultSet resultSet = CrudUtil.execute(sql, connection);
+
+            while (resultSet.next()) {
+                String id = resultSet.getString(1);
+                String name = resultSet.getString(2);
+                String address = resultSet.getString(3);
+                double salary = resultSet.getDouble(4);
+
+                customer = new CustomerEntity(id, name, address, salary);
+                customerList.add(customer);
+            }
+            Jsonb jsonb = JsonbBuilder.create();
+            jsonb.toJson(customerList, resp.getWriter());
+
+        } catch (SQLException e) {
+            sendServerMsg(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Internal Server Error! Please try again");
         }
     }
 
 
-    public  void sendMsg(HttpServletResponse resp, JsonArray data, String message, int status) throws IOException {
-        resp.setStatus(200);
-        JsonObjectBuilder builder = Json.createObjectBuilder();
-        builder.add("data",data);
-        builder.add("message",message);
-        builder.add("status",status);
-        resp.getWriter().println(builder.build());
+
+    private void getItemById(HttpServletRequest req, HttpServletResponse resp, BasicDataSource source) throws IOException {
+        String cusID = req.getParameter("cusID");
+        CustomerEntity customer = null;
+
+        try (Connection connection = source.getConnection()){
+            String sql = "SELECT * FROM customer WHERE id=?";
+            ResultSet resultSet = CrudUtil.execute(sql, connection, cusID);
+
+            if (resultSet.next()) {
+                String id = resultSet.getString(1);
+                String name = resultSet.getString(2);
+                String address = resultSet.getString(3);
+                double salary = resultSet.getDouble(4);
+
+                customer = new CustomerEntity(id, name, address, salary);
+
+            }
+            Jsonb jsonb = JsonbBuilder.create();
+            jsonb.toJson(customer, resp.getWriter());
+
+        } catch (SQLException e) {
+            sendServerMsg(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Internal Server Error! Please try again");
+        }
+    }
+
+    private void getItemIDList(HttpServletResponse resp, BasicDataSource source) throws IOException {
+        List<String> cusIdList = new ArrayList<>();
+
+        try (Connection connection = source.getConnection()){
+            String sql = "SELECT id FROM customer";
+            ResultSet resultSet = CrudUtil.execute(sql, connection);
+
+            while (resultSet.next()) {
+                String id = resultSet.getString(1);
+                cusIdList.add(id);
+            }
+            Jsonb jsonb = JsonbBuilder.create();
+            jsonb.toJson(cusIdList, resp.getWriter());
+
+        } catch (SQLException e) {
+            sendServerMsg(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Internal Server Error! Please try again");
+        }
+    }
+
+    private void sendServerMsg(HttpServletResponse resp, int status, String msg) throws IOException {
+        resp.setStatus(status);
+        resp.getWriter().println(msg);
     }
 }

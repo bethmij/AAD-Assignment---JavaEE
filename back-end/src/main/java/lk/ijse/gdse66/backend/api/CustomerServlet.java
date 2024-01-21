@@ -1,6 +1,5 @@
 package lk.ijse.gdse66.backend.api;
 
-import jakarta.json.*;
 import jakarta.json.bind.Jsonb;
 import jakarta.json.bind.JsonbBuilder;
 import jakarta.servlet.annotation.WebServlet;
@@ -10,12 +9,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import lk.ijse.gdse66.backend.entity.CustomerEntity;
 import lk.ijse.gdse66.backend.util.CrudUtil;
 import org.apache.commons.dbcp.BasicDataSource;
-
-import javax.annotation.Resource;
-import javax.sql.DataSource;
 import java.io.IOException;
 import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -23,9 +18,6 @@ import java.util.List;
 
 @WebServlet(urlPatterns = "/customer")
 public class CustomerServlet extends HttpServlet {
-
-    @Resource(name = "java:comp/env/jdbc/pool")
-    DataSource source;
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
@@ -51,7 +43,6 @@ public class CustomerServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        resp.setContentType("application/json");
         BasicDataSource source = (BasicDataSource) req.getServletContext().getAttribute("bds");
 
         CustomerEntity customer = JsonbBuilder.create().fromJson(req.getReader(),CustomerEntity.class);
@@ -67,17 +58,16 @@ public class CustomerServlet extends HttpServlet {
             if(isSaved){
                 sendServerMsg(resp, HttpServletResponse.SC_OK, "Customer Saved Successfully!");
             }else {
-                sendServerMsg(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Server error! Please try again");
+                sendServerMsg(resp, HttpServletResponse.SC_BAD_REQUEST, "Customer Save Failed!");
             }
         } catch (SQLException e) {
-            sendServerMsg(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Server error! Please try again");
+            sendServerMsg(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Internal Server Error! Please try again");
         }
 
     }
 
     @Override
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        resp.setContentType("application/json");
         BasicDataSource source = (BasicDataSource) req.getServletContext().getAttribute("bds");
 
         CustomerEntity customer = JsonbBuilder.create().fromJson(req.getReader(),CustomerEntity.class);
@@ -88,51 +78,35 @@ public class CustomerServlet extends HttpServlet {
 
         try (Connection connection = source.getConnection()){
             String sql = "UPDATE customer SET name=?, address=?, salary=? WHERE id=?";
-            boolean isUpdared
-            PreparedStatement pst = connection.prepareStatement(
-                    "");
+            boolean isUpdated = CrudUtil.execute(sql, connection, name, address, salary, id);
 
-
-            boolean is_updated = pst.executeUpdate() > 0;
-            if(is_updated)
-                sendMsg(resp,JsonValue.EMPTY_JSON_ARRAY,"Customer Updated Successfully", 200);
+            if(isUpdated)
+                sendServerMsg(resp,HttpServletResponse.SC_OK,"Customer Updated Successfully!");
             else
-                sendMsg(resp,JsonValue.EMPTY_JSON_ARRAY,"Customer Update Failed", 400);
+                sendServerMsg(resp,HttpServletResponse.SC_BAD_REQUEST,"Customer Update Failed!");
         } catch (SQLException e) {
-            sendMsg(resp,JsonValue.EMPTY_JSON_ARRAY, e.getLocalizedMessage(), 400);
+            sendServerMsg(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Internal Server Error! Please try again");
         }
     }
 
     @Override
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        resp.setContentType("application/json");
         String cusID = req.getParameter("cusID");
+        BasicDataSource source = (BasicDataSource) req.getServletContext().getAttribute("bds");
+
         try (Connection connection = source.getConnection()){
-            PreparedStatement pst = connection.prepareStatement(
-                    "DELETE FROM customer WHERE id=?"
-            );
-            pst.setString(1,cusID);
-            boolean isDeleted = pst.executeUpdate() > 0;
+            String sql = "DELETE FROM customer WHERE id=?";
+            boolean isDeleted = CrudUtil.execute(sql, connection, cusID);
+
             if(isDeleted){
-                sendMsg(resp, JsonValue.EMPTY_JSON_ARRAY, "Customer Deleted Successfully", 200);
+                sendServerMsg(resp, HttpServletResponse.SC_OK, "Customer Deleted Successfully!");
             }else {
-                sendMsg(resp, JsonValue.EMPTY_JSON_ARRAY, "Customer Delete Failed", 400);
+                sendServerMsg(resp, HttpServletResponse.SC_BAD_REQUEST, "Customer Delete Failed!");
             }
         } catch (SQLException e) {
-            sendMsg(resp, JsonValue.EMPTY_JSON_ARRAY, e.getLocalizedMessage(), 400);
+            sendServerMsg(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Internal Internal Server Error! Please try again");
         }
     }
-
-
-    public  void sendMsg(HttpServletResponse resp, JsonArray data, String message, int status) throws IOException {
-        resp.setStatus(200);
-        JsonObjectBuilder builder = Json.createObjectBuilder();
-        builder.add("data",data);
-        builder.add("message",message);
-        builder.add("status",status);
-        resp.getWriter().println(builder.build());
-    }
-
 
     private void getAllCustomer(HttpServletResponse resp, BasicDataSource source) throws IOException {
         List<CustomerEntity> customerList = new ArrayList<>();
@@ -155,7 +129,7 @@ public class CustomerServlet extends HttpServlet {
             jsonb.toJson(customerList, resp.getWriter());
 
         } catch (SQLException e) {
-            sendServerMsg(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Server error! Please try again");
+            sendServerMsg(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Internal Server Error! Please try again");
         }
     }
 
@@ -182,7 +156,7 @@ public class CustomerServlet extends HttpServlet {
             jsonb.toJson(customer, resp.getWriter());
 
         } catch (SQLException e) {
-            sendServerMsg(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Server error! Please try again");
+            sendServerMsg(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Internal Server Error! Please try again");
         }
     }
 
@@ -201,7 +175,7 @@ public class CustomerServlet extends HttpServlet {
             jsonb.toJson(cusIdList, resp.getWriter());
 
         } catch (SQLException e) {
-            sendServerMsg(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Server error! Please try again");
+            sendServerMsg(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Internal Server Error! Please try again");
         }
     }
 
