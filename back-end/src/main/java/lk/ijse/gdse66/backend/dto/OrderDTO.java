@@ -1,0 +1,23 @@
+package lk.ijse.gdse66.backend.dto;
+
+import jakarta.json.bind.annotation.JsonbDateFormat;
+import lk.ijse.gdse66.backend.entity.OrderDetailsEntity;
+import lk.ijse.gdse66.backend.entity.OrderEntity;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.time.LocalDate;
+import java.util.List;
+
+@AllArgsConstructor
+@NoArgsConstructor
+@Data
+public class OrderDTO {
+    private String orderId;
+
+    @JsonbDateFormat(value = "yyyyMMdd")
+    private LocalDate orderDate;
+    private String customerId;
+    private List<OrderDetailsEntity> orderDetails;
+}

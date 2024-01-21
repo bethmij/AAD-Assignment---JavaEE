@@ -11,8 +11,9 @@ import java.time.LocalDate;
 @Data
 public class OrderEntity {
 
-    private int orderId;
+    private String orderId;
     private LocalDate orderDate;
     private String customerId;
+
 
 }
