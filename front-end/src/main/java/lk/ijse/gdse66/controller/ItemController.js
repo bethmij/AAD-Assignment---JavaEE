@@ -6,7 +6,7 @@ let itemName = $("#txtItemName");
 let itemQuantity = $("#txtItemQuantity");
 let itemPrice = $("#txtItemPrice");
 let btnItemSave = $('#itemSave');
-let itemCodeList = [];
+
 
 $(document).on('keydown', function(event) {
     if (event.keyCode === 9) {
@@ -27,7 +27,7 @@ btnItemSave.click(function (event){
                 if (!(IDList.includes(itemCode.val()))) {
                     let item = $("#itemForm").serialize();
                     $.ajax({
-                        url: "http://localhost:8080/java-pos/item",
+                        url: "http://localhost:8000/java-pos/item",
                         method: "POST",
                         data: item,
                         success: function (resp) {
@@ -71,7 +71,7 @@ btnItemSave.click(function (event){
             newItem.qtyOnHand = itemQuantity.val();
 
             $.ajax({
-                url: "http://localhost:8080/java-pos/item",
+                url: "http://localhost:8000/java-pos/item",
                 method: "PUT",
                 contentType: "application/json",
                 data: JSON.stringify(newItem),
@@ -125,27 +125,27 @@ $('#itemGetAll').click(function (){
 
 function getAll() {
     $.ajax({
-        url: "http://localhost:8080/java-pos/item?option=GET",
+        url: "http://localhost:8000/java-pos/item?option=GET",
         method: "GET",
-        success: function (resp) {
-            if(resp.status===200){
+        success: function (resp, status, xhr) {
+            if(xhr.status===200) {
                 let itemBody = $("#itemBody");
                 itemBody.empty();
-                for (let respElement of resp.data) {
+                for (let item of resp) {
                     itemBody.append(`<tr>
-                        <th scope="row">${respElement.code}</th>
-                        <td>${respElement.description}</td>
-                        <td>${respElement.qtyOnHand}</td>
-                        <td>${respElement.uPrice}</td>
+                        <th scope="row">${item.code}</th>
+                        <td>${item.description}</td>
+                        <td>${item.qtyOnHand}</td>
+                        <td>${item.unitPrice}</td>
                         <td style="width: 10%"><img  class="delete"  src="../resources/assests/img/icons8-delete-96.png" alt="Logo" width="50%" class="opacity-75"></td>
                 </tr>`);
                     deleteDetail();
                     setFeilds();
                 }
-
-            }else if (resp.status === 200){
-                alert(resp.message);
             }
+        },
+        error: function (xhr, status, error){
+            console.log("Error : ", xhr.statusText);
         }
     })
 
@@ -181,7 +181,7 @@ function deleteDetail() {
             let code = $( $(this).parents('tr').children(':nth-child(1)')).text();
 
             $.ajax({
-                url: "http://localhost:8080/java-pos/item?code="+code,
+                url: "http://localhost:8000/java-pos/item?code="+code,
                 method: "DELETE",
                 success: function (resp){
                     if(resp.status===200){
@@ -201,7 +201,7 @@ function deleteDetail() {
 
 export function getItemList(code, callback) {
     $.ajax({
-        url: "http://localhost:8080/java-pos/item?option=SEARCH&code=" + code,
+        url: "http://localhost:8000/java-pos/item?option=SEARCH&code=" + code,
         method: "GET",
         success: function (resp) {
             callback(resp);
@@ -246,17 +246,18 @@ $('#itemSearch').click(function (){
 });
 
 export function getItemCodeList(callback) {
+    let itemCodeList = [];
     $.ajax({
-        url: "http://localhost:8080/java-pos/item?option=ID",
+        url: "http://localhost:8000/java-pos/item?option=ID",
         method: "GET",
-        success: function (resp) {
-            for (let respElement of resp.data) {
-                itemCodeList.push(respElement);
+        success: function (resp, status, xhr) {
+            if(xhr.status === 200) {
+                itemCodeList = resp;
+                callback(itemCodeList);
             }
-            callback(itemCodeList);
         },
-        error:function (resp){
-            alert(resp);
+        error: function (xhr, status, error){
+            console.log("Error : ", xhr.statusText);
         }
     });
 }

@@ -8,7 +8,7 @@ btnSave.attr("disabled", true);
 txtQty.keyup(function (){
     enableButton();
 
-    if( txtQty.val().length == 0) {
+    if( txtQty.val().length === 0) {
         txtQty.css("border", "1px solid white");
         paraQty.text("");
         btnSave.attr("disabled", true);
@@ -25,7 +25,7 @@ txtQty.keyup(function (){
 })
 
 function enableButton(){
-    if( qtyRegEx.test(txtQty.val()) && $('#cusName').val()!="Customer Name : " && $('#itemName').val()!="Item Name : "){
+    if( qtyRegEx.test(txtQty.val()) && $('#cusName').val()!=="Customer Name : " && $('#itemName').val()!=="Item Name : "){
         btnSave.attr("disabled", false);
     }
 }

@@ -2,7 +2,6 @@ package lk.ijse.gdse66.backend.dto;
 
 import jakarta.json.bind.annotation.JsonbDateFormat;
 import lk.ijse.gdse66.backend.entity.OrderDetailsEntity;
-import lk.ijse.gdse66.backend.entity.OrderEntity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

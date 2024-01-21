@@ -15,8 +15,7 @@ btnSave.attr("disabled", true);
 
 txtID.keyup(function (){
 
-
-    if( txtID.val().length == 0) {
+    if( txtID.val().length === 0) {
         txtID.css("border", "1px solid white");
         paraID.text("");
         btnSave.attr("disabled", true);
@@ -35,7 +34,7 @@ txtID.keyup(function (){
 
 txtName.keyup(function (){
 
-    if( txtName.val().length == 0) {
+    if( txtName.val().length === 0) {
         txtName.css("border", "1px solid white");
         paraName.text("");
         btnSave.attr("disabled", true);
@@ -54,7 +53,7 @@ txtName.keyup(function (){
 
 txtAddress.keyup(function (){
 
-    if( txtAddress.val().length == 0) {
+    if( txtAddress.val().length === 0) {
         txtAddress.css("border", "1px solid white");
         paraAddress.text("");
         btnSave.attr("disabled", true);
@@ -73,7 +72,7 @@ txtAddress.keyup(function (){
 
 txtSalary.keyup(function (){
 
-    if( txtSalary.val().length == 0) {
+    if( txtSalary.val().length === 0) {
         txtSalary.css("border", "1px solid white");
         paraSalary.text("");
         btnSave.attr("disabled", true);
@@ -92,7 +91,7 @@ txtSalary.keyup(function (){
 
 function enableButton(){
     if( idRegEx.test(txtID.val()) && nameRegEx.test(txtName.val())  && txtAddress.val().length >= 7 &&
-        salaryRegEx.test(txtSalary.val()) && txtSalary.val().length != 0 ){
+        salaryRegEx.test(txtSalary.val()) && txtSalary.val().length !== 0 ){
         btnSave.attr("disabled", false);
     }
 }

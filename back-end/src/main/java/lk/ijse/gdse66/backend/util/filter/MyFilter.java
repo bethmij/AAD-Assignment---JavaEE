@@ -11,10 +11,6 @@ import java.io.IOException;
 
 @WebFilter(urlPatterns = "/*")
 public class MyFilter extends HttpFilter {
-    @Override
-    public void init(FilterConfig filterConfig) throws ServletException {
-        System.out.println("filter called");
-    }
 
     @Override
     protected void doFilter(HttpServletRequest req, HttpServletResponse res, FilterChain chain) throws IOException, ServletException {
@@ -27,9 +23,4 @@ public class MyFilter extends HttpFilter {
         chain.doFilter(req,res);
     }
 
-
-    @Override
-    public void destroy() {
-
-    }
 }

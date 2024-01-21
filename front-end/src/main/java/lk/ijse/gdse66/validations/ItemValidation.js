@@ -17,7 +17,7 @@ txtCode.keyup(function (){
 
     enableButton();
 
-    if( txtCode.val().length == 0) {
+    if( txtCode.val().length === 0) {
         txtCode.css("border", "1px solid white");
         paraCode.text("");
         btnSave.attr("disabled", true);
@@ -38,7 +38,7 @@ txtName.keyup(function (){
 
     enableButton();
 
-    if( txtName.val().length == 0) {
+    if( txtName.val().length === 0) {
         txtName.css("border", "1px solid white");
         paraName.text("");
         btnSave.attr("disabled", true);
@@ -58,7 +58,7 @@ txtPrice.keyup(function (){
 
     enableButton();
 
-    if( txtPrice.val().length == 0) {
+    if( txtPrice.val().length === 0) {
         txtPrice.css("border", "1px solid white");
         paraPrice.text("");
         btnSave.attr("disabled", true);
@@ -78,7 +78,7 @@ txtQty.keyup(function (){
 
     enableButton();
 
-    if( txtQty.val().length == 0) {
+    if( txtQty.val().length === 0) {
         txtQty.css("border", "1px solid white");
         paraQty.text("");
         btnSave.attr("disabled", true);

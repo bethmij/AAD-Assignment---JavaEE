@@ -6,7 +6,7 @@ let cusName = $("#txtCusName");
 let cusAddress = $("#txtCusAddress");
 let cusSalary = $("#txtCusSalary");
 let btnCustomerSave = $('#btnSave');
-let cusIdList = [];
+
 
 $(document).on('keydown', function(event) {
     if (event.keyCode === 9) {
@@ -123,28 +123,31 @@ $('#getAll').click(function (){
 })
 
 function getAll() {
+
     $.ajax({
         url: "http://localhost:8000/java-pos/customer?option=GET",
         method: "GET",
-        success: function (resp) {
-            if(resp.status===200){
+        success: function (resp, status, xhr) {
+
+            if(xhr.status===200) {
                 let cusBody = $("#cusTBody");
                 cusBody.empty();
-                for (let respElement of resp.data) {
-                    cusBody.append(`<tr>
-                        <th scope="row">${respElement.cusID}</th>
-                        <td>${respElement.cusName}</td>
-                        <td>${respElement.cusAddress}</td>
-                        <td>${respElement.cusSalary}</td>
-                        <td style="width: 10%"><img  class="delete"  src="../resources/assests/img/icons8-delete-96.png" alt="Logo" width="50%" class="opacity-75"></td>
-                </tr>`);
+                for (let customer of resp) {
+                    cusBody.append(`
+                        <tr>
+                            <th scope="row">${customer.id}</th>
+                            <td>${customer.name}</td>
+                            <td>${customer.address}</td>
+                            <td>${customer.salary}</td>
+                            <td style="width: 10%"><img  class="delete"  src="../resources/assests/img/icons8-delete-96.png" alt="Logo" width="50%" class="opacity-75"></td>
+                        </tr>`);
                     deleteDetail();
                     setFeilds();
                 }
-
-            }else if (resp.status === 200){
-                alert(resp.message);
             }
+        },
+        error: function (xhr, status, error){
+            console.log("Error : ", xhr.statusText);
         }
     })
 
@@ -245,17 +248,18 @@ $('#btnSearch').click(function (){
 });
 
 export function getCusIDList(callback) {
+    let cusIDList = [];
     $.ajax({
         url: "http://localhost:8000/java-pos/customer?option=ID",
         method: "GET",
-        success: function (resp) {
-            for (let respElement of resp.data) {
-                 cusIdList.push(respElement);
+        success: function (resp, status, xhr) {
+            if(xhr.status === 200) {
+                cusIDList = resp
+                callback(cusIDList);
             }
-            callback(cusIdList);
         },
-        error:function (resp){
-            alert(resp);
+        error: function (xhr, status, error){
+            console.log("Error : ", xhr.statusText);
         }
     });
 }

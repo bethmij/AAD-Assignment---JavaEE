@@ -70,7 +70,7 @@ function setOrderID() {
 selectCusOp.change(function () {
     let cusID = selectCusOp.val();
     $.ajax({
-        url:"http://localhost:8080/java-pos/customer?option=SEARCH&cusID="+cusID,
+        url:"http://localhost:8000/java-pos/customer?option=SEARCH&cusID="+cusID,
         method: "GET",
         success: function (resp) {
             if(resp.status===200){
@@ -99,7 +99,7 @@ selectCusOp.change(function () {
 selectItemOp.change(function () {
     let itemCode = selectItemOp.val();
     $.ajax({
-        url:"http://localhost:8080/java-pos/item?option=SEARCH&code="+itemCode,
+        url:"http://localhost:8000/java-pos/item?option=SEARCH&code="+itemCode,
         method: "GET",
         success: function (resp) {
             if(resp.status===200){
@@ -261,7 +261,7 @@ btnOrder.click(function (event){
                     if (!(parseInt(cash.val()) < total1)) {
                         let order = setOrderArray(orderID, oID, currDate);
                         $.ajax({
-                           url: "http://localhost:8080/java-pos/order",
+                           url: "http://localhost:8000/java-pos/order",
                             method: "POST",
                             data: JSON.stringify(order),
                             success: function (resp) {
@@ -285,7 +285,7 @@ btnOrder.click(function (event){
             } else if (btnOrder.text().includes("Update Order")) {
                 let order = setOrderArray(orderID, oID, currDate);
                 $.ajax({
-                    url:"http://localhost:8080/java-pos/order",
+                    url:"http://localhost:8000/java-pos/order",
                     method: "PUT",
                     data: JSON.stringify(order),
                     success:function (resp){
@@ -450,7 +450,7 @@ $('#orderSearch').click(function (){
 function getOrderIDList(callback) {
     let orderIDList = []
     $.ajax({
-        url: "http://localhost:8080/java-pos/order?option=ID",
+        url: "http://localhost:8000/java-pos/order?option=ID",
         method: "GET",
         success: function (resp) {
             if (resp.status === 200) {
@@ -476,7 +476,7 @@ function getOrderIDList(callback) {
 function getOrderList(id,callback) {
     let orderDetail = [];
     $.ajax({
-        url: "http://localhost:8080/java-pos/order?option=SEARCH&id="+id,
+        url: "http://localhost:8000/java-pos/order?option=SEARCH&id="+id,
         method: "GET",
         success: function (resp) {
             if (resp.status === 200) {
