@@ -6,8 +6,6 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lk.ijse.gdse66.backend.dto.ItemDTO;
-import lk.ijse.gdse66.backend.entity.CustomerEntity;
 import lk.ijse.gdse66.backend.entity.ItemEntity;
 import lk.ijse.gdse66.backend.util.CrudUtil;
 import org.apache.commons.dbcp.BasicDataSource;
@@ -45,14 +43,13 @@ public class ItemServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        resp.setContentType("application/json");
         BasicDataSource source = (BasicDataSource) req.getServletContext().getAttribute("bds");
 
         ItemEntity item = JsonbBuilder.create().fromJson(req.getReader(),ItemEntity.class);
         String code = item.getCode();
         String description = item.getDescription();
         int qtyOnHand = item.getQtyOnHand();
-        double unitPrice = item.getUnit_price();
+        double unitPrice = item.getUnitPrice();
 
         try (Connection connection = source.getConnection()) {
             String sql = "INSERT INTO item (code, description, qtyOnHand, unitPrice) VALUES (?,?,?,?)";
@@ -73,20 +70,20 @@ public class ItemServlet extends HttpServlet {
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         BasicDataSource source = (BasicDataSource) req.getServletContext().getAttribute("bds");
 
-        CustomerEntity customer = JsonbBuilder.create().fromJson(req.getReader(), ItemEntity.class);
-        String id = customer.getId();
-        String name = customer.getName();
-        String address = customer.getAddress();
-        double salary = customer.getSalary();
+        ItemEntity item = JsonbBuilder.create().fromJson(req.getReader(),ItemEntity.class);
+        String code = item.getCode();
+        String description = item.getDescription();
+        int qtyOnHand = item.getQtyOnHand();
+        double unitPrice = item.getUnitPrice();
 
         try (Connection connection = source.getConnection()){
-            String sql = "UPDATE customer SET name=?, address=?, salary=? WHERE id=?";
-            boolean isUpdated = CrudUtil.execute(sql, connection, name, address, salary, id);
+            String sql = "UPDATE item SET description=?, qtyOnHand=?, unitPrice=? WHERE code=?";
+            boolean isUpdated = CrudUtil.execute(sql, connection, description, qtyOnHand, unitPrice, code);
 
             if(isUpdated)
-                sendServerMsg(resp,HttpServletResponse.SC_OK,"Customer Updated Successfully!");
+                sendServerMsg(resp,HttpServletResponse.SC_OK,"Item Updated Successfully!");
             else
-                sendServerMsg(resp,HttpServletResponse.SC_BAD_REQUEST,"Customer Update Failed!");
+                sendServerMsg(resp,HttpServletResponse.SC_BAD_REQUEST,"Item Update Failed!");
         } catch (SQLException e) {
             sendServerMsg(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Internal Server Error! Please try again");
         }
@@ -94,18 +91,17 @@ public class ItemServlet extends HttpServlet {
 
     @Override
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        resp.setContentType("application/json");
-        String cusID = req.getParameter("cusID");
+        String itemCode = req.getParameter("itemCode");
         BasicDataSource source = (BasicDataSource) req.getServletContext().getAttribute("bds");
 
         try (Connection connection = source.getConnection()){
-            String sql = "DELETE FROM customer WHERE id=?";
-            boolean isDeleted = CrudUtil.execute(sql, connection, cusID);
+            String sql = "DELETE FROM item WHERE code=?";
+            boolean isDeleted = CrudUtil.execute(sql, connection, itemCode);
 
             if(isDeleted){
-                sendServerMsg(resp, HttpServletResponse.SC_OK, "Customer Deleted Successfully!");
+                sendServerMsg(resp, HttpServletResponse.SC_OK, "Item Deleted Successfully!");
             }else {
-                sendServerMsg(resp, HttpServletResponse.SC_BAD_REQUEST, "Customer Delete Failed!");
+                sendServerMsg(resp, HttpServletResponse.SC_BAD_REQUEST, "Item Delete Failed!");
             }
         } catch (SQLException e) {
             sendServerMsg(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Internal Internal Server Error! Please try again");
@@ -113,24 +109,24 @@ public class ItemServlet extends HttpServlet {
     }
 
     private void getAllItem(HttpServletResponse resp, BasicDataSource source) throws IOException {
-        List<CustomerEntity> customerList = new ArrayList<>();
-        CustomerEntity customer;
+        List<ItemEntity> itemList = new ArrayList<>();
+        ItemEntity item;
 
         try (Connection connection = source.getConnection()){
-            String sql = "SELECT * FROM customer";
+            String sql = "SELECT * FROM item";
             ResultSet resultSet = CrudUtil.execute(sql, connection);
 
             while (resultSet.next()) {
-                String id = resultSet.getString(1);
-                String name = resultSet.getString(2);
-                String address = resultSet.getString(3);
-                double salary = resultSet.getDouble(4);
+                String code = resultSet.getString(1);
+                String description = resultSet.getString(2);
+                int qtyOnHand = resultSet.getInt(3);
+                double unitPrice = resultSet.getDouble(4);
 
-                customer = new CustomerEntity(id, name, address, salary);
-                customerList.add(customer);
+                item = new ItemEntity(code, description, qtyOnHand, unitPrice);
+                itemList.add(item);
             }
             Jsonb jsonb = JsonbBuilder.create();
-            jsonb.toJson(customerList, resp.getWriter());
+            jsonb.toJson(itemList, resp.getWriter());
 
         } catch (SQLException e) {
             sendServerMsg(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Internal Server Error! Please try again");
@@ -140,24 +136,24 @@ public class ItemServlet extends HttpServlet {
 
 
     private void getItemById(HttpServletRequest req, HttpServletResponse resp, BasicDataSource source) throws IOException {
-        String cusID = req.getParameter("cusID");
-        CustomerEntity customer = null;
+        String itemCode = req.getParameter("itemCode");
+        ItemEntity item = null;
 
         try (Connection connection = source.getConnection()){
-            String sql = "SELECT * FROM customer WHERE id=?";
-            ResultSet resultSet = CrudUtil.execute(sql, connection, cusID);
+            String sql = "SELECT * FROM item WHERE code=?";
+            ResultSet resultSet = CrudUtil.execute(sql, connection, itemCode);
 
             if (resultSet.next()) {
-                String id = resultSet.getString(1);
-                String name = resultSet.getString(2);
-                String address = resultSet.getString(3);
-                double salary = resultSet.getDouble(4);
+                String code = resultSet.getString(1);
+                String description = resultSet.getString(2);
+                int qtyOnHand = resultSet.getInt(3);
+                double unitPrice = resultSet.getDouble(4);
 
-                customer = new CustomerEntity(id, name, address, salary);
+                item = new ItemEntity(code, description, qtyOnHand, unitPrice);
 
             }
             Jsonb jsonb = JsonbBuilder.create();
-            jsonb.toJson(customer, resp.getWriter());
+            jsonb.toJson(item, resp.getWriter());
 
         } catch (SQLException e) {
             sendServerMsg(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Internal Server Error! Please try again");
@@ -165,18 +161,18 @@ public class ItemServlet extends HttpServlet {
     }
 
     private void getItemIDList(HttpServletResponse resp, BasicDataSource source) throws IOException {
-        List<String> cusIdList = new ArrayList<>();
+        List<String> itemCodeList = new ArrayList<>();
 
         try (Connection connection = source.getConnection()){
-            String sql = "SELECT id FROM customer";
+            String sql = "SELECT code FROM item";
             ResultSet resultSet = CrudUtil.execute(sql, connection);
 
             while (resultSet.next()) {
-                String id = resultSet.getString(1);
-                cusIdList.add(id);
+                String code = resultSet.getString(1);
+                itemCodeList.add(code);
             }
             Jsonb jsonb = JsonbBuilder.create();
-            jsonb.toJson(cusIdList, resp.getWriter());
+            jsonb.toJson(itemCodeList, resp.getWriter());
 
         } catch (SQLException e) {
             sendServerMsg(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Internal Server Error! Please try again");
