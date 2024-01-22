@@ -10,19 +10,19 @@ import java.util.List;
 
 public interface ItemDAO extends CrudDAO<ItemEntity> {
     @Override
-    boolean save(Connection connection, ItemEntity dto);
+    boolean save(Connection connection, ItemEntity dto) throws SQLException;
 
     @Override
-    boolean update(Connection connection, ItemEntity dto);
+    boolean update(Connection connection, ItemEntity dto) throws SQLException;
 
     @Override
-    boolean delete(Connection connection, String id);
+    boolean delete(Connection connection, String id) throws SQLException;
 
     @Override
-    ItemEntity search(Connection connection, String id);
+    ItemEntity search(Connection connection, String id) throws SQLException;
 
     @Override
-    List<ItemEntity> getAll(Connection connection);
+    List<ItemEntity> getAll(Connection connection) throws SQLException;
 
     @Override
     List<String> getIDList(Connection connection) throws SQLException;

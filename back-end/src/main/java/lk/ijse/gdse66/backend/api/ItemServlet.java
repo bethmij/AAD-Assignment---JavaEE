@@ -6,18 +6,20 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lk.ijse.gdse66.backend.bo.BOFactory;
+import lk.ijse.gdse66.backend.bo.custom.ItemBO;
+import lk.ijse.gdse66.backend.dto.ItemDTO;
 import lk.ijse.gdse66.backend.entity.ItemEntity;
-import lk.ijse.gdse66.backend.util.CrudUtil;
 import org.apache.commons.dbcp.BasicDataSource;
+
 import java.io.IOException;
 import java.sql.Connection;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 
 @WebServlet(urlPatterns = "/item")
 public class ItemServlet extends HttpServlet {
+    ItemBO itemBO = BOFactory.getBoFactory().getBO(BOFactory.BOTypes.ITEMBO);
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
@@ -52,8 +54,8 @@ public class ItemServlet extends HttpServlet {
         double unitPrice = item.getUnitPrice();
 
         try (Connection connection = source.getConnection()) {
-            String sql = "INSERT INTO item (code, description, qtyOnHand, unitPrice) VALUES (?,?,?,?)";
-            boolean isSaved = CrudUtil.execute(sql, connection, code, description, qtyOnHand, unitPrice);
+            ItemDTO itemDTO = new ItemDTO(code, description, unitPrice, qtyOnHand);
+            boolean isSaved = itemBO.saveItem(connection, itemDTO);
 
             if(isSaved){
                 sendServerMsg(resp, HttpServletResponse.SC_OK, "Item Saved Successfully!");
@@ -77,8 +79,8 @@ public class ItemServlet extends HttpServlet {
         double unitPrice = item.getUnitPrice();
 
         try (Connection connection = source.getConnection()){
-            String sql = "UPDATE item SET description=?, qtyOnHand=?, unitPrice=? WHERE code=?";
-            boolean isUpdated = CrudUtil.execute(sql, connection, description, qtyOnHand, unitPrice, code);
+            ItemDTO itemDTO = new ItemDTO(code, description, unitPrice, qtyOnHand);
+            boolean isUpdated = itemBO.updateItem(connection, itemDTO);
 
             if(isUpdated)
                 sendServerMsg(resp,HttpServletResponse.SC_OK,"Item Updated Successfully!");
@@ -95,8 +97,7 @@ public class ItemServlet extends HttpServlet {
         BasicDataSource source = (BasicDataSource) req.getServletContext().getAttribute("bds");
 
         try (Connection connection = source.getConnection()){
-            String sql = "DELETE FROM item WHERE code=?";
-            boolean isDeleted = CrudUtil.execute(sql, connection, itemCode);
+            boolean isDeleted = itemBO.deleteItem(connection, itemCode);
 
             if(isDeleted){
                 sendServerMsg(resp, HttpServletResponse.SC_OK, "Item Deleted Successfully!");
@@ -109,22 +110,10 @@ public class ItemServlet extends HttpServlet {
     }
 
     private void getAllItem(HttpServletResponse resp, BasicDataSource source) throws IOException {
-        List<ItemEntity> itemList = new ArrayList<>();
-        ItemEntity item;
 
         try (Connection connection = source.getConnection()){
-            String sql = "SELECT * FROM item";
-            ResultSet resultSet = CrudUtil.execute(sql, connection);
+            List<ItemDTO> itemList = itemBO.getAllItems(connection);
 
-            while (resultSet.next()) {
-                String code = resultSet.getString(1);
-                String description = resultSet.getString(2);
-                int qtyOnHand = resultSet.getInt(3);
-                double unitPrice = resultSet.getDouble(4);
-
-                item = new ItemEntity(code, description, qtyOnHand, unitPrice);
-                itemList.add(item);
-            }
             Jsonb jsonb = JsonbBuilder.create();
             jsonb.toJson(itemList, resp.getWriter());
 
@@ -137,21 +126,10 @@ public class ItemServlet extends HttpServlet {
 
     private void getItemById(HttpServletRequest req, HttpServletResponse resp, BasicDataSource source) throws IOException {
         String itemCode = req.getParameter("itemCode");
-        ItemEntity item = null;
 
         try (Connection connection = source.getConnection()){
-            String sql = "SELECT * FROM item WHERE code=?";
-            ResultSet resultSet = CrudUtil.execute(sql, connection, itemCode);
+            ItemDTO item = itemBO.getItemByCode(connection, itemCode);
 
-            if (resultSet.next()) {
-                String code = resultSet.getString(1);
-                String description = resultSet.getString(2);
-                int qtyOnHand = resultSet.getInt(3);
-                double unitPrice = resultSet.getDouble(4);
-
-                item = new ItemEntity(code, description, qtyOnHand, unitPrice);
-
-            }
             Jsonb jsonb = JsonbBuilder.create();
             jsonb.toJson(item, resp.getWriter());
 
@@ -161,18 +139,11 @@ public class ItemServlet extends HttpServlet {
     }
 
     private void getItemIDList(HttpServletResponse resp, BasicDataSource source) throws IOException {
-        List<String> itemCodeList = new ArrayList<>();
 
         try (Connection connection = source.getConnection()){
-            String sql = "SELECT code FROM item";
-            ResultSet resultSet = CrudUtil.execute(sql, connection);
-
-            while (resultSet.next()) {
-                String code = resultSet.getString(1);
-                itemCodeList.add(code);
-            }
+            List<String> itemIDList = itemBO.getItemIDList(connection);
             Jsonb jsonb = JsonbBuilder.create();
-            jsonb.toJson(itemCodeList, resp.getWriter());
+            jsonb.toJson(itemIDList, resp.getWriter());
 
         } catch (SQLException e) {
             sendServerMsg(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getLocalizedMessage());

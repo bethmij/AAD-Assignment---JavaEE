@@ -1,19 +1,22 @@
 package lk.ijse.gdse66.backend.bo.custom;
 
-import lk.ijse.gdse66.backend.dto.CustomerDTO;
+import lk.ijse.gdse66.backend.bo.SuperBO;
+import lk.ijse.gdse66.backend.dto.ItemDTO;
 
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.List;
 
-public interface ItemBO {
-    List<CustomerDTO> getAllItems();
+public interface ItemBO extends SuperBO {
+    List<ItemDTO> getAllItems(Connection connection) throws SQLException;
 
-    CustomerDTO getItemByCode();
+    ItemDTO getItemByCode(Connection connection, String code) throws SQLException;
 
-    List<String> getItemIDList();
+    List<String> getItemIDList(Connection connection) throws SQLException;
 
-    void saveItem();
+    boolean saveItem(Connection connection, ItemDTO itemDTO) throws SQLException;
 
-    void updateItem();
+    boolean updateItem(Connection connection, ItemDTO itemDTO) throws SQLException;
 
-    void deleteItem();
+    boolean deleteItem(Connection connection, String code) throws SQLException;
 }
