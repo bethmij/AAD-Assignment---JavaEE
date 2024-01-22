@@ -204,8 +204,8 @@ export function getCustomerList(id, callback) {
     $.ajax({
         url: "http://localhost:8000/java-pos/customer?option=SEARCH&cusID=" + id,
         method: "GET",
-        success: function (resp) {
-            callback(resp);
+        success: function (resp, status, xhr) {
+            callback(resp, xhr);
         },
         error: function (resp) {
             alert(resp);

@@ -202,7 +202,7 @@ export function getItemList(code, callback) {
         method: "GET",
         success: function (resp, status, xhr) {
             if (xhr.status === 200) {
-                callback(resp);
+                callback(resp,xhr);
             }
         },
         error: function (resp) {

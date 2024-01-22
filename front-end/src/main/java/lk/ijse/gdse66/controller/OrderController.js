@@ -304,9 +304,11 @@ btnOrder.click(function (event){
                             clearItemSelect();
                             clearCusDetail();
                             clearTotal();
-                            $('#orderID').val(`Order ID : ${currOID[1]}`);
+                            setOrderID();
+                            // $('#orderID').val(`Order ID : ${currOID[1]}`);
                             btnOrder.text("");
-                            btnOrder.append(`<img src="../resources/assests/img/Screenshot__550_-removebg-preview.png" alt="Logo" width="25vw" class="opacity-50 me-2">Place Order`);
+                            btnOrder.append(`<img src="../resources/assests/img/Screenshot__550_-removebg-preview.png" alt="Logo"
+                                 width="25vw" style="opacity: 50%;">  Place Order`);
                             cash.attr("disabled", false);
                             discount.attr("disabled", false);
                             $('#txtOrderSearch').val("");
@@ -402,13 +404,13 @@ $('#orderSearch').click(function (){
         getOrderIDList(function (IDList) {
             if (IDList.includes(id)) {
                 getOrderList(id, function (order) {
-                    $('#orderID').val("Order ID : " + order.oid);
-                    getCustomerList(order.customerID, function (resp) {
-                        if (resp.status === 200) {
-                            selectCusOp.val(resp.data[0].cusID);
-                            $('#cusName').val(`Customer Name : ${resp.data[0].cusName}`);
-                            $('#cusAddress').val(`Customer Address : ${resp.data[0].cusAddress}`);
-                            $('#cusSalary').val(`Customer Salary : ${resp.data[0].cusSalary}`);
+                    $('#orderID').val("Order ID : " + order.orderId);
+                    getCustomerList(order.customerId, function (resp,xhr) {
+                        if (xhr.status === 200) {
+                            selectCusOp.val(resp.cusID);
+                            $('#cusName').val(`Customer Name : ${resp.cusName}`);
+                            $('#cusAddress').val(`Customer Address : ${resp.cusAddress}`);
+                            $('#cusSalary').val(`Customer Salary : ${resp.cusSalary}`);
                             tbody.empty();
                             tbody.append(`<tr >
                                     <th scope="col">Code</th>
@@ -418,31 +420,26 @@ $('#orderSearch').click(function (){
                                     <th scope="col"></th>
                              </tr> `);
                             for (const item of order.orderDetails) {
-                                getItemList(item.code, function (resp) {
-                                    if (resp.status === 200) {
+                                getItemList(item.itemCode, function (resp,xhr) {
+                                    if (xhr.status === 200) {
                                         tbody.append(
                                             `<tr>
-                                        <th scope="row">${resp.data[0].code}</th>
-                                        <td>${resp.data[0].description}</td>
-                                        <td>${resp.data[0].uPrice}</td>
-                                        <td>${item.qty}</td>                        
+                                        <th scope="row">${resp.itemCode}</th>
+                                        <td>${resp.description}</td>
+                                        <td>${resp.unitPrice}</td>
+                                        <td>${item.qtyOnHand}</td>                        
                                         <td style="width: 10%"><img class="orderDelete" src="../resources/assests/img/icons8-delete-96.png"
                                                                         alt="Logo" width="50%" class="opacity-75"></td>
                                     </tr>`)
                                         setFeilds();
                                         deleteDetail();
-                                        calcTotal(resp.data[0].uPrice, item.qty);
+                                        calcTotal(resp.unitPrice, item.qtyOnHand);
                                         btnOrder.text("");
                                         btnOrder.append(`<img src="../resources/assests/img/Screenshot__550_-removebg-preview.png" 
                                                              alt="Logo" width="25vw" class="opacity-50 me-2">Update Order`);
-                                    } else if (resp.status === 400) {
-                                        alert(resp.message);
                                     }
                                 });
                             }
-
-                        } else if (resp.status === 400) {
-                            alert(resp.message);
                         }
                     })
                 });
@@ -483,14 +480,11 @@ function getOrderList(id,callback) {
         method: "GET",
         success: function (resp, status, xhr) {
             if (xhr.status === 200) {
-                for (const order of resp) {
-                    orderDetail.push(order.orderDetails);
-                }
                 let newOrder = Object.assign({}, order);
                 newOrder.orderId = resp.orderId;
                 newOrder.orderDate = resp.orderDate;
                 newOrder.customerId = resp.customerId;
-                newOrder.orderDetails = orderDetail;
+                newOrder.orderDetails = resp.orderDetails;
                 callback(newOrder);
             }
         },
