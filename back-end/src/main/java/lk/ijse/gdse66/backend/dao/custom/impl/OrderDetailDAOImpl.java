@@ -1,7 +1,6 @@
 package lk.ijse.gdse66.backend.dao.custom.impl;
 
 import lk.ijse.gdse66.backend.dao.custom.OrderDetailDAO;
-import lk.ijse.gdse66.backend.entity.CustomerEntity;
 import lk.ijse.gdse66.backend.entity.OrderDetailsEntity;
 import lk.ijse.gdse66.backend.util.CrudUtil;
 
@@ -37,8 +36,23 @@ public class OrderDetailDAOImpl implements OrderDetailDAO {
 
 
     @Override
-    public boolean update(Connection connection, List<OrderDetailsEntity> dto) {
-        return false;
+    public boolean update(Connection connection, List<OrderDetailsEntity> orderDetailsList) throws SQLException {
+        int updatedCount = 0;
+
+        for (OrderDetailsEntity orderDetail : orderDetailsList) {
+
+            String oid = orderDetail.getOrderId();
+            String code = orderDetail.getItemCode();
+            int qty = orderDetail.getQtyOnHand();
+            double unitPrice = orderDetail.getUnitPrice();
+
+            String sql1 = "UPDATE orderdetails SET qty=?, unitPrice=? WHERE oid=? AND itemCode=?";
+            boolean isUpdated = CrudUtil.execute(sql1, connection, qty, unitPrice, oid, code);
+            updatedCount +=  isUpdated ? 1:0;
+
+        }
+
+        return updatedCount == orderDetailsList.size();
     }
 
     @Override

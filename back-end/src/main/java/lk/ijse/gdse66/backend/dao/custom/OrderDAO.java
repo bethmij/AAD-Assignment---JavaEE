@@ -13,7 +13,7 @@ public interface OrderDAO extends CrudDAO<OrderEntity> {
     boolean save(Connection connection, OrderEntity dto) throws SQLException;
 
     @Override
-    boolean update(Connection connection, OrderEntity dto);
+    boolean update(Connection connection, OrderEntity dto) throws SQLException;
 
     @Override
     boolean delete(Connection connection, String id);

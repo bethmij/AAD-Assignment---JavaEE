@@ -14,7 +14,7 @@ public interface OrderDetailDAO extends CrudDAO<List<OrderDetailsEntity>> {
     boolean save(Connection connection, List<OrderDetailsEntity> dto) throws SQLException;
 
     @Override
-    boolean update(Connection connection, List<OrderDetailsEntity> dto);
+    boolean update(Connection connection, List<OrderDetailsEntity> dto) throws SQLException;
 
     @Override
     boolean delete(Connection connection, String id);

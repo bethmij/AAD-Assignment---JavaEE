@@ -20,7 +20,7 @@ let cash = $("#cash");
 let discount = $("#discount");
 let btnOrder = $('#btnPlaceOrder');
 let orderBody = $("#orderTbody");
-let tbRow, tblQty, tblPrice, currOID;
+let tbRow, tblQty, tblPrice;
 setCusID();
 setOrderID();
 setItemCode();
@@ -82,57 +82,59 @@ function setOrderID() {
 
 selectCusOp.change(function () {
     let cusID = selectCusOp.val();
-    $.ajax({
-        url:"http://localhost:8000/java-pos/customer?option=SEARCH&cusID="+cusID,
-        method: "GET",
-        success: function (resp, status, xhr) {
-            if(xhr.status===200){
-                if(cusID !== "Customer ID" ) {
+
+    if(cusID !== "Customer ID") {
+        $.ajax({
+            url: "http://localhost:8000/java-pos/customer?option=SEARCH&cusID=" + cusID,
+            method: "GET",
+            success: function (resp, status, xhr) {
+                if (xhr.status === 200) {
                     $('#cusName').val(`Customer Name : ${resp.cusName}`);
                     $('#cusAddress').val(`Customer Address : ${resp.cusAddress}`);
                     $('#cusSalary').val(`Customer Salary : ${resp.cusSalary}`);
-                }else {
-                    $('#cusName').val(`Customer Name : `);
-                    $('#cusAddress').val(`Customer Address : `);
-                    $('#cusSalary').val(`Customer Salary : `);
-                    btnSave.attr("disabled", true);
                 }
+            },
+            error: function (resp) {
+                alert(resp);
             }
-        },
-        error:function (resp) {
-            alert(resp);
-        }
-    });
+        });
+    }else {
+        $('#cusName').val(`Customer Name : `);
+        $('#cusAddress').val(`Customer Address : `);
+        $('#cusSalary').val(`Customer Salary : `);
+        btnSave.attr("disabled", true);
+    }
 })
 
 
 
 selectItemOp.change(function () {
     let itemCode = selectItemOp.val();
-    $.ajax({
-        url:"http://localhost:8000/java-pos/item?option=SEARCH&itemCode="+itemCode,
-        method: "GET",
-        success: function (resp, status, xhr) {
-            if(xhr.status===200){
-                if(itemCode !== "Item Code" ) {
+
+    if(itemCode !== "Item Code" ) {
+        $.ajax({
+            url:"http://localhost:8000/java-pos/item?option=SEARCH&itemCode="+itemCode,
+            method: "GET",
+            success: function (resp, status, xhr) {
+                if(xhr.status===200){
                     txtItemName.val(`Item Name : ${resp.description}`);
                     txtItemPrice.val(`Item Price : ${resp.unitPrice}`);
                     txtItemQty.val(`Item Quantity : ${resp.qtyOnHand}`);
-                }else {
-                    txtItemName.val(`Item Name : `);
-                    txtItemPrice.val(`Item Price : `);
-                    txtItemQty.val(`Item Quantity : `);
-                    txtOrderQty.val("");
-                    txtOrderQty.css("border", "1px solid white");
-                    btnSave.attr("disabled", true);
                 }
+            },
+            error:function (resp) {
+                alert(resp);
             }
-        },
-        error:function (resp) {
-            alert(resp);
-        }
-    });
-})
+        });
+    } else {
+        txtItemName.val(`Item Name : `);
+        txtItemPrice.val(`Item Price : `);
+        txtItemQty.val(`Item Quantity : `);
+        txtOrderQty.val("");
+        txtOrderQty.css("border", "1px solid white");
+        btnSave.attr("disabled", true);
+    }
+});
 
 
 
@@ -312,7 +314,6 @@ btnOrder.click(function (event){
                             clearCusDetail();
                             clearTotal();
                             setOrderID();
-                            // $('#orderID').val(`Order ID : ${currOID[1]}`);
                             btnOrder.text("");
                             btnOrder.append(`<img src="../resources/assests/img/Screenshot__550_-removebg-preview.png" alt="Logo"
                                  width="25vw" style="opacity: 50%;">  Place Order`);
@@ -392,7 +393,7 @@ function clearTotal(){
     $('#cash').val("");
     $('#discount').val("");
     $('#balance').val("");
-    $("#orderTbody").empty();
+    orderBody.empty();
     $('#orderTbody').append(`<tr >
         <th scope="col">Code</th>
         <th scope="col">Name</th>
@@ -481,7 +482,7 @@ function getOrderIDList(callback) {
 }
 
 function getOrderList(id,callback) {
-    let orderDetail = [];
+
     $.ajax({
         url: "http://localhost:8000/java-pos/order?option=SEARCH&id="+id,
         method: "GET",

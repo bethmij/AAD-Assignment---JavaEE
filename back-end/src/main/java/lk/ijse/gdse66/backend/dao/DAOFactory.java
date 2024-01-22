@@ -1,9 +1,6 @@
 package lk.ijse.gdse66.backend.dao;
 
-import lk.ijse.gdse66.backend.dao.custom.impl.CustomerDAOImpl;
-import lk.ijse.gdse66.backend.dao.custom.impl.ItemDAOImpl;
-import lk.ijse.gdse66.backend.dao.custom.impl.OrderDAOImpl;
-import lk.ijse.gdse66.backend.dao.custom.impl.OrderDetailDAOImpl;
+import lk.ijse.gdse66.backend.dao.custom.impl.*;
 
 public class DAOFactory {
 
@@ -16,7 +13,7 @@ public class DAOFactory {
     }
 
     public enum DAOTypes {
-        CUSTOMERDAO, ITEMDAO, ORDERDAO, ORDERDETAILDAO
+        CUSTOMERDAO, ITEMDAO, ORDERDAO, ORDERDETAILDAO, QUERYDAO
     }
 
     public <T extends SuperDAO> T getDAO (DAOFactory.DAOTypes daoTypes){
@@ -30,6 +27,8 @@ public class DAOFactory {
                 return (T) new OrderDAOImpl();
             case ORDERDETAILDAO:
                 return (T) new OrderDetailDAOImpl();
+            case QUERYDAO:
+                return (T) new QueryDAOImpl();
             default:
                 return null;
         }
