@@ -40,7 +40,9 @@ btnCustomerSave.click(function (event){
                                 deleteDetail();
                                 setFeilds();
                                 clearAll(event);
-                                setCusID();
+                                getCusIDList(function (IDList) {
+                                   setCusID(IDList);
+                                });
                                 btnCustomerSave.attr("disabled", true);
                             }
                         },
@@ -183,7 +185,9 @@ function deleteDetail() {
                         alert(resp);
                         deleteRow.remove();
                         clearAll(event);
-                        setCusID();
+                        getCusIDList(function (IDList) {
+                            setCusID(IDList)
+                        });
                     }
                 },
                 error: function (xhr) {

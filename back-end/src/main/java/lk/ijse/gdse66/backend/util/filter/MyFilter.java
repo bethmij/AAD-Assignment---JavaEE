@@ -14,7 +14,6 @@ public class MyFilter extends HttpFilter {
 
     @Override
     protected void doFilter(HttpServletRequest req, HttpServletResponse res, FilterChain chain) throws IOException, ServletException {
-        System.out.println("filter");
 
         res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
         res.addHeader("Access-Control-Allow-Origin", "*");

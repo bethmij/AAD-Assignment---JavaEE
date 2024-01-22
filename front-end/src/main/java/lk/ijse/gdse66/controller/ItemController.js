@@ -41,7 +41,9 @@ btnItemSave.click(function (event){
                                 deleteDetail();
                                 setFeilds();
                                 clearAll(event);
-                                setItemCode();
+                                getItemCodeList(function (CodeList) {
+                                   setItemCode(CodeList)
+                                });
                                 btnItemSave.attr("disabled", true);
                             }
                         },
@@ -178,6 +180,9 @@ function deleteDetail() {
                     if(xhr.status === 200) {
                         deleteRow.remove();
                         clearAll(event);
+                        getItemCodeList(function (CodeList) {
+                            setItemCode(CodeList);
+                        });
                         alert(resp);
                     }
                 },

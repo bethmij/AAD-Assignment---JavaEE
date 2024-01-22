@@ -20,31 +20,46 @@ let cash = $("#cash");
 let discount = $("#discount");
 let btnOrder = $('#btnPlaceOrder');
 let tbRow, tblQty, tblPrice, currOID;
+let cusIDList = [];
 
 setCusID();
 setOrderID();
 setItemCode();
 
-export function setCusID() {
+
+
+export function setCusID(IDList) {
     selectCusOp.empty();
     selectCusOp.append(`<option class="text-white">Customer ID</option>`);
 
-    getCusIDList(function (IDList) {
+    if (IDList === undefined) {
+        getCusIDList(function (IDList) {
+            for (const id of IDList) {
+                selectCusOp.append(`<option class="text-white">${id}</option>`);
+            }
+        });
+    }else {
         for (const id of IDList) {
             selectCusOp.append(`<option class="text-white">${id}</option>`);
         }
-    });
+    }
 }
 
-export function setItemCode() {
+export function setItemCode(CodeList) {
     selectItemOp.empty();
     selectItemOp.append(`<option class="text-white">Item Code</option>`);
 
-    getItemCodeList(function (IDList) {
-        for (const id of IDList) {
-            selectItemOp.append(`<option class="text-white">${id}</option>`);
+    if (CodeList === undefined) {
+        getItemCodeList(function (CodeList) {
+            for (const code of CodeList) {
+                selectItemOp.append(`<option class="text-white">${code}</option>`);
+            }
+        });
+    }else {
+        for (const code of CodeList) {
+            selectItemOp.append(`<option class="text-white">${code}</option>`);
         }
-    });
+    }
 }
 
 function setOrderID() {
