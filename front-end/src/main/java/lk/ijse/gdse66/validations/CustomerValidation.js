@@ -27,7 +27,7 @@ txtID.keyup(function (){
         } else {
             txtID.css("border", "1px solid green");
             paraID.text("");
-            enableButton();
+            enableCustomerButton();
         }
     }
 })
@@ -46,7 +46,7 @@ txtName.keyup(function (){
         } else {
             txtName.css("border", "1px solid green");
             paraName.text("");
-            enableButton();
+            enableCustomerButton();
         }
     }
 })
@@ -65,10 +65,12 @@ txtAddress.keyup(function (){
         } else {
             txtAddress.css("border", "1px solid green");
             paraAddress.text("");
-            enableButton();
+            enableCustomerButton();
         }
     }
 })
+
+
 
 txtSalary.keyup(function (){
 
@@ -84,14 +86,15 @@ txtSalary.keyup(function (){
         } else {
             txtSalary.css("border", "1px solid green");
             paraSalary.text("");
-            enableButton();
+            enableCustomerButton();
         }
     }
 })
 
-function enableButton(){
+
+function enableCustomerButton() {
     if( idRegEx.test(txtID.val()) && nameRegEx.test(txtName.val())  && txtAddress.val().length >= 7 &&
-        salaryRegEx.test(txtSalary.val()) && txtSalary.val().length !== 0 ){
+        salaryRegEx.test(txtSalary.val()) && txtSalary.val().length !== 0 ) {
         btnSave.attr("disabled", false);
     }
 }

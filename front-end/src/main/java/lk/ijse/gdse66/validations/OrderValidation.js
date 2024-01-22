@@ -1,32 +1,32 @@
-let txtQty = $('#orderQuantity');
-let paraQty = $('#orderQtyPara');
-let btnSave = $('#btnAddCart');
-let qtyRegEx = /^\d+$/;
+let txtOrderQty = $('#orderQuantity');
+let paraOrderQty = $('#orderQtyPara');
+let btnOrderSave = $('#btnAddCart');
+let OrderQtyRegEx = /^\d+$/;
 
-btnSave.attr("disabled", true);
+btnOrderSave.attr("disabled", true);
 
-txtQty.keyup(function (){
+txtOrderQty.keyup(function (){
     enableButton();
 
-    if( txtQty.val().length === 0) {
-        txtQty.css("border", "1px solid white");
-        paraQty.text("");
-        btnSave.attr("disabled", true);
+    if( txtOrderQty.val().length === 0) {
+        txtOrderQty.css("border", "1px solid white");
+        paraOrderQty.text("");
+        btnOrderSave.attr("disabled", true);
     }else {
-        if (!qtyRegEx.test(txtQty.val())) {
-            txtQty.css("border", "1px solid red");
-            paraQty.text("Order quantity is a required field : only numbers");
-            btnSave.attr("disabled", true);
+        if (!OrderQtyRegEx.test(txtOrderQty.val())) {
+            txtOrderQty.css("border", "1px solid red");
+            paraOrderQty.text("Order quantity is a required field : only numbers");
+            btnOrderSave.attr("disabled", true);
         } else {
-            txtQty.css("border", "1px solid green");
-            paraQty.text("");
+            txtOrderQty.css("border", "1px solid green");
+            paraOrderQty.text("");
         }
     }
 })
 
 function enableButton(){
-    if( qtyRegEx.test(txtQty.val()) && $('#cusName').val()!=="Customer Name : " && $('#itemName').val()!=="Item Name : "){
-        btnSave.attr("disabled", false);
+    if( OrderQtyRegEx.test(txtOrderQty.val()) && $('#cusName').val()!=="Customer Name : " && $('#itemName').val()!=="Item Name : "){
+        btnOrderSave.attr("disabled", false);
     }
 }
 

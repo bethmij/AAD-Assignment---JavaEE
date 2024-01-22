@@ -67,6 +67,8 @@ function setOrderID() {
     });
 }
 
+
+
 selectCusOp.change(function () {
     let cusID = selectCusOp.val();
     $.ajax({

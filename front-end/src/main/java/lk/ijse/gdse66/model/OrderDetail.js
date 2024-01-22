@@ -1,6 +1,6 @@
 export var orderDetails = {
-    oid:"",
-    code:"",
-    qty:0,
+    orderId:"",
+    itemCode:"",
+    qtyOnHand:0,
     unitPrice:0,
 }

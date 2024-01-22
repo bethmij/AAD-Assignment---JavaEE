@@ -1,8 +1,8 @@
 export var item = {
-    code : '',
+    itemCode : '',
     description: '',
-    uPrice : '',
     qtyOnHand : '',
+    unitPrice : ''
 
 }
 

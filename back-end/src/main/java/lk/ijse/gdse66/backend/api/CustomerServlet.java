@@ -46,10 +46,10 @@ public class CustomerServlet extends HttpServlet {
         BasicDataSource source = (BasicDataSource) req.getServletContext().getAttribute("bds");
 
         CustomerEntity customer = JsonbBuilder.create().fromJson(req.getReader(),CustomerEntity.class);
-        String id = customer.getId();
-        String name = customer.getName();
-        String address = customer.getAddress();
-        double salary = customer.getSalary();
+        String id = customer.getCusID();
+        String name = customer.getCusName();
+        String address = customer.getCusAddress();
+        double salary = customer.getCusSalary();
 
         try (Connection connection = source.getConnection()) {
             String sql = "INSERT INTO company.customer (id, name, address, salary) VALUES (?,?,?,?)";
@@ -61,7 +61,7 @@ public class CustomerServlet extends HttpServlet {
                 sendServerMsg(resp, HttpServletResponse.SC_BAD_REQUEST, "Customer Save Failed!");
             }
         } catch (SQLException e) {
-            sendServerMsg(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Internal Server Error! Please try again");
+            sendServerMsg(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getLocalizedMessage());
         }
 
     }
@@ -71,10 +71,10 @@ public class CustomerServlet extends HttpServlet {
         BasicDataSource source = (BasicDataSource) req.getServletContext().getAttribute("bds");
 
         CustomerEntity customer = JsonbBuilder.create().fromJson(req.getReader(),CustomerEntity.class);
-        String id = customer.getId();
-        String name = customer.getName();
-        String address = customer.getAddress();
-        double salary = customer.getSalary();
+        String id = customer.getCusID();
+        String name = customer.getCusName();
+        String address = customer.getCusAddress();
+        double salary = customer.getCusSalary();
 
         try (Connection connection = source.getConnection()){
             String sql = "UPDATE customer SET name=?, address=?, salary=? WHERE id=?";
@@ -85,7 +85,7 @@ public class CustomerServlet extends HttpServlet {
             else
                 sendServerMsg(resp,HttpServletResponse.SC_BAD_REQUEST,"Customer Update Failed!");
         } catch (SQLException e) {
-            sendServerMsg(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Internal Server Error! Please try again");
+            sendServerMsg(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getLocalizedMessage());
         }
     }
 
@@ -104,7 +104,7 @@ public class CustomerServlet extends HttpServlet {
                 sendServerMsg(resp, HttpServletResponse.SC_BAD_REQUEST, "Customer Delete Failed!");
             }
         } catch (SQLException e) {
-            sendServerMsg(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Internal Internal Server Error! Please try again");
+            sendServerMsg(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getLocalizedMessage());
         }
     }
 
@@ -129,7 +129,7 @@ public class CustomerServlet extends HttpServlet {
             jsonb.toJson(customerList, resp.getWriter());
 
         } catch (SQLException e) {
-            sendServerMsg(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Internal Server Error! Please try again");
+            sendServerMsg(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getLocalizedMessage());
         }
     }
 
@@ -156,7 +156,7 @@ public class CustomerServlet extends HttpServlet {
             jsonb.toJson(customer, resp.getWriter());
 
         } catch (SQLException e) {
-            sendServerMsg(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Internal Server Error! Please try again");
+            sendServerMsg(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getLocalizedMessage());
         }
     }
 
@@ -175,7 +175,7 @@ public class CustomerServlet extends HttpServlet {
             jsonb.toJson(cusIdList, resp.getWriter());
 
         } catch (SQLException e) {
-            sendServerMsg(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Internal Server Error! Please try again");
+            sendServerMsg(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getLocalizedMessage());
         }
     }
 

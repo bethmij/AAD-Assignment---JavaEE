@@ -9,9 +9,9 @@ import lombok.NoArgsConstructor;
 @Data
 public class CustomerEntity {
 
-    private String id;
-    private String name;
-    private String address;
-    private double salary;
+    private String cusID;
+    private String cusName;
+    private String cusAddress;
+    private double cusSalary;
 
 }

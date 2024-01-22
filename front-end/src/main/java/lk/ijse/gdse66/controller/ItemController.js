@@ -17,42 +17,36 @@ $(document).on('keydown', function(event) {
 getAll();
 
 btnItemSave.click(function (event){
+    let newItem = Object.assign({}, item);
+    newItem.itemCode = itemCode.val();
+    newItem.description = itemName.val();
+    newItem.unitPrice = itemPrice.val();
+    newItem.qtyOnHand = itemQuantity.val();
 
     if(btnItemSave.text()==="Save ") {
-
         const userChoice = window.confirm("Do you want to save the item?")
         if (userChoice) {
             getItemCodeList( function (IDList) {
 
                 if (!(IDList.includes(itemCode.val()))) {
-                    let item = $("#itemForm").serialize();
                     $.ajax({
                         url: "http://localhost:8000/java-pos/item",
                         method: "POST",
-                        data: item,
-                        success: function (resp) {
-                            if (resp.status === 200) {
-                                alert(resp.message);
-                                $('#itemBody').append(
-                                    `<tr>
-                                        <th scope="row">${itemCode.val()}</th>
-                                        <td>${itemName.val()}</td>
-                                        <td>${itemPrice.val()}</td>
-                                        <td>${itemQuantity.val()}</td>
-                                        <td style="width: 10%"><img class="delete opacity-75" src="../resources/assests/img/icons8-delete-96.png" alt="Logo" width="50%" ></td>
-                                     </tr>`
-                                );
+                        contentType: "application/json",
+                        data: JSON.stringify(newItem),
+                        success: function (resp, status, xhr) {
+                            if (xhr.status === 200) {
+                                alert(resp)
+                                getAll();
                                 deleteDetail();
                                 setFeilds();
                                 clearAll(event);
                                 setItemCode();
                                 btnItemSave.attr("disabled", true);
-                            } else if (resp.status === 400) {
-                                alert(resp.message);
                             }
                         },
-                        error: function (resp) {
-                            alert(resp.message);
+                        error: function (xhr, status, error) {
+                            alert("Error : "+xhr.responseText)
                         }
                     });
                 } else {
@@ -64,10 +58,6 @@ btnItemSave.click(function (event){
     }else if(btnItemSave.text()==="Update ") {
         const userChoice = window.confirm("Do you want to update the item?");
         if (userChoice) {
-            let newItem = Object.assign({}, item);
-            newItem.code = itemCode.val();
-            newItem.description = itemName.val();
-            newItem.uPrice = itemPrice.val();
             newItem.qtyOnHand = itemQuantity.val();
 
             $.ajax({
@@ -75,17 +65,18 @@ btnItemSave.click(function (event){
                 method: "PUT",
                 contentType: "application/json",
                 data: JSON.stringify(newItem),
-                success: function (resp) {
-                    if (resp.status === 200) {
-                        alert(resp.message);
+                success: function (resp, status, xhr) {
+                    if (xhr.status === 200) {
+                        alert(resp)
                         getAll();
                         clearAll(event);
                         btnItemSave.text("Save ");
                         btnItemSave.attr("disabled", true);
                         itemCode.attr("disabled", false);
-                    } else if (resp.status === 200) {
-                        alert(resp.message);
                     }
+                },
+                error: function (xhr) {
+                    alert("Error : "+xhr.responseText)
                 }
             });
         }
@@ -133,7 +124,7 @@ function getAll() {
                 itemBody.empty();
                 for (let item of resp) {
                     itemBody.append(`<tr>
-                        <th scope="row">${item.code}</th>
+                        <th scope="row">${item.itemCode}</th>
                         <td>${item.description}</td>
                         <td>${item.qtyOnHand}</td>
                         <td>${item.unitPrice}</td>
@@ -173,25 +164,26 @@ function deleteDetail() {
         $(this).css("cursor", "pointer");}
     )
 
-    btnDelete.click(function () {
-        var userChoice = window.confirm("Do you want to delete the item?");
+    btnDelete.click(function (event) {
+        const userChoice = window.confirm("Do you want to delete the item?");
 
         if (userChoice) {
-            $(this).parents('tr').remove();
-            let code = $( $(this).parents('tr').children(':nth-child(1)')).text();
+            let deleteRow = $(this).parents('tr');
+            let code = $( deleteRow.children(':nth-child(1)')).text();
 
             $.ajax({
-                url: "http://localhost:8000/java-pos/item?code="+code,
+                url: "http://localhost:8000/java-pos/item?itemCode="+code,
                 method: "DELETE",
-                success: function (resp){
-                    if(resp.status===200){
-                        alert(resp.message);
-                    }else if(resp.status===400){
-                        alert(resp.message);
+                success: function (resp, status, xhr){
+                    if(xhr.status === 200) {
+                        deleteRow.remove();
+                        clearAll(event);
+                        alert(resp);
                     }
                 },
-                error: function (resp) {
-
+                error: function (xhr) {
+                    alert("Error : "+xhr.responseText)
+                    console.log("Error : ", xhr.statusText);
                 }
             });
             setItemCode();
@@ -201,10 +193,12 @@ function deleteDetail() {
 
 export function getItemList(code, callback) {
     $.ajax({
-        url: "http://localhost:8000/java-pos/item?option=SEARCH&code=" + code,
+        url: "http://localhost:8000/java-pos/item?option=SEARCH&itemCode=" + code,
         method: "GET",
-        success: function (resp) {
-            callback(resp);
+        success: function (resp, status, xhr) {
+            if (xhr.status === 200) {
+                callback(resp);
+            }
         },
         error: function (resp) {
             alert(resp);
@@ -220,20 +214,17 @@ $('#itemSearch').click(function (){
         getItemCodeList(function (IDList) {
             if (IDList.includes(code)) {
                 getItemList(code, function (resp) {
-                    if (resp.status === 200) {
                         tbody.empty();
-                        tbody.append(`<tr>
-                    <th scope="row">${resp.data[0].code}</th>
-                        <td>${resp.data[0].description}</td>
-                        <td>${resp.data[0].qtyOnHand}</td>
-                        <td>${resp.data[0].uPrice}</td>
-                        <td style="width: 10%"><img class="delete" src="../resources/assests/img/icons8-delete-96.png" alt="Logo" width="50%" class="opacity-75"></td>
-                   </tr>`);
+                        tbody.append(`
+                            <tr>
+                                <th scope="row">${resp.itemCode}</th>
+                                <td>${resp.description}</td>
+                                <td>${resp.qtyOnHand}</td>
+                                <td>${resp.unitPrice}</td>
+                                <td style="width: 10%"><img class="delete" src="../resources/assests/img/icons8-delete-96.png" alt="Logo" width="50%" class="opacity-75"></td>
+                            </tr>`);
                         deleteDetail();
                         setFeilds();
-                    } else if (resp.status === 400) {
-                        alert(resp.message);
-                    }
                 });
 
             } else {

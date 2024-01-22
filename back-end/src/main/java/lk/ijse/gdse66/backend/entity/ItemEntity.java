@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Data
 public class ItemEntity {
 
-    private String code;
+    private String itemCode;
     private String description;
     private int qtyOnHand;
     private double unitPrice;

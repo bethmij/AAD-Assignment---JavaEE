@@ -46,7 +46,7 @@ public class ItemServlet extends HttpServlet {
         BasicDataSource source = (BasicDataSource) req.getServletContext().getAttribute("bds");
 
         ItemEntity item = JsonbBuilder.create().fromJson(req.getReader(),ItemEntity.class);
-        String code = item.getCode();
+        String code = item.getItemCode();
         String description = item.getDescription();
         int qtyOnHand = item.getQtyOnHand();
         double unitPrice = item.getUnitPrice();
@@ -61,7 +61,7 @@ public class ItemServlet extends HttpServlet {
                 sendServerMsg(resp, HttpServletResponse.SC_BAD_REQUEST, "Item Save Failed!");
             }
         } catch (SQLException e) {
-            sendServerMsg(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Internal Server Error! Please try again");
+            sendServerMsg(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getLocalizedMessage());
         }
 
     }
@@ -71,7 +71,7 @@ public class ItemServlet extends HttpServlet {
         BasicDataSource source = (BasicDataSource) req.getServletContext().getAttribute("bds");
 
         ItemEntity item = JsonbBuilder.create().fromJson(req.getReader(),ItemEntity.class);
-        String code = item.getCode();
+        String code = item.getItemCode();
         String description = item.getDescription();
         int qtyOnHand = item.getQtyOnHand();
         double unitPrice = item.getUnitPrice();
@@ -85,7 +85,7 @@ public class ItemServlet extends HttpServlet {
             else
                 sendServerMsg(resp,HttpServletResponse.SC_BAD_REQUEST,"Item Update Failed!");
         } catch (SQLException e) {
-            sendServerMsg(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Internal Server Error! Please try again");
+            sendServerMsg(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getLocalizedMessage());
         }
     }
 
@@ -104,7 +104,7 @@ public class ItemServlet extends HttpServlet {
                 sendServerMsg(resp, HttpServletResponse.SC_BAD_REQUEST, "Item Delete Failed!");
             }
         } catch (SQLException e) {
-            sendServerMsg(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Internal Internal Server Error! Please try again");
+            sendServerMsg(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getLocalizedMessage());
         }
     }
 
@@ -129,7 +129,7 @@ public class ItemServlet extends HttpServlet {
             jsonb.toJson(itemList, resp.getWriter());
 
         } catch (SQLException e) {
-            sendServerMsg(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Internal Server Error! Please try again");
+            sendServerMsg(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getLocalizedMessage());
         }
     }
 
@@ -156,7 +156,7 @@ public class ItemServlet extends HttpServlet {
             jsonb.toJson(item, resp.getWriter());
 
         } catch (SQLException e) {
-            sendServerMsg(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Internal Server Error! Please try again");
+            sendServerMsg(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getLocalizedMessage());
         }
     }
 
@@ -175,7 +175,7 @@ public class ItemServlet extends HttpServlet {
             jsonb.toJson(itemCodeList, resp.getWriter());
 
         } catch (SQLException e) {
-            sendServerMsg(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Internal Server Error! Please try again");
+            sendServerMsg(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getLocalizedMessage());
         }
     }
 

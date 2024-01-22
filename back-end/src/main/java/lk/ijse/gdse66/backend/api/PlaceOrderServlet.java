@@ -67,7 +67,7 @@ public class PlaceOrderServlet<T> extends HttpServlet {
                 for (OrderDetailsEntity orderDetail : orderDetailsList) {
 
                     String code = orderDetail.getItemCode();
-                    int qty = orderDetail.getQty();
+                    int qty = orderDetail.getQtyOnHand();
                     double unitPrice = orderDetail.getUnitPrice();
 
                     String sql1 = "INSERT INTO orderdetails (oid, itemCode, qty, unitPrice) VALUES (?,?,?,?)";
@@ -85,7 +85,7 @@ public class PlaceOrderServlet<T> extends HttpServlet {
                 assert connection != null;
                 connection.rollback();
             } catch (SQLException ignored) {}
-            sendServerMsg(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Internal Server Error! Please try again");
+            sendServerMsg(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getLocalizedMessage());
 
         }finally {
             try {
@@ -123,7 +123,7 @@ public class PlaceOrderServlet<T> extends HttpServlet {
                 for (OrderDetailsEntity orderDetail : orderDetailsList) {
 
                     String code = orderDetail.getItemCode();
-                    int qty = orderDetail.getQty();
+                    int qty = orderDetail.getQtyOnHand();
                     double unitPrice = orderDetail.getUnitPrice();
 
                     String sql1 = "UPDATE orderdetails SET qty=?, unitPrice=? WHERE oid=? AND itemCode=?";
@@ -188,7 +188,7 @@ public class PlaceOrderServlet<T> extends HttpServlet {
             jsonb.toJson(orderDetailList, resp.getWriter());
 
         } catch (SQLException e) {
-            sendServerMsg(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Internal Server Error! Please try again");
+            sendServerMsg(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getLocalizedMessage());
         }
     }
 
@@ -205,7 +205,7 @@ public class PlaceOrderServlet<T> extends HttpServlet {
             jsonb.toJson(orderIDList, resp.getWriter());
 
         } catch (SQLException e) {
-            sendServerMsg(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Internal Server Error! Please try again");
+            sendServerMsg(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getLocalizedMessage());
         }
     }
 

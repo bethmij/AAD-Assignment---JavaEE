@@ -1,103 +1,103 @@
-let txtCode = $('#txtItemCode');
+let txtItemCode = $('#txtItemCode');
 let paraCode = $('#itemCodePara');
-let txtName = $('#txtItemName');
-let paraName = $('#itemNamePara');
+let txtItemName = $('#txtItemName');
+let paraItemName = $('#itemNamePara');
 let txtPrice = $('#txtItemPrice');
 let paraPrice = $('#itemPricePara');
 let txtQty = $('#txtItemQuantity');
 let paraQty = $('#itemQtyPara');
-let btnSave = $('#itemSave');
-let idRegEx = /^(I00-)[0-9]{3}$/;
-let nameRegEx = /^[A-Za-z\s]*$/;
+let btnItemSave = $('#itemSave');
+let itemCodeRegEx = /^(I00-)[0-9]{3}$/;
 let priceRegEx = /^[0-9]*(\.[0-9]{0,2})?$/;
 let qtyRegEx = /^\d+$/;
-btnSave.attr("disabled", true);
+btnItemSave.attr("disabled", false);
 
-txtCode.keyup(function (){
 
-    enableButton();
+txtItemCode.keyup(function (){
 
-    if( txtCode.val().length === 0) {
-        txtCode.css("border", "1px solid white");
+
+    if( txtItemCode.val().length === 0) {
+        txtItemCode.css("border", "1px solid white");
         paraCode.text("");
-        btnSave.attr("disabled", true);
+        btnItemSave.attr("disabled", true);
     }else {
-        if (!idRegEx.test(txtCode.val())) {
-            txtCode.css("border", "1px solid red");
+        if (!itemCodeRegEx.test(txtItemCode.val())) {
+            txtItemCode.css("border", "1px solid red");
             paraCode.text("Item code is a required field : Pattern I00-000");
-            btnSave.attr("disabled", true);
+            btnItemSave.attr("disabled", true);
         } else {
-            txtCode.css("border", "1px solid green");
+            txtItemCode.css("border", "1px solid green");
             paraCode.text("");
-            console.log(txtCode.css("border-left-color"));
+            console.log(txtItemCode.css("border-left-color"));
+            enableItemButton();
         }
     }
 })
 
-txtName.keyup(function (){
+txtItemName.keyup(function (){
 
-    enableButton();
-
-    if( txtName.val().length === 0) {
-        txtName.css("border", "1px solid white");
-        paraName.text("");
-        btnSave.attr("disabled", true);
+    if( txtItemName.val().length === 0) {
+        txtItemName.css("border", "1px solid white");
+        paraItemName.text("");
+        btnItemSave.attr("disabled", true);
     }else {
-        if (!nameRegEx.test(txtName.val()) || !(txtName.val().length >= 5) || !(txtName.val().length <= 50)) {
-            txtName.css("border", "1px solid red");
-            paraName.text("Item Name is a required field : Min 5, Max 20, Spaces Allowed");
-            btnSave.attr("disabled", true);
+        if (!(txtItemName.val().length >= 5) || !(txtItemName.val().length <= 50)) {
+            txtItemName.css("border", "1px solid red");
+            paraItemName.text("Item Name is a required field : Min 5, Max 20, Spaces Allowed");
+            btnItemSave.attr("disabled", true);
         } else {
-            txtName.css("border", "1px solid green");
-            paraName.text("");
+            txtItemName.css("border", "1px solid green");
+            paraItemName.text("");
+            enableItemButton();
         }
     }
 })
 
 txtPrice.keyup(function (){
 
-    enableButton();
 
     if( txtPrice.val().length === 0) {
         txtPrice.css("border", "1px solid white");
         paraPrice.text("");
-        btnSave.attr("disabled", true);
+        btnItemSave.attr("disabled", true);
     }else {
         if (!priceRegEx.test(txtPrice.val())) {
             txtPrice.css("border", "1px solid red");
             paraPrice.text("Item Price is a required field : Pattern 100.00 or 100");
-            btnSave.attr("disabled", true);
+            btnItemSave.attr("disabled", true);
         } else {
             txtPrice.css("border", "1px solid green");
             paraPrice.text("");
+            enableItemButton();
         }
     }
 })
 
 txtQty.keyup(function (){
 
-    enableButton();
 
     if( txtQty.val().length === 0) {
         txtQty.css("border", "1px solid white");
         paraQty.text("");
-        btnSave.attr("disabled", true);
+        btnItemSave.attr("disabled", true);
     }else {
         if (!qtyRegEx.test(txtQty.val())) {
             txtQty.css("border", "1px solid red");
             paraQty.text("Item quantity is a required field : only numbers");
-            btnSave.attr("disabled", true);
+            btnItemSave.attr("disabled", true);
         } else {
             txtQty.css("border", "1px solid green");
             paraQty.text("");
+            enableItemButton();
         }
     }
 })
 
-function enableButton(){
-    if( idRegEx.test(txtCode.val()) && priceRegEx.test(txtPrice.val()) && qtyRegEx.test(txtQty.val()) &&
-        nameRegEx.test(txtName.val()) && (txtName.val().length >= 5) && (txtName.val().length <= 50)){
-        btnSave.attr("disabled", false);
+
+function enableItemButton() {
+    if( itemCodeRegEx.test(txtItemCode.val()) && priceRegEx.test(txtPrice.val()) && qtyRegEx.test(txtQty.val()) &&
+        (txtItemName.val().length >= 5) && (txtItemName.val().length <= 50)) {
+        btnItemSave.attr("disabled", false);
     }
 }
 
