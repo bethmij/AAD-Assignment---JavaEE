@@ -3,6 +3,7 @@ package lk.ijse.gdse66.backend.dao.custom.impl;
 import lk.ijse.gdse66.backend.dao.custom.OrderDAO;
 import lk.ijse.gdse66.backend.entity.CustomerEntity;
 import lk.ijse.gdse66.backend.entity.OrderEntity;
+import lk.ijse.gdse66.backend.util.CrudUtil;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -12,8 +13,9 @@ public class OrderDAOImpl implements OrderDAO {
 
 
     @Override
-    public boolean save(Connection connection, OrderEntity dto) {
-        return false;
+    public boolean save(Connection connection, OrderEntity order) throws SQLException {
+        String sql = "INSERT INTO orders (oid, date, customerID) VALUES (?,?,?)";
+        return CrudUtil.execute(sql, connection, order.getOrderId(), order.getOrderDate(), order.getCustomerId());
     }
 
     @Override

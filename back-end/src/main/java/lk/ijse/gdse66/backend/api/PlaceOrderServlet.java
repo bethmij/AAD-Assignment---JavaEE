@@ -6,6 +6,8 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lk.ijse.gdse66.backend.bo.BOFactory;
+import lk.ijse.gdse66.backend.bo.custom.PlaceOrderBO;
 import lk.ijse.gdse66.backend.dto.OrderDTO;
 import lk.ijse.gdse66.backend.entity.OrderDetailsEntity;
 import lk.ijse.gdse66.backend.entity.OrderEntity;
@@ -22,6 +24,7 @@ import java.util.List;
 
 @WebServlet(urlPatterns = "/order")
 public class PlaceOrderServlet extends HttpServlet {
+    PlaceOrderBO placeOrderBO = BOFactory.getBoFactory().getBO(BOFactory.BOTypes.PLACEORDERBO);
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
@@ -43,60 +46,21 @@ public class PlaceOrderServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        System.out.println("doPost");
         BasicDataSource source = (BasicDataSource) req.getServletContext().getAttribute("bds");
 
         OrderDTO orderDTO = JsonbBuilder.create().fromJson(req.getReader(), OrderDTO.class);
-        String oid = orderDTO.getOrderId();
-        LocalDate date = orderDTO.getOrderDate();
-        String customerID = orderDTO.getCustomerId();
-        List<OrderDetailsEntity> orderDetailsList = orderDTO.getOrderDetails();
 
+        try (Connection connection = source.getConnection()){
+            boolean isOrderSaved = placeOrderBO.saveOrder(connection, orderDTO);
 
-        Connection connection = null;
-        try {
-            connection = source.getConnection();
-            connection.setAutoCommit(false);
-
-            String sql = "INSERT INTO orders (oid, date, customerID) VALUES (?,?,?)";
-            boolean isOrderAdded = CrudUtil.execute(sql, connection, oid, date, customerID);
-
-            boolean isOrderDetailsAdded = false;
-            if (isOrderAdded) {
-
-                for (OrderDetailsEntity orderDetail : orderDetailsList) {
-
-                    String code = orderDetail.getItemCode();
-                    int qty = orderDetail.getQtyOnHand();
-                    double unitPrice = orderDetail.getUnitPrice();
-
-                    String sql1 = "INSERT INTO orderdetails (oid, itemCode, qty, unitPrice) VALUES (?,?,?,?)";
-                    isOrderDetailsAdded = CrudUtil.execute(sql1, connection, oid, code, qty,unitPrice);
-
-                }
-
-                if (isOrderDetailsAdded) {
-                    sendServerMsg(resp, HttpServletResponse.SC_OK, "Order Placed Successfully!");
-                    connection.commit();
-                }
+            if (isOrderSaved) {
+                sendServerMsg(resp, HttpServletResponse.SC_OK, "Order Updated Successfully!");
+            }else {
+                sendServerMsg(resp, HttpServletResponse.SC_BAD_REQUEST, "Order Update Failed!");
             }
+
         } catch (SQLException e) {
-            try {
-                assert connection != null;
-                connection.rollback();
-            } catch (SQLException ignored) {}
-            System.out.println(e.getLocalizedMessage());
             sendServerMsg(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getLocalizedMessage());
-
-        }finally {
-            try {
-                assert connection != null;
-                connection.setAutoCommit(true);
-                connection.close();
-            } catch (SQLException e) {
-                System.out.println(e.getLocalizedMessage());
-                sendServerMsg(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getLocalizedMessage());
-            }
         }
     }
 
@@ -105,53 +69,18 @@ public class PlaceOrderServlet extends HttpServlet {
         BasicDataSource source = (BasicDataSource) req.getServletContext().getAttribute("bds");
 
         OrderDTO orderDTO = JsonbBuilder.create().fromJson(req.getReader(), OrderDTO.class);
-        String oid = orderDTO.getOrderId();
-        LocalDate date = orderDTO.getOrderDate();
-        String customerID = orderDTO.getCustomerId();
-        List<OrderDetailsEntity> orderDetailsList = orderDTO.getOrderDetails();
 
+        try (Connection connection = source.getConnection()){
+            boolean isOrderSaved = placeOrderBO.updateOrder(connection, orderDTO);
 
-        Connection connection = null;
-        try {
-            connection = source.getConnection();
-            connection.setAutoCommit(false);
-
-            String sql = "UPDATE orders SET date=?, customerID=? WHERE oid=?";
-            boolean isOrderUpdated = CrudUtil.execute(sql, connection, date, customerID, oid);
-
-            boolean isOrderDetailsUpdated = false;
-            if (isOrderUpdated) {
-
-                for (OrderDetailsEntity orderDetail : orderDetailsList) {
-
-                    String code = orderDetail.getItemCode();
-                    int qty = orderDetail.getQtyOnHand();
-                    double unitPrice = orderDetail.getUnitPrice();
-
-                    String sql1 = "UPDATE orderdetails SET qty=?, unitPrice=? WHERE oid=? AND itemCode=?";
-                    isOrderDetailsUpdated = CrudUtil.execute(sql1, connection, qty, unitPrice, oid, code);
-                }
-
-                if (isOrderDetailsUpdated) {
-                    sendServerMsg(resp, HttpServletResponse.SC_OK, "Order Updated Successfully!");
-                    connection.commit();
-                }
+            if (isOrderSaved) {
+                sendServerMsg(resp, HttpServletResponse.SC_OK, "Order Updated Successfully!");
+            }else {
+                sendServerMsg(resp, HttpServletResponse.SC_BAD_REQUEST, "Order Update Failed!");
             }
+
         } catch (SQLException e) {
-            try {
-                assert connection != null;
-                connection.rollback();
-            } catch (SQLException ignored) {}
             sendServerMsg(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getLocalizedMessage());
-
-        }finally {
-            try {
-                assert connection != null;
-                connection.setAutoCommit(true);
-                connection.close();
-            } catch (SQLException e) {
-                sendServerMsg(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getLocalizedMessage());
-            }
         }
     }
 
@@ -178,7 +107,7 @@ public class PlaceOrderServlet extends HttpServlet {
                 int qtyOnHand = resultSet.getInt(5);
                 double unitPrice = resultSet.getDouble(6);
 
-//                OrderEntity order = new OrderEntity(orderID, date, customerID);
+                OrderEntity order = new OrderEntity(orderID, date, customerID);
                 OrderDetailsEntity orderDetails = new OrderDetailsEntity(orderID, itemCode, qtyOnHand, unitPrice);
                 orderList.add(orderDetails);
 

@@ -10,7 +10,7 @@ import java.util.List;
 
 public interface OrderDAO extends CrudDAO<OrderEntity> {
     @Override
-    boolean save(Connection connection, OrderEntity dto);
+    boolean save(Connection connection, OrderEntity dto) throws SQLException;
 
     @Override
     boolean update(Connection connection, OrderEntity dto);
