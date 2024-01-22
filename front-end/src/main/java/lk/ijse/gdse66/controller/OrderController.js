@@ -20,13 +20,9 @@ let cash = $("#cash");
 let discount = $("#discount");
 let btnOrder = $('#btnPlaceOrder');
 let tbRow, tblQty, tblPrice, currOID;
-let cusIDList = [];
-
 setCusID();
 setOrderID();
 setItemCode();
-
-
 
 export function setCusID(IDList) {
     selectCusOp.empty();
@@ -71,7 +67,6 @@ function setOrderID() {
             return parseInt(numB) - parseInt(numA);
         });
 
-
         if(orderList.length===0){
             orderID.val(`Order ID : OR00-1`);
         }else {
@@ -89,20 +84,18 @@ selectCusOp.change(function () {
     $.ajax({
         url:"http://localhost:8000/java-pos/customer?option=SEARCH&cusID="+cusID,
         method: "GET",
-        success: function (resp) {
-            if(resp.status===200){
+        success: function (resp, status, xhr) {
+            if(xhr.status===200){
                 if(cusID !== "Customer ID" ) {
-                    $('#cusName').val(`Customer Name : ${resp.data[0].cusName}`);
-                    $('#cusAddress').val(`Customer Address : ${resp.data[0].cusAddress}`);
-                    $('#cusSalary').val(`Customer Salary : ${resp.data[0].cusSalary}`);
+                    $('#cusName').val(`Customer Name : ${resp.cusName}`);
+                    $('#cusAddress').val(`Customer Address : ${resp.cusAddress}`);
+                    $('#cusSalary').val(`Customer Salary : ${resp.cusSalary}`);
                 }else {
                     $('#cusName').val(`Customer Name : `);
                     $('#cusAddress').val(`Customer Address : `);
                     $('#cusSalary').val(`Customer Salary : `);
                     btnSave.attr("disabled", true);
                 }
-            }else if(resp.status===400){
-                alert(resp.message);
             }
         },
         error:function (resp) {
@@ -116,14 +109,14 @@ selectCusOp.change(function () {
 selectItemOp.change(function () {
     let itemCode = selectItemOp.val();
     $.ajax({
-        url:"http://localhost:8000/java-pos/item?option=SEARCH&code="+itemCode,
+        url:"http://localhost:8000/java-pos/item?option=SEARCH&itemCode="+itemCode,
         method: "GET",
-        success: function (resp) {
-            if(resp.status===200){
+        success: function (resp, status, xhr) {
+            if(xhr.status===200){
                 if(itemCode !== "Item Code" ) {
-                    txtItemName.val(`Item Name : ${resp.data[0].description}`);
-                    txtItemPrice.val(`Item Price : ${resp.data[0].uPrice}`);
-                    txtItemQty.val(`Item Quantity : ${resp.data[0].qtyOnHand}`);
+                    txtItemName.val(`Item Name : ${resp.description}`);
+                    txtItemPrice.val(`Item Price : ${resp.unitPrice}`);
+                    txtItemQty.val(`Item Quantity : ${resp.qtyOnHand}`);
                 }else {
                     txtItemName.val(`Item Name : `);
                     txtItemPrice.val(`Item Price : `);
@@ -132,8 +125,6 @@ selectItemOp.change(function () {
                     txtOrderQty.css("border", "1px solid white");
                     btnSave.attr("disabled", true);
                 }
-            }else if(resp.status===400){
-                alert(resp.message);
             }
         },
         error:function (resp) {
@@ -245,18 +236,18 @@ function setOrderArray(orderID, oID, currDate) {
 
     for (let i = 1; i < tableCode.length; i++) {
         let newOrderDetails = Object.assign({}, orderDetails);
-        newOrderDetails.oid = orderID;
-        newOrderDetails.code = $(tableCode[i]).text();
+        newOrderDetails.orderId = orderID;
+        newOrderDetails.itemCode = $(tableCode[i]).text();
         newOrderDetails.unitPrice = parseInt($(tablePrice[i]).text());
-        newOrderDetails.qty = parseInt($(tableQty[i]).text());
+        newOrderDetails.qtyOnHand = parseInt($(tableQty[i]).text());
         newOrderDetailArray.push(newOrderDetails);
 
     }
     console.log(newOrderDetailArray)
     let newOrder = Object.assign({}, order);
-    newOrder.oid = oID[1];
-    newOrder.date = currDate[1];
-    newOrder.customerID = selectCusOp.val();
+    newOrder.orderId = oID[1];
+    newOrder.orderDate = currDate[1];
+    newOrder.customerId = selectCusOp.val();
     newOrder.orderDetails = newOrderDetailArray;
     return newOrder;
 
@@ -277,20 +268,22 @@ btnOrder.click(function (event){
                 if (cash.val() !== "") {
                     if (!(parseInt(cash.val()) < total1)) {
                         let order = setOrderArray(orderID, oID, currDate);
+                        console.log(order)
                         $.ajax({
                            url: "http://localhost:8000/java-pos/order",
                             method: "POST",
                             data: JSON.stringify(order),
-                            success: function (resp) {
-                                if (resp.status === 200) {
-                                    alert(resp.message);
+                            success: function (resp, status, xhr) {
+                                if (xhr.status === 200) {
+                                    alert(resp);
                                     clearItemSelect();
                                     clearCusDetail();
                                     clearTotal();
                                     setOrderID();
-                                }else  if (resp.status === 400){
-                                    alert(resp.message);
                                 }
+                            },
+                            error:function (resp){
+                                alert(resp);
                             }
                         });
                     } else {
@@ -469,19 +462,14 @@ function getOrderIDList(callback) {
     $.ajax({
         url: "http://localhost:8000/java-pos/order?option=ID",
         method: "GET",
-        success: function (resp) {
-            if (resp.status === 200) {
-                if(resp.data.length !== 0) {
-                    for (const respElement of resp.data) {
-                        orderIDList.push(respElement);
-                    }
-
-                    callback(orderIDList);
+        success: function (resp, status, xhr) {
+            if (xhr.status === 200) {
+                if(resp.length !== 0) {
+                   orderIDList = resp;
+                   callback(orderIDList);
                 }else {
                     callback(orderIDList);
                 }
-            }else if(resp.status === 400){
-                alert(resp.message);
             }
         },
         error: function (resp) {

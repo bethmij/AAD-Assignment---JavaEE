@@ -14,5 +14,4 @@ public class OrderDetailsEntity {
    private int qtyOnHand;
    private double unitPrice;
 
-
 }

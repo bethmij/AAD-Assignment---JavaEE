@@ -19,4 +19,6 @@ public class OrderDTO {
     private LocalDate orderDate;
     private String customerId;
     private List<OrderDetailsEntity> orderDetails;
+
+
 }
