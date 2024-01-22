@@ -14,6 +14,7 @@ import java.util.List;
 public class OrderEntity {
 
     private String orderId;
+    @JsonbDateFormat(value = "yyyy-MM-dd")
     private LocalDate orderDate;
     private String customerId;
 

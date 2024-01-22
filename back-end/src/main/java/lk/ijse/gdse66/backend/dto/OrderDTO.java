@@ -15,7 +15,7 @@ import java.util.List;
 public class OrderDTO {
     private String orderId;
 
-    @JsonbDateFormat(value = "yyyyMMdd")
+    @JsonbDateFormat(value = "yyyy-MM-dd")
     private LocalDate orderDate;
     private String customerId;
     private List<OrderDetailsEntity> orderDetails;

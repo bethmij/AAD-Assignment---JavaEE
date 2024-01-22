@@ -282,8 +282,8 @@ btnOrder.click(function (event){
                                     setOrderID();
                                 }
                             },
-                            error:function (resp){
-                                alert(resp);
+                            error:function (xhr){
+                                alert(xhr.responseText);
                             }
                         });
                     } else {
@@ -298,9 +298,9 @@ btnOrder.click(function (event){
                     url:"http://localhost:8000/java-pos/order",
                     method: "PUT",
                     data: JSON.stringify(order),
-                    success:function (resp){
-                        if (resp.status === 200) {
-                            alert(resp.message);
+                    success:function (resp, status, xhr){
+                        if (xhr.status === 200) {
+                            alert(resp);
                             clearItemSelect();
                             clearCusDetail();
                             clearTotal();
@@ -312,8 +312,6 @@ btnOrder.click(function (event){
                             $('#txtOrderSearch').val("");
                             $("#orderSearch").removeClass('btn-outline-danger').addClass('btn-outline-success');
                             $('#orderSearch').text("Search");
-                        }else if(resp.status===400){
-                            alert(resp.message);
                         }
                     },
                     error:function (resp){
@@ -464,7 +462,7 @@ function getOrderIDList(callback) {
         method: "GET",
         success: function (resp, status, xhr) {
             if (xhr.status === 200) {
-                if(resp.length !== 0) {
+                if(resp !== 0) {
                    orderIDList = resp;
                    callback(orderIDList);
                 }else {
@@ -483,21 +481,17 @@ function getOrderList(id,callback) {
     $.ajax({
         url: "http://localhost:8000/java-pos/order?option=SEARCH&id="+id,
         method: "GET",
-        success: function (resp) {
-            if (resp.status === 200) {
-
-                for (const item of resp.data[0].items) {
-                    orderDetail.push(item);
+        success: function (resp, status, xhr) {
+            if (xhr.status === 200) {
+                for (const order of resp) {
+                    orderDetail.push(order.orderDetails);
                 }
                 let newOrder = Object.assign({}, order);
-                newOrder.oid = resp.data[0].oid;
-                newOrder.date = resp.data[0].date;
-                newOrder.customerID = resp.data[0].customerID;
+                newOrder.orderId = resp.orderId;
+                newOrder.orderDate = resp.orderDate;
+                newOrder.customerId = resp.customerId;
                 newOrder.orderDetails = orderDetail;
                 callback(newOrder);
-
-            }else if(resp.status === 400){
-                alert(resp.message);
             }
         },
         error: function (resp) {
