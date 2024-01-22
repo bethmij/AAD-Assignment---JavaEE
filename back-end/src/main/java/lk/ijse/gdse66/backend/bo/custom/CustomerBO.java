@@ -11,13 +11,13 @@ public interface CustomerBO extends SuperBO {
 
     List<CustomerDTO> getAllCustomer(Connection connection) throws SQLException;
 
-    CustomerDTO getCustomerByID();
+    CustomerDTO getCustomerByID(Connection connection, String id) throws SQLException;
 
-    List<String> getCustomerIDList();
+    List<String> getCustomerIDList(Connection connection) throws SQLException;
 
-    boolean saveCustomer(Connection connection, CustomerDTO customerDTO);
+    boolean saveCustomer(Connection connection, CustomerDTO customerDTO) throws SQLException;
 
-    void updateCustomer(Connection connection, CustomerDTO customerDTO);
+    boolean updateCustomer(Connection connection, CustomerDTO customerDTO) throws SQLException;
 
-    void deleteCustomer();
+    boolean deleteCustomer(Connection connection, String id) throws SQLException;
 }

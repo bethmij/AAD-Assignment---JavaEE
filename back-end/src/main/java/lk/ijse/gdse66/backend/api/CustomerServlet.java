@@ -10,13 +10,11 @@ import lk.ijse.gdse66.backend.bo.BOFactory;
 import lk.ijse.gdse66.backend.bo.custom.CustomerBO;
 import lk.ijse.gdse66.backend.dto.CustomerDTO;
 import lk.ijse.gdse66.backend.entity.CustomerEntity;
-import lk.ijse.gdse66.backend.util.CrudUtil;
 import org.apache.commons.dbcp.BasicDataSource;
+
 import java.io.IOException;
 import java.sql.Connection;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 
 @WebServlet(urlPatterns = "/customer")
@@ -58,8 +56,6 @@ public class CustomerServlet extends HttpServlet {
         try (Connection connection = source.getConnection()) {
             CustomerDTO customerDTO = new CustomerDTO(id, name, address, salary);
             boolean isSaved = customerBO.saveCustomer(connection, customerDTO);
-            String sql = "INSERT INTO company.customer (id, name, address, salary) VALUES (?,?,?,?)";
-            boolean isSaved = CrudUtil.execute(sql, connection, id, name, address, salary);
 
             if(isSaved){
                 sendServerMsg(resp, HttpServletResponse.SC_OK, "Customer Saved Successfully!");
@@ -83,8 +79,8 @@ public class CustomerServlet extends HttpServlet {
         double salary = customer.getCusSalary();
 
         try (Connection connection = source.getConnection()){
-            String sql = "UPDATE customer SET name=?, address=?, salary=? WHERE id=?";
-            boolean isUpdated = CrudUtil.execute(sql, connection, name, address, salary, id);
+            CustomerDTO customerDTO = new CustomerDTO(id, name, address, salary);
+            boolean isUpdated = customerBO.updateCustomer(connection, customerDTO);
 
             if(isUpdated)
                 sendServerMsg(resp,HttpServletResponse.SC_OK,"Customer Updated Successfully!");
@@ -101,8 +97,7 @@ public class CustomerServlet extends HttpServlet {
         BasicDataSource source = (BasicDataSource) req.getServletContext().getAttribute("bds");
 
         try (Connection connection = source.getConnection()){
-            String sql = "DELETE FROM customer WHERE id=?";
-            boolean isDeleted = CrudUtil.execute(sql, connection, cusID);
+            boolean isDeleted = customerBO.deleteCustomer(connection, cusID);
 
             if(isDeleted){
                 sendServerMsg(resp, HttpServletResponse.SC_OK, "Customer Deleted Successfully!");
@@ -131,21 +126,12 @@ public class CustomerServlet extends HttpServlet {
 
     private void getCustomerById(HttpServletRequest req, HttpServletResponse resp, BasicDataSource source) throws IOException {
         String cusID = req.getParameter("cusID");
-        CustomerEntity customer = null;
+        CustomerDTO customer;
 
         try (Connection connection = source.getConnection()){
-            String sql = "SELECT * FROM customer WHERE id=?";
-            ResultSet resultSet = CrudUtil.execute(sql, connection, cusID);
 
-            if (resultSet.next()) {
-                String id = resultSet.getString(1);
-                String name = resultSet.getString(2);
-                String address = resultSet.getString(3);
-                double salary = resultSet.getDouble(4);
+            customer = customerBO.getCustomerByID(connection, cusID);
 
-                customer = new CustomerEntity(id, name, address, salary);
-
-            }
             Jsonb jsonb = JsonbBuilder.create();
             jsonb.toJson(customer, resp.getWriter());
 
@@ -155,18 +141,13 @@ public class CustomerServlet extends HttpServlet {
     }
 
     private void getCusIDList(HttpServletResponse resp, BasicDataSource source) throws IOException {
-        List<String> cusIdList = new ArrayList<>();
+        List<String> customerIDList;
 
         try (Connection connection = source.getConnection()){
-            String sql = "SELECT id FROM customer";
-            ResultSet resultSet = CrudUtil.execute(sql, connection);
+            customerIDList = customerBO.getCustomerIDList(connection);
 
-            while (resultSet.next()) {
-                String id = resultSet.getString(1);
-                cusIdList.add(id);
-            }
             Jsonb jsonb = JsonbBuilder.create();
-            jsonb.toJson(cusIdList, resp.getWriter());
+            jsonb.toJson(customerIDList, resp.getWriter());
 
         } catch (SQLException e) {
             sendServerMsg(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getLocalizedMessage());

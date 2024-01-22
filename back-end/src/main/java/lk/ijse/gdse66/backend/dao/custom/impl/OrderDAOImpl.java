@@ -5,6 +5,7 @@ import lk.ijse.gdse66.backend.entity.CustomerEntity;
 import lk.ijse.gdse66.backend.entity.OrderEntity;
 
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.List;
 
 public class OrderDAOImpl implements OrderDAO {
@@ -21,7 +22,7 @@ public class OrderDAOImpl implements OrderDAO {
     }
 
     @Override
-    public boolean delete(Connection connection, OrderEntity dto) {
+    public boolean delete(Connection connection, String id) {
         return false;
     }
 
@@ -32,6 +33,11 @@ public class OrderDAOImpl implements OrderDAO {
 
     @Override
     public List<OrderEntity> getAll(Connection connection) {
+        return null;
+    }
+
+    @Override
+    public List<String> getIDList(Connection connection) throws SQLException {
         return null;
     }
 }

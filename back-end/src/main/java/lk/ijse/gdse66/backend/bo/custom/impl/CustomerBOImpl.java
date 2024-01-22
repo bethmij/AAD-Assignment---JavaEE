@@ -28,17 +28,18 @@ public class CustomerBOImpl implements CustomerBO {
     }
 
     @Override
-    public CustomerDTO getCustomerByID() {
-        return null;
+    public CustomerDTO getCustomerByID(Connection connection, String id) throws SQLException {
+        CustomerEntity customer = customerDAO.search(connection, id);
+        return new CustomerDTO(customer.getCusID(), customer.getCusName(), customer.getCusAddress(), customer.getCusSalary());
     }
 
     @Override
-    public List<String> getCustomerIDList() {
-        return null;
+    public List<String> getCustomerIDList(Connection connection) throws SQLException {
+        return customerDAO.getIDList(connection);
     }
 
     @Override
-    public boolean saveCustomer(Connection connection, CustomerDTO customerDTO) {
+    public boolean saveCustomer(Connection connection, CustomerDTO customerDTO) throws SQLException {
         CustomerEntity customerEntity = new CustomerEntity(customerDTO.getCusID(), customerDTO.getCusName(),
                 customerDTO.getCusAddress(), customerDTO.getCusSalary());
 
@@ -46,7 +47,7 @@ public class CustomerBOImpl implements CustomerBO {
     }
 
     @Override
-    public void updateCustomer(Connection connection, CustomerDTO customerDTO) {
+    public boolean updateCustomer(Connection connection, CustomerDTO customerDTO) throws SQLException {
         CustomerEntity customerEntity = new CustomerEntity(customerDTO.getCusID(), customerDTO.getCusName(),
                 customerDTO.getCusAddress(), customerDTO.getCusSalary());
 
@@ -54,7 +55,7 @@ public class CustomerBOImpl implements CustomerBO {
     }
 
     @Override
-    public void deleteCustomer() {
-
+    public boolean deleteCustomer(Connection connection, String id) throws SQLException {
+        return  customerDAO.delete(connection, id);
     }
 }

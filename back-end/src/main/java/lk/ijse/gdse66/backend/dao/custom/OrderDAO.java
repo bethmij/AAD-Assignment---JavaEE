@@ -5,6 +5,7 @@ import lk.ijse.gdse66.backend.entity.CustomerEntity;
 import lk.ijse.gdse66.backend.entity.OrderEntity;
 
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.List;
 
 public interface OrderDAO extends CrudDAO<OrderEntity> {
@@ -15,11 +16,14 @@ public interface OrderDAO extends CrudDAO<OrderEntity> {
     boolean update(Connection connection, OrderEntity dto);
 
     @Override
-    boolean delete(Connection connection, OrderEntity dto);
+    boolean delete(Connection connection, String id);
 
     @Override
     OrderEntity search(Connection connection, String id);
 
     @Override
     List<OrderEntity> getAll(Connection connection);
+
+    @Override
+    List<String> getIDList(Connection connection) throws SQLException;
 }

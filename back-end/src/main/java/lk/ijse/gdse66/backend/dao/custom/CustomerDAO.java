@@ -9,17 +9,20 @@ import java.util.List;
 
 public interface CustomerDAO extends CrudDAO<CustomerEntity> {
     @Override
-    boolean save(Connection connection, CustomerEntity dto);
+    boolean save(Connection connection, CustomerEntity dto) throws SQLException;
 
     @Override
-    boolean update(Connection connection, CustomerEntity dto);
+    boolean update(Connection connection, CustomerEntity dto) throws SQLException;
 
     @Override
-    boolean delete(Connection connection, CustomerEntity dto);
+    boolean delete(Connection connection, String id) throws SQLException;
 
     @Override
-    CustomerEntity search(Connection connection, String id);
+    CustomerEntity search(Connection connection, String id) throws SQLException;
 
     @Override
     List<CustomerEntity> getAll(Connection connection) throws SQLException;
+
+    @Override
+    List<String> getIDList(Connection connection) throws SQLException;
 }

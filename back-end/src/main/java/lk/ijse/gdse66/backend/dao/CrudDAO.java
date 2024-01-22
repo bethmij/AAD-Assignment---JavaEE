@@ -8,15 +8,15 @@ import java.util.List;
 
 public interface CrudDAO<T> extends SuperDAO{
 
-    boolean save(Connection connection, T dto);
+    boolean save(Connection connection, T dto) throws SQLException;
 
-    boolean update(Connection connection, T dto);
+    boolean update(Connection connection, T dto) throws SQLException;
 
-    boolean delete(Connection connection, T dto);
+    boolean delete(Connection connection, String id) throws SQLException;
 
-    T search(Connection connection, String id);
+    T search(Connection connection, String id) throws SQLException;
 
     List<T> getAll(Connection connection) throws SQLException;
 
-
+    List<String> getIDList(Connection connection) throws SQLException;
 }
