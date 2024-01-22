@@ -2,7 +2,6 @@ package lk.ijse.gdse66.backend.bo.custom;
 
 import lk.ijse.gdse66.backend.bo.SuperBO;
 import lk.ijse.gdse66.backend.dto.CustomerDTO;
-import lk.ijse.gdse66.backend.entity.CustomerEntity;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -16,9 +15,9 @@ public interface CustomerBO extends SuperBO {
 
     List<String> getCustomerIDList();
 
-    void saveCustomer();
+    boolean saveCustomer(Connection connection, CustomerDTO customerDTO);
 
-    void updateCustomer();
+    void updateCustomer(Connection connection, CustomerDTO customerDTO);
 
     void deleteCustomer();
 }

@@ -1,6 +1,7 @@
 package lk.ijse.gdse66.backend.dao.custom.impl;
 
 import lk.ijse.gdse66.backend.dao.custom.OrderDetailDAO;
+import lk.ijse.gdse66.backend.entity.CustomerEntity;
 import lk.ijse.gdse66.backend.entity.OrderDetailsEntity;
 
 import java.sql.Connection;
@@ -10,22 +11,22 @@ public class OrderDetailDAOImpl implements OrderDetailDAO {
 
 
     @Override
-    public boolean save(OrderDetailsEntity dto, Connection connection) {
+    public boolean save(Connection connection, OrderDetailsEntity dto) {
         return false;
     }
 
     @Override
-    public boolean update(OrderDetailsEntity dto, Connection connection) {
+    public boolean update(Connection connection, OrderDetailsEntity dto) {
         return false;
     }
 
     @Override
-    public boolean delete(OrderDetailsEntity dto, Connection connection) {
+    public boolean delete(Connection connection, OrderDetailsEntity dto) {
         return false;
     }
 
     @Override
-    public OrderDetailsEntity search(String id, Connection connection) {
+    public OrderDetailsEntity search(Connection connection, String id) {
         return null;
     }
 

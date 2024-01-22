@@ -56,6 +56,8 @@ public class CustomerServlet extends HttpServlet {
         double salary = customer.getCusSalary();
 
         try (Connection connection = source.getConnection()) {
+            CustomerDTO customerDTO = new CustomerDTO(id, name, address, salary);
+            boolean isSaved = customerBO.saveCustomer(connection, customerDTO);
             String sql = "INSERT INTO company.customer (id, name, address, salary) VALUES (?,?,?,?)";
             boolean isSaved = CrudUtil.execute(sql, connection, id, name, address, salary);
 

@@ -14,25 +14,24 @@ public class CustomerDAOImpl implements CustomerDAO {
 
 
     @Override
-    public boolean save(CustomerEntity dto, Connection connection) {
+    public boolean save(Connection connection, CustomerEntity dto) {
         return false;
     }
 
     @Override
-    public boolean update(CustomerEntity dto, Connection connection) {
+    public boolean update(Connection connection, CustomerEntity dto) {
         return false;
     }
 
     @Override
-    public boolean delete(CustomerEntity dto, Connection connection) {
+    public boolean delete(Connection connection, CustomerEntity dto) {
         return false;
     }
 
     @Override
-    public CustomerEntity search(String id, Connection connection) {
+    public CustomerEntity search(Connection connection, String id) {
         return null;
     }
-
 
     @Override
     public List<CustomerEntity> getAll(Connection connection) throws SQLException {

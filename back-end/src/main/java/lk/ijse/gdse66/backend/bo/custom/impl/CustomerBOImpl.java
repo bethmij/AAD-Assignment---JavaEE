@@ -38,13 +38,19 @@ public class CustomerBOImpl implements CustomerBO {
     }
 
     @Override
-    public void saveCustomer() {
+    public boolean saveCustomer(Connection connection, CustomerDTO customerDTO) {
+        CustomerEntity customerEntity = new CustomerEntity(customerDTO.getCusID(), customerDTO.getCusName(),
+                customerDTO.getCusAddress(), customerDTO.getCusSalary());
 
+        return customerDAO.save(connection, customerEntity);
     }
 
     @Override
-    public void updateCustomer() {
+    public void updateCustomer(Connection connection, CustomerDTO customerDTO) {
+        CustomerEntity customerEntity = new CustomerEntity(customerDTO.getCusID(), customerDTO.getCusName(),
+                customerDTO.getCusAddress(), customerDTO.getCusSalary());
 
+        return customerDAO.update(connection, customerEntity);
     }
 
     @Override
