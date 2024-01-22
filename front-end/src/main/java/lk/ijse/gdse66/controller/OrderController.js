@@ -19,6 +19,7 @@ let total1 = parseInt(total[0]);
 let cash = $("#cash");
 let discount = $("#discount");
 let btnOrder = $('#btnPlaceOrder');
+let orderBody = $("#orderTbody");
 let tbRow, tblQty, tblPrice, currOID;
 setCusID();
 setOrderID();
@@ -142,6 +143,8 @@ btnSave.click(function (event){
         let itemQty = txtItemQty.val().split("Item Quantity : ");
 
         if (parseInt(itemQty[1]) >= parseInt(txtOrderQty.val())) {
+            let isAdded = checkDuplicateItem(selectItemOp.val(), txtOrderQty.val());
+            if(!isAdded) {
                 $('#orderTbody').append(
                     `<tr>
                         <th scope="row">${selectItemOp.val()}</th>
@@ -151,9 +154,13 @@ btnSave.click(function (event){
                         <td style="width: 10%"><img class="orderDelete" src="../resources/assests/img/icons8-delete-96.png" alt="Logo" width="50%" class="opacity-75"></td>
                     </tr>`
                 );
+
                 setFeilds();
                 deleteDetail();
                 calcTotal(itemPrice[1], txtOrderQty.val());
+            }else {
+                calcTotal(itemPrice[1], txtOrderQty.val());
+            }
         } else {
             alert("Stock unavailable!");
         }
@@ -228,7 +235,7 @@ discount.keyup(function (){
 })
 
 function setOrderArray(orderID, oID, currDate) {
-    let orderBody = $("#orderTbody");
+
     let tableCode = orderBody.children('tr').children(':nth-child(1)');
     let tablePrice = orderBody.children('tr').children(':nth-child(3)');
     let tableQty = orderBody.children('tr').children(':nth-child(4)');
@@ -344,9 +351,9 @@ function setFeilds() {
         selectItemOp.val(itemCode);
         selectItemOp.attr("disabled", true);
 
-        getItemList(itemCode,function (resp) {
-            if(resp.status===200){
-                txtItemQty.val(`Item Quantity : ${resp.data[0].qtyOnHand}`);
+        getItemList(itemCode,function (resp,xhr) {
+            if(xhr.status===200){
+                txtItemQty.val(`Item Quantity : ${resp.qtyOnHand}`);
             }
         });
         setFeilds();
@@ -493,5 +500,20 @@ function getOrderList(id,callback) {
         }
     })
 }
+
+function checkDuplicateItem(itemCode, itemQty) {
+    let tableCode = orderBody.children('tr').children(':nth-child(1)');
+    let tableQty = orderBody.children('tr').children(':nth-child(4)');
+
+    for (let i = 1; i < tableCode.length; i++) {
+        if(itemCode===$(tableCode[i]).text()){
+            let qty = parseInt($(tableQty[i]).text()) + parseInt(itemQty);
+            $(tableQty[i]).text(qty)
+            return true;
+        }
+    }
+    return false;
+}
+
 
 
