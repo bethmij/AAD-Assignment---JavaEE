@@ -1,23 +1,25 @@
 package lk.ijse.gdse66.backend.dao.custom;
 
 import lk.ijse.gdse66.backend.dao.CrudDAO;
+import lk.ijse.gdse66.backend.entity.OrderDetailsEntity;
 
+import java.sql.Connection;
 import java.util.List;
 
-public interface OrderDetailDAO extends CrudDAO<OrderDetailDAO> {
+public interface OrderDetailDAO extends CrudDAO<OrderDetailsEntity> {
 
     @Override
-    boolean save(OrderDetailDAO dto);
+    boolean save(OrderDetailsEntity dto, Connection connection);
 
     @Override
-    boolean update(OrderDetailDAO dto);
+    boolean update(OrderDetailsEntity dto, Connection connection);
 
     @Override
-    boolean delete(OrderDetailDAO dto);
+    boolean delete(OrderDetailsEntity dto, Connection connection);
 
     @Override
-    OrderDetailDAO search();
+    OrderDetailsEntity search(String id, Connection connection);
 
     @Override
-    List<OrderDetailDAO> getAll();
+    List<OrderDetailsEntity> getAll(Connection connection);
 }

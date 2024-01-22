@@ -1,22 +1,24 @@
 package lk.ijse.gdse66.backend.dao.custom;
 
 import lk.ijse.gdse66.backend.dao.CrudDAO;
+import lk.ijse.gdse66.backend.entity.ItemEntity;
 
+import java.sql.Connection;
 import java.util.List;
 
-public interface ItemDAO extends CrudDAO<ItemDAO> {
+public interface ItemDAO extends CrudDAO<ItemEntity> {
     @Override
-    boolean save(ItemDAO dto);
+    boolean save(ItemEntity dto, Connection connection);
 
     @Override
-    boolean update(ItemDAO dto);
+    boolean update(ItemEntity dto, Connection connection);
 
     @Override
-    boolean delete(ItemDAO dto);
+    boolean delete(ItemEntity dto, Connection connection);
 
     @Override
-    ItemDAO search();
+    ItemEntity search(String id, Connection connection);
 
     @Override
-    List<ItemDAO> getAll();
+    List<ItemEntity> getAll(Connection connection);
 }

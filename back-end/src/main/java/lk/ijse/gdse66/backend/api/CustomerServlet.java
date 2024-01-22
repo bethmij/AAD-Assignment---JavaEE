@@ -6,6 +6,9 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lk.ijse.gdse66.backend.bo.BOFactory;
+import lk.ijse.gdse66.backend.bo.custom.CustomerBO;
+import lk.ijse.gdse66.backend.dto.CustomerDTO;
 import lk.ijse.gdse66.backend.entity.CustomerEntity;
 import lk.ijse.gdse66.backend.util.CrudUtil;
 import org.apache.commons.dbcp.BasicDataSource;
@@ -18,6 +21,7 @@ import java.util.List;
 
 @WebServlet(urlPatterns = "/customer")
 public class CustomerServlet extends HttpServlet {
+    CustomerBO customerBO = BOFactory.getBoFactory().getBO(BOFactory.BOTypes.CUSTOMERBO);
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
@@ -109,22 +113,10 @@ public class CustomerServlet extends HttpServlet {
     }
 
     private void getAllCustomer(HttpServletResponse resp, BasicDataSource source) throws IOException {
-        List<CustomerEntity> customerList = new ArrayList<>();
-        CustomerEntity customer;
 
         try (Connection connection = source.getConnection()){
-            String sql = "SELECT * FROM customer";
-            ResultSet resultSet = CrudUtil.execute(sql, connection);
+            List<CustomerDTO> customerList = customerBO.getAllCustomer(connection);
 
-            while (resultSet.next()) {
-                String id = resultSet.getString(1);
-                String name = resultSet.getString(2);
-                String address = resultSet.getString(3);
-                double salary = resultSet.getDouble(4);
-
-                customer = new CustomerEntity(id, name, address, salary);
-                customerList.add(customer);
-            }
             Jsonb jsonb = JsonbBuilder.create();
             jsonb.toJson(customerList, resp.getWriter());
 
