@@ -137,7 +137,7 @@ function getAll() {
                             <td>${customer.cusName}</td>
                             <td>${customer.cusAddress}</td>
                             <td>${customer.cusSalary}</td>
-                            <td style="width: 10%"><img  class="delete"  src="../resources/assests/img/icons8-delete-96.png" alt="Logo" width="50%" class="opacity-75"></td>
+                            <td style="width: 10%"><img  class="delete"  src="../resources/assests/img/icons8-delete-96.png" alt="Logo" width="50%" style="opacity: 100%;" "></td>
                         </tr>`);
                     deleteDetail();
                     setFeilds();
@@ -168,8 +168,9 @@ deleteDetail();
 
 function deleteDetail() {
     let btnDelete = $('.delete');
-    btnDelete.on("mouseover", function (){
-        $(this).css("cursor", "pointer");}
+    btnDelete.on("mouseover", function () {
+            $(this).css("cursor", "pointer")
+        }
     )
 
     btnDelete.click(function (event) {

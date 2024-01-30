@@ -1,5 +1,6 @@
 package lk.ijse.gdse66.backend.dao.custom.impl;
 
+import lk.ijse.gdse66.backend.dao.SuperDAO;
 import lk.ijse.gdse66.backend.dao.custom.OrderDetailDAO;
 import lk.ijse.gdse66.backend.entity.OrderDetailsEntity;
 import lk.ijse.gdse66.backend.util.CrudUtil;
@@ -11,7 +12,6 @@ import java.util.List;
 public class OrderDetailDAOImpl implements OrderDetailDAO {
 
 
-    @Override
     public boolean save(Connection connection, List<OrderDetailsEntity> orderDetailsList) throws SQLException {
 
         int savedCount = 0;
@@ -33,9 +33,6 @@ public class OrderDetailDAOImpl implements OrderDetailDAO {
 
     }
 
-
-
-    @Override
     public boolean update(Connection connection, List<OrderDetailsEntity> orderDetailsList) throws SQLException {
         int updatedCount = 0;
 
@@ -55,23 +52,4 @@ public class OrderDetailDAOImpl implements OrderDetailDAO {
         return updatedCount == orderDetailsList.size();
     }
 
-    @Override
-    public boolean delete(Connection connection, String id) {
-        return false;
-    }
-
-    @Override
-    public List<OrderDetailsEntity> search(Connection connection, String id) {
-        return null;
-    }
-
-    @Override
-    public List<List<OrderDetailsEntity>> getAll(Connection connection) {
-        return null;
-    }
-
-    @Override
-    public List<String> getIDList(Connection connection) throws SQLException {
-        return null;
-    }
 }

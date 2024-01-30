@@ -77,4 +77,9 @@ public class PlaceOrderBOImpl implements PlaceOrderBO {
         }
         return false;
     }
+
+    @Override
+    public boolean deleteOrder(Connection connection, String id) throws SQLException {
+        return  orderDAO.delete(connection, id);
+    }
 }

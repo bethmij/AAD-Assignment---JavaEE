@@ -29,6 +29,11 @@ body{
     color: #919191;
 }
 
+.custom-tooltip {
+    --bs-tooltip-bg: #151515;
+    --bs-tooltip-color: #0c9a3b;
+}
+
 @media all and (max-width: 768px){
 
     .menuContainer{

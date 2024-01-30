@@ -10,7 +10,7 @@ let btnItemSave = $('#itemSave');
 let itemCodeRegEx = /^(I00-)[0-9]{3}$/;
 let priceRegEx = /^[0-9]*(\.[0-9]{0,2})?$/;
 let qtyRegEx = /^\d+$/;
-btnItemSave.attr("disabled", false);
+btnItemSave.attr("disabled", true);
 
 
 txtItemCode.keyup(function (){

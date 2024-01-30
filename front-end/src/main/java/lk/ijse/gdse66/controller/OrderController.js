@@ -20,6 +20,7 @@ let cash = $("#cash");
 let discount = $("#discount");
 let btnOrder = $('#btnPlaceOrder');
 let orderBody = $("#orderTbody");
+let btnSearch = $('#orderSearch');
 let tbRow, tblQty, tblPrice;
 setCusID();
 setOrderID();
@@ -310,18 +311,7 @@ btnOrder.click(function (event){
                     success:function (resp, status, xhr){
                         if (xhr.status === 200) {
                             alert(resp);
-                            clearItemSelect();
-                            clearCusDetail();
-                            clearTotal();
-                            setOrderID();
-                            btnOrder.text("");
-                            btnOrder.append(`<img src="../resources/assests/img/Screenshot__550_-removebg-preview.png" alt="Logo"
-                                 width="25vw" style="opacity: 50%;">  Place Order`);
-                            cash.attr("disabled", false);
-                            discount.attr("disabled", false);
-                            $('#txtOrderSearch').val("");
-                            $("#orderSearch").removeClass('btn-outline-danger').addClass('btn-outline-success');
-                            $('#orderSearch').text("Search");
+                            updateSearch();
                         }
                     },
                     error:function (resp){
@@ -404,34 +394,53 @@ function clearTotal(){
     total1 = parseInt(total[0]);
 }
 
-$('#orderSearch').click(function (){
+function updateSearch() {
+    clearItemSelect();
+    clearCusDetail();
+    clearTotal();
+    setOrderID();
+    btnOrder.text("");
+    btnOrder.append(`<img src="../resources/assests/img/Screenshot__550_-removebg-preview.png" alt="Logo"
+                                 width="25vw" style="opacity: 50%;">  Place Order`);
+    cash.attr("disabled", false);
+    discount.attr("disabled", false);
+    $('#txtOrderSearch').val("");
+    $('#cash').attr("disabled", false);
+    $('#discount').attr("disabled", false);
+    btnSearch.text("Search");
+    btnSearch.toggleClass('btn-outline-danger btn-outline-success');
+}
+
+btnSearch.click(function (){
     let id = $('#txtOrderSearch').val();
     let tbody = $('#orderTbody');
 
-    if(id.length!==0) {
-        getOrderIDList(function (IDList) {
-            if (IDList.includes(id)) {
-                getOrderList(id, function (order) {
-                    $('#orderID').val("Order ID : " + order.orderId);
-                    getCustomerList(order.customerId, function (resp,xhr) {
-                        if (xhr.status === 200) {
-                            selectCusOp.val(resp.cusID);
-                            $('#cusName').val(`Customer Name : ${resp.cusName}`);
-                            $('#cusAddress').val(`Customer Address : ${resp.cusAddress}`);
-                            $('#cusSalary').val(`Customer Salary : ${resp.cusSalary}`);
-                            tbody.empty();
-                            tbody.append(`<tr >
+    if(btnSearch.text().includes("Search")) {
+
+        if (id.length !== 0) {
+            getOrderIDList(function (IDList) {
+                if (IDList.includes(id)) {
+                    getOrderList(id, function (order) {
+                        $('#orderID').val("Order ID : " + order.orderId);
+                        getCustomerList(order.customerId, function (resp, xhr) {
+                            if (xhr.status === 200) {
+                                selectCusOp.val(resp.cusID);
+                                $('#cusName').val(`Customer Name : ${resp.cusName}`);
+                                $('#cusAddress').val(`Customer Address : ${resp.cusAddress}`);
+                                $('#cusSalary').val(`Customer Salary : ${resp.cusSalary}`);
+                                tbody.empty();
+                                tbody.append(`<tr >
                                     <th scope="col">Code</th>
                                     <th scope="col">Name</th>
                                     <th scope="col">Price</th>
                                     <th scope="col">Order Qty</th>
                                     <th scope="col"></th>
                              </tr> `);
-                            for (const item of order.orderDetails) {
-                                getItemList(item.itemCode, function (resp,xhr) {
-                                    if (xhr.status === 200) {
-                                        tbody.append(
-                                            `<tr>
+                                for (const item of order.orderDetails) {
+                                    getItemList(item.itemCode, function (resp, xhr) {
+                                        if (xhr.status === 200) {
+                                            tbody.append(
+                                                `<tr>
                                         <th scope="row">${resp.itemCode}</th>
                                         <td>${resp.description}</td>
                                         <td>${resp.unitPrice}</td>
@@ -439,24 +448,47 @@ $('#orderSearch').click(function (){
                                         <td style="width: 10%"><img class="orderDelete" src="../resources/assests/img/icons8-delete-96.png"
                                                                         alt="Logo" width="50%" class="opacity-75"></td>
                                     </tr>`)
-                                        setFeilds();
-                                        deleteDetail();
-                                        calcTotal(resp.unitPrice, item.qtyOnHand);
-                                        btnOrder.text("");
-                                        btnOrder.append(`<img src="../resources/assests/img/Screenshot__550_-removebg-preview.png" 
+                                            setFeilds();
+                                            deleteDetail();
+                                            calcTotal(resp.unitPrice, item.qtyOnHand);
+                                        }
+                                    });
+                                }
+                                $('#cash').attr("disabled", true);
+                                $('#discount').attr("disabled", true);
+                                btnOrder.text("");
+                                btnOrder.append(`<img src="../resources/assests/img/Screenshot__550_-removebg-preview.png" 
                                                              alt="Logo" width="25vw" class="opacity-50 me-2">Update Order`);
-                                    }
-                                });
+                                btnSearch.text("Delete");
+                                btnSearch.toggleClass('btn-outline-success btn-outline-danger');
                             }
-                        }
-                    })
-                });
-            } else {
-                alert("No such Order..please check the order ID");
-            }
-        });
-    }else {
-        alert("Please enter the order ID");
+                        })
+                    });
+                } else {
+                    alert("No such Order..please check the order ID");
+                }
+            });
+        } else {
+            alert("Please enter the order ID");
+        }
+    }else if(btnSearch.text().includes("Delete")) {
+        const userChoice = window.confirm("Do you want to delete the order?");
+        if (userChoice) {
+            $.ajax({
+                url: "http://localhost:8000/java-pos/order?ID=" + id,
+                method: "DELETE",
+                success: function (resp, status, xhr) {
+                    if (xhr.status === 200) {
+                        alert(resp);
+                        updateSearch();
+                    }
+                },
+                error: function (xhr) {
+                    alert("Error : " + xhr.responseText)
+                    console.log("Error : ", xhr.statusText);
+                }
+            });
+        }
     }
 })
 

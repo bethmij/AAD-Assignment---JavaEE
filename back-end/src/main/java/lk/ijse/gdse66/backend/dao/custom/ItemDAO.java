@@ -1,7 +1,6 @@
 package lk.ijse.gdse66.backend.dao.custom;
 
 import lk.ijse.gdse66.backend.dao.CrudDAO;
-import lk.ijse.gdse66.backend.entity.CustomerEntity;
 import lk.ijse.gdse66.backend.entity.ItemEntity;
 
 import java.sql.Connection;

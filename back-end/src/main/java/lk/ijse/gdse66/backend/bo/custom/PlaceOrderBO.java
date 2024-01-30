@@ -18,4 +18,6 @@ public interface PlaceOrderBO extends SuperBO {
 
     boolean updateOrder(Connection connection, OrderDTO orderDTO) throws SQLException;
 
+    boolean deleteOrder(Connection connection, String id) throws SQLException;
+
 }

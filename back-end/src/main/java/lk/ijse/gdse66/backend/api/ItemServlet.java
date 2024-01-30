@@ -10,8 +10,10 @@ import lk.ijse.gdse66.backend.bo.BOFactory;
 import lk.ijse.gdse66.backend.bo.custom.ItemBO;
 import lk.ijse.gdse66.backend.dto.ItemDTO;
 import lk.ijse.gdse66.backend.entity.ItemEntity;
-import org.apache.commons.dbcp.BasicDataSource;
 
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+import javax.sql.DataSource;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -20,13 +22,24 @@ import java.util.List;
 @WebServlet(urlPatterns = "/item")
 public class ItemServlet extends HttpServlet {
     ItemBO itemBO = BOFactory.getBoFactory().getBO(BOFactory.BOTypes.ITEMBO);
+    DataSource source;
+    List<String> itemCodeList;
+
+    @Override
+    public void init(){
+        try {
+            InitialContext initCtx = new InitialContext();
+            source = (DataSource)initCtx.lookup("java:comp/env/jdbc/pool");
+            itemCodeList = getItemIDList(null, source);
+        } catch (NamingException | IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         resp.setContentType("application/json");
         String option = req.getParameter("option");
-
-        BasicDataSource source = (BasicDataSource) req.getServletContext().getAttribute("bds");
 
         switch (option) {
             case "GET": {
@@ -38,20 +51,28 @@ public class ItemServlet extends HttpServlet {
                 break;
             }
             case "ID":
-                getItemIDList(resp, source);
+                itemCodeList = getItemIDList(resp, source);
+                Jsonb jsonb = JsonbBuilder.create();
+                jsonb.toJson(itemCodeList, resp.getWriter());
                 break;
         }
     }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        BasicDataSource source = (BasicDataSource) req.getServletContext().getAttribute("bds");
 
         ItemEntity item = JsonbBuilder.create().fromJson(req.getReader(),ItemEntity.class);
         String code = item.getItemCode();
         String description = item.getDescription();
         int qtyOnHand = item.getQtyOnHand();
         double unitPrice = item.getUnitPrice();
+
+        if (validation(code, resp, description, qtyOnHand, unitPrice)) return;
+
+        if(itemCodeList.contains(code)){
+            sendServerMsg(resp, HttpServletResponse.SC_BAD_REQUEST, "Item code already saved!");
+            return;
+        }
 
         try (Connection connection = source.getConnection()) {
             ItemDTO itemDTO = new ItemDTO(code, description, unitPrice, qtyOnHand);
@@ -70,13 +91,19 @@ public class ItemServlet extends HttpServlet {
 
     @Override
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        BasicDataSource source = (BasicDataSource) req.getServletContext().getAttribute("bds");
 
         ItemEntity item = JsonbBuilder.create().fromJson(req.getReader(),ItemEntity.class);
         String code = item.getItemCode();
         String description = item.getDescription();
         int qtyOnHand = item.getQtyOnHand();
         double unitPrice = item.getUnitPrice();
+
+        if (validation(code, resp, description, qtyOnHand, unitPrice)) return;
+
+        if(!itemCodeList.contains(code)){
+            sendServerMsg(resp, HttpServletResponse.SC_BAD_REQUEST, "Item code not added!");
+            return;
+        }
 
         try (Connection connection = source.getConnection()){
             ItemDTO itemDTO = new ItemDTO(code, description, unitPrice, qtyOnHand);
@@ -94,7 +121,11 @@ public class ItemServlet extends HttpServlet {
     @Override
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         String itemCode = req.getParameter("itemCode");
-        BasicDataSource source = (BasicDataSource) req.getServletContext().getAttribute("bds");
+
+        if(!itemCodeList.contains(itemCode)){
+            sendServerMsg(resp, HttpServletResponse.SC_BAD_REQUEST, "Item code not saved!");
+            return;
+        }
 
         try (Connection connection = source.getConnection()){
             boolean isDeleted = itemBO.deleteItem(connection, itemCode);
@@ -109,7 +140,7 @@ public class ItemServlet extends HttpServlet {
         }
     }
 
-    private void getAllItem(HttpServletResponse resp, BasicDataSource source) throws IOException {
+    private void getAllItem(HttpServletResponse resp, DataSource source) throws IOException {
 
         try (Connection connection = source.getConnection()){
             List<ItemDTO> itemList = itemBO.getAllItems(connection);
@@ -124,7 +155,7 @@ public class ItemServlet extends HttpServlet {
 
 
 
-    private void getItemById(HttpServletRequest req, HttpServletResponse resp, BasicDataSource source) throws IOException {
+    private void getItemById(HttpServletRequest req, HttpServletResponse resp, DataSource source) throws IOException {
         String itemCode = req.getParameter("itemCode");
 
         try (Connection connection = source.getConnection()){
@@ -138,16 +169,32 @@ public class ItemServlet extends HttpServlet {
         }
     }
 
-    private void getItemIDList(HttpServletResponse resp, BasicDataSource source) throws IOException {
+    private List<String> getItemIDList(HttpServletResponse resp, DataSource source) throws IOException {
 
         try (Connection connection = source.getConnection()){
-            List<String> itemIDList = itemBO.getItemIDList(connection);
-            Jsonb jsonb = JsonbBuilder.create();
-            jsonb.toJson(itemIDList, resp.getWriter());
+            return itemBO.getItemIDList(connection);
 
         } catch (SQLException e) {
             sendServerMsg(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getLocalizedMessage());
         }
+        return itemCodeList;
+    }
+
+    private boolean validation(String code, HttpServletResponse resp, String description, int qty, double price) throws IOException {
+        if(code.equals("") || !code.matches("^(I00-)[0-9]{3}$")){
+            sendServerMsg(resp, HttpServletResponse.SC_BAD_REQUEST, "Item code is a required field : Pattern I00-000");
+            return true;
+        } else if (description.length() < 5 || description.length() > 50) {
+            sendServerMsg(resp, HttpServletResponse.SC_BAD_REQUEST, "Item Name is a required field : Min 5, Max 20, Spaces Allowed");
+            return true;
+        } else if (qty==0 || !String.valueOf(qty).matches("^\\d+$")) {
+            sendServerMsg(resp, HttpServletResponse.SC_BAD_REQUEST, "Item quantity is a required field : only numbers");
+            return true;
+        } else if (price == 0.0 || !String.valueOf(price).matches("^[0-9]*(\\.[0-9]{0,2})?$")) {
+            sendServerMsg(resp, HttpServletResponse.SC_BAD_REQUEST, "Item Price is a required field : Pattern 100.00 or 100");
+            return true;
+        }
+        return false;
     }
 
     private void sendServerMsg(HttpServletResponse resp, int status, String msg) throws IOException {

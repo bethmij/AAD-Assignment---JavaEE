@@ -9,8 +9,10 @@ import jakarta.servlet.http.HttpServletResponse;
 import lk.ijse.gdse66.backend.bo.BOFactory;
 import lk.ijse.gdse66.backend.bo.custom.PlaceOrderBO;
 import lk.ijse.gdse66.backend.dto.OrderDTO;
-import org.apache.commons.dbcp.BasicDataSource;
 
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+import javax.sql.DataSource;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -18,13 +20,22 @@ import java.util.List;
 
 @WebServlet(urlPatterns = "/order")
 public class PlaceOrderServlet extends HttpServlet {
+    DataSource source;
     PlaceOrderBO placeOrderBO = BOFactory.getBoFactory().getBO(BOFactory.BOTypes.PLACEORDERBO);
+
+    @Override
+    public void init(){
+        try {
+            InitialContext initCtx = new InitialContext();
+            source = (DataSource)initCtx.lookup("java:comp/env/jdbc/pool");
+        } catch (NamingException e) {
+            e.printStackTrace();
+        }
+    }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         resp.setContentType("application/json");
-        BasicDataSource source = (BasicDataSource) req.getServletContext().getAttribute("bds");
-
         String option = req.getParameter("option");
 
         switch (option){
@@ -39,9 +50,9 @@ public class PlaceOrderServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        BasicDataSource source = (BasicDataSource) req.getServletContext().getAttribute("bds");
 
         OrderDTO orderDTO = JsonbBuilder.create().fromJson(req.getReader(), OrderDTO.class);
+
 
         try (Connection connection = source.getConnection()){
             boolean isOrderSaved = placeOrderBO.saveOrder(connection, orderDTO);
@@ -59,7 +70,6 @@ public class PlaceOrderServlet extends HttpServlet {
 
     @Override
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        BasicDataSource source = (BasicDataSource) req.getServletContext().getAttribute("bds");
 
         OrderDTO orderDTO = JsonbBuilder.create().fromJson(req.getReader(), OrderDTO.class);
 
@@ -79,11 +89,25 @@ public class PlaceOrderServlet extends HttpServlet {
 
 
     @Override
-    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) {
+    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        String cusID = req.getParameter("ID");
 
+        try (Connection connection = source.getConnection()){
+            boolean isDeleted = placeOrderBO.deleteOrder(connection, cusID);
+
+            if(isDeleted){
+                sendServerMsg(resp, HttpServletResponse.SC_OK, "Order Deleted Successfully!");
+            }else {
+                sendServerMsg(resp, HttpServletResponse.SC_BAD_REQUEST, "Order Delete Failed!");
+            }
+        } catch (SQLException e) {
+            sendServerMsg(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getLocalizedMessage());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
-    private void getOrderDetailsByID(HttpServletRequest req, HttpServletResponse resp, BasicDataSource source) throws IOException {
+    private void getOrderDetailsByID(HttpServletRequest req, HttpServletResponse resp, DataSource source) throws IOException {
         String id = req.getParameter("id");
 
         try (Connection connection = source.getConnection()){
@@ -97,7 +121,7 @@ public class PlaceOrderServlet extends HttpServlet {
         }
     }
 
-    private void getOrderIDs(HttpServletResponse resp, BasicDataSource source) throws IOException {
+    private void getOrderIDs(HttpServletResponse resp, DataSource source) throws IOException {
         try (Connection connection = source.getConnection()){
             List<String> orderIDList = placeOrderBO.getOrderIDList(connection);
 

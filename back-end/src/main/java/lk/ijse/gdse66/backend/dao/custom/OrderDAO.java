@@ -1,7 +1,6 @@
 package lk.ijse.gdse66.backend.dao.custom;
 
 import lk.ijse.gdse66.backend.dao.CrudDAO;
-import lk.ijse.gdse66.backend.entity.CustomerEntity;
 import lk.ijse.gdse66.backend.entity.OrderEntity;
 
 import java.sql.Connection;
@@ -16,7 +15,7 @@ public interface OrderDAO extends CrudDAO<OrderEntity> {
     boolean update(Connection connection, OrderEntity dto) throws SQLException;
 
     @Override
-    boolean delete(Connection connection, String id);
+    boolean delete(Connection connection, String id) throws SQLException;
 
     @Override
     OrderEntity search(Connection connection, String id);

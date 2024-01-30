@@ -26,8 +26,9 @@ public class OrderDAOImpl implements OrderDAO {
     }
 
     @Override
-    public boolean delete(Connection connection, String id) {
-        return false;
+    public boolean delete(Connection connection, String id) throws SQLException {
+        String sql = "DELETE FROM orders WHERE oid=?";
+        return CrudUtil.execute(sql, connection, id);
     }
 
     @Override
