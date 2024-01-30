@@ -1,7 +1,14 @@
 
+
 initiateUI();
 setDate();
 setTime();
+
+
+setCustomerCount();
+setItemCount();
+seOrderCount();
+
 
 function initiateUI() {
     clearAll();
@@ -139,4 +146,53 @@ function setTime() {
         $('#currTime').text(`Time : ${formattedTime}`);
     },1000);
 }
+
+export function setCustomerCount() {
+    $.ajax({
+        url: "http://localhost:8000/java-pos/customer?option=COUNT",
+        method: "GET",
+        success: function (resp, status, xhr){
+            if(xhr.status === 200) {
+                let count = String(resp).padStart(2, '0')
+                $("#customerCount").text(count);
+            }
+        },
+        error: function (xhr) {
+            alert("Error : "+xhr.responseText)
+        }
+    });
+}
+
+export function setItemCount() {
+    $.ajax({
+        url: "http://localhost:8000/java-pos/item?option=COUNT",
+        method: "GET",
+        success: function (resp, status, xhr){
+            if(xhr.status === 200) {
+                let count = String(resp).padStart(2, '0')
+                $("#itemCount").text(count);
+            }
+        },
+        error: function (xhr) {
+            alert("Error : "+xhr.responseText)
+        }
+    });
+}
+
+export function seOrderCount() {
+    $.ajax({
+        url: "http://localhost:8000/java-pos/order?option=COUNT",
+        method: "GET",
+        success: function (resp, status, xhr){
+            if(xhr.status === 200) {
+                let count = String(resp).padStart(2, '0')
+                $("#orderCount").text(count);
+            }
+        },
+        error: function (xhr) {
+            alert("Error : "+xhr.responseText)
+        }
+    });
+}
+
 

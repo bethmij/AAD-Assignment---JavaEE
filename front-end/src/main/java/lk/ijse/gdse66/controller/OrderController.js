@@ -4,6 +4,7 @@ import {getCusIDList} from "./CustomerController.js";
 import {getItemCodeList} from "./ItemController.js";
 import {getCustomerList} from "./CustomerController.js";
 import {getItemList} from "./ItemController.js";
+import {seOrderCount} from "./DashboardController.js";
 
 let selectCusOp = $('#cusID');
 let selectItemOp = $('#itemCode');
@@ -290,6 +291,7 @@ btnOrder.click(function (event){
                                     clearCusDetail();
                                     clearTotal();
                                     setOrderID();
+                                    seOrderCount();
                                 }
                             },
                             error:function (xhr){
@@ -481,6 +483,7 @@ btnSearch.click(function (){
                     if (xhr.status === 200) {
                         alert(resp);
                         updateSearch();
+                        seOrderCount();
                     }
                 },
                 error: function (xhr) {

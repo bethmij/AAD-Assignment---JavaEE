@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lk.ijse.gdse66.backend.bo.BOFactory;
+import lk.ijse.gdse66.backend.bo.custom.DashboardBO;
 import lk.ijse.gdse66.backend.bo.custom.PlaceOrderBO;
 import lk.ijse.gdse66.backend.dto.OrderDTO;
 
@@ -22,6 +23,7 @@ import java.util.List;
 public class PlaceOrderServlet extends HttpServlet {
     DataSource source;
     PlaceOrderBO placeOrderBO = BOFactory.getBoFactory().getBO(BOFactory.BOTypes.PLACEORDERBO);
+    DashboardBO dashboardBO = BOFactory.getBoFactory().getBO(BOFactory.BOTypes.DASHBOARDBO);
 
     @Override
     public void init(){
@@ -45,6 +47,10 @@ public class PlaceOrderServlet extends HttpServlet {
 
             case "ID" :
                 getOrderIDs(resp, source);
+                break;
+
+            case "COUNT":
+                getOrderCount(resp, source);
         }
     }
 
@@ -130,6 +136,20 @@ public class PlaceOrderServlet extends HttpServlet {
 
         } catch (SQLException e) {
             sendServerMsg(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getLocalizedMessage());
+        }
+    }
+
+    private void getOrderCount(HttpServletResponse resp, DataSource source) throws IOException {
+        try (Connection connection = source.getConnection()){
+            int count = dashboardBO.getOrderCount(connection);
+
+            Jsonb jsonb = JsonbBuilder.create();
+            jsonb.toJson(count, resp.getWriter());
+
+        } catch (SQLException e) {
+            sendServerMsg(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getLocalizedMessage());
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 

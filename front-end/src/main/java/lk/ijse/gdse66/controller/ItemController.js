@@ -1,5 +1,7 @@
 import {setItemCode} from "./OrderController.js";
 import {item} from "../model/Item.js";
+import {setItemCount} from "./DashboardController.js";
+
 
 let itemCode = $("#txtItemCode");
 let itemName = $("#txtItemName");
@@ -45,6 +47,7 @@ btnItemSave.click(function (event){
                                    setItemCode(CodeList)
                                 });
                                 btnItemSave.attr("disabled", true);
+                                setItemCount();
                             }
                         },
                         error: function (xhr, status, error) {
@@ -184,6 +187,7 @@ function deleteDetail() {
                             setItemCode(CodeList);
                         });
                         alert(resp);
+                        setItemCount();
                     }
                 },
                 error: function (xhr) {

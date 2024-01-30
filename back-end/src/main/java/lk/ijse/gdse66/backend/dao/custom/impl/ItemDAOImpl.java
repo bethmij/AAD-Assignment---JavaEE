@@ -53,6 +53,16 @@ public class ItemDAOImpl implements ItemDAO {
     }
 
     @Override
+    public int count(Connection connection) throws SQLException {
+        String sql = "SELECT count(code) FROM item";
+        ResultSet resultSet = CrudUtil.execute(sql, connection);
+        if (resultSet.next()){
+            return resultSet.getInt(1);
+        }
+        return 0;
+    }
+
+    @Override
     public List<ItemEntity> getAll(Connection connection) throws SQLException {
         List<ItemEntity> itemList = new ArrayList<>();
 

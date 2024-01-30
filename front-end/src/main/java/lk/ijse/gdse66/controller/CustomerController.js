@@ -1,5 +1,7 @@
 import {setCusID} from "./OrderController.js";
 import {customer} from "../model/Customer.js";
+import {setCustomerCount} from "./DashboardController.js";
+
 
 let cusId = $("#txtCusID");
 let cusName = $("#txtCusName");
@@ -46,6 +48,7 @@ btnCustomerSave.click(function (event){
                                    setCusID(IDList);
                                 });
                                 btnCustomerSave.attr("disabled", true);
+                                setCustomerCount();
                             }
                         },
                         error: function (xhr, status, error) {
@@ -191,6 +194,7 @@ function deleteDetail() {
                         getCusIDList(function (IDList) {
                             setCusID(IDList)
                         });
+                        setCustomerCount();
                     }
                 },
                 error: function (xhr) {

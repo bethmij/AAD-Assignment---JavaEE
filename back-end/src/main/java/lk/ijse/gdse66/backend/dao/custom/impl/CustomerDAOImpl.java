@@ -52,6 +52,16 @@ public class CustomerDAOImpl implements CustomerDAO {
     }
 
     @Override
+    public int count(Connection connection) throws SQLException {
+        String sql = "SELECT count(id) FROM customer";
+        ResultSet resultSet = CrudUtil.execute(sql, connection);
+        if (resultSet.next()){
+            return resultSet.getInt(1);
+        }
+        return 0;
+    }
+
+    @Override
     public List<CustomerEntity> getAll(Connection connection) throws SQLException {
         List<CustomerEntity> customerList = new ArrayList<>();
         String sql = "SELECT * FROM customer";

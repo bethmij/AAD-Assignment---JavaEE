@@ -58,4 +58,6 @@ public class CustomerBOImpl implements CustomerBO {
     public boolean deleteCustomer(Connection connection, String id) throws SQLException {
         return  customerDAO.delete(connection, id);
     }
+
+
 }

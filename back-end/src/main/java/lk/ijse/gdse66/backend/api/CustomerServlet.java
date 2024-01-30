@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lk.ijse.gdse66.backend.bo.BOFactory;
 import lk.ijse.gdse66.backend.bo.custom.CustomerBO;
+import lk.ijse.gdse66.backend.bo.custom.DashboardBO;
 import lk.ijse.gdse66.backend.dto.CustomerDTO;
 import lk.ijse.gdse66.backend.entity.CustomerEntity;
 
@@ -22,6 +23,7 @@ import java.util.List;
 @WebServlet(urlPatterns = "/customer")
 public class CustomerServlet extends HttpServlet {
     CustomerBO customerBO = BOFactory.getBoFactory().getBO(BOFactory.BOTypes.CUSTOMERBO);
+    DashboardBO dashboardBO = BOFactory.getBoFactory().getBO(BOFactory.BOTypes.DASHBOARDBO);
     DataSource source;
     List<String> cusIDList;
 
@@ -56,8 +58,13 @@ public class CustomerServlet extends HttpServlet {
                 Jsonb jsonb = JsonbBuilder.create();
                 jsonb.toJson(cusIDList, resp.getWriter());
                 break;
+
+            case "COUNT":
+                getCustomerCount(resp, source);
         }
     }
+
+
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
@@ -181,6 +188,20 @@ public class CustomerServlet extends HttpServlet {
             sendServerMsg(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getLocalizedMessage());
         }
         return cusIDList;
+    }
+
+    private void getCustomerCount(HttpServletResponse resp, DataSource source) throws IOException {
+        try (Connection connection = source.getConnection()){
+            int count = dashboardBO.getCustomerCount(connection);
+
+            Jsonb jsonb = JsonbBuilder.create();
+            jsonb.toJson(count, resp.getWriter());
+
+        } catch (SQLException e) {
+            sendServerMsg(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getLocalizedMessage());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private boolean validation(String id, HttpServletResponse resp, String name, String address, double salary) throws IOException {

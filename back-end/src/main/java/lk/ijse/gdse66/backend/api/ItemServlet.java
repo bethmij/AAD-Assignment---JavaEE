@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lk.ijse.gdse66.backend.bo.BOFactory;
+import lk.ijse.gdse66.backend.bo.custom.DashboardBO;
 import lk.ijse.gdse66.backend.bo.custom.ItemBO;
 import lk.ijse.gdse66.backend.dto.ItemDTO;
 import lk.ijse.gdse66.backend.entity.ItemEntity;
@@ -22,6 +23,7 @@ import java.util.List;
 @WebServlet(urlPatterns = "/item")
 public class ItemServlet extends HttpServlet {
     ItemBO itemBO = BOFactory.getBoFactory().getBO(BOFactory.BOTypes.ITEMBO);
+    DashboardBO dashboardBO = BOFactory.getBoFactory().getBO(BOFactory.BOTypes.DASHBOARDBO);
     DataSource source;
     List<String> itemCodeList;
 
@@ -55,6 +57,9 @@ public class ItemServlet extends HttpServlet {
                 Jsonb jsonb = JsonbBuilder.create();
                 jsonb.toJson(itemCodeList, resp.getWriter());
                 break;
+
+            case "COUNT":
+                getItemCount(resp, source);
         }
     }
 
@@ -178,6 +183,20 @@ public class ItemServlet extends HttpServlet {
             sendServerMsg(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getLocalizedMessage());
         }
         return itemCodeList;
+    }
+
+    private void getItemCount(HttpServletResponse resp, DataSource source) throws IOException {
+        try (Connection connection = source.getConnection()){
+            int count = dashboardBO.getItemCount(connection);
+
+            Jsonb jsonb = JsonbBuilder.create();
+            jsonb.toJson(count, resp.getWriter());
+
+        } catch (SQLException e) {
+            sendServerMsg(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getLocalizedMessage());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private boolean validation(String code, HttpServletResponse resp, String description, int qty, double price) throws IOException {

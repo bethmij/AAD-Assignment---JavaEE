@@ -37,6 +37,16 @@ public class OrderDAOImpl implements OrderDAO {
     }
 
     @Override
+    public int count(Connection connection) throws SQLException {
+        String sql = "SELECT count(oid) FROM orders";
+        ResultSet resultSet = CrudUtil.execute(sql, connection);
+        if (resultSet.next()){
+            return resultSet.getInt(1);
+        }
+        return 0;
+    }
+
+    @Override
     public List<OrderEntity> getAll(Connection connection) {
         return null;
     }
