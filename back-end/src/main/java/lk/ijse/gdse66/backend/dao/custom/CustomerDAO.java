@@ -3,26 +3,24 @@ package lk.ijse.gdse66.backend.dao.custom;
 import lk.ijse.gdse66.backend.dao.CrudDAO;
 import lk.ijse.gdse66.backend.entity.CustomerEntity;
 
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.List;
 
 public interface CustomerDAO extends CrudDAO<CustomerEntity> {
     @Override
-    boolean save(CustomerEntity dto) throws SQLException;
+    boolean save(CustomerEntity dto) ;
 
     @Override
-    boolean update(CustomerEntity dto) throws SQLException;
+    boolean update(CustomerEntity dto) ;
 
     @Override
-    boolean delete(String id) throws SQLException;
+    boolean delete(String id) ;
 
     @Override
-    CustomerEntity search(String id) throws SQLException;
+    CustomerEntity search(String id) ;
 
     @Override
-    List<CustomerEntity> getAll() throws SQLException;
+    List<CustomerEntity> getAll() ;
 
     @Override
-    List<String> getIDList() throws SQLException;
+    List<String> getIDList() ;
 }

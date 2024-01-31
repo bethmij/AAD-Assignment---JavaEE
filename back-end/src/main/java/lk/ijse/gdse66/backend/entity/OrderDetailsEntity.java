@@ -4,29 +4,40 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
 @Entity
-@Table(name = "orderdetails")
+@Table(name = "order_details")
 public class OrderDetailsEntity {
 
    @Id
-   @Column(name = "oid")
-   private String orderId;
+   @GeneratedValue (strategy = GenerationType.IDENTITY)
+   @Column (name = "order_detail_id")
+   private int ordeDetailId;
 
-   @Column (name = "itemCode")
-   private String itemCode;
-
-   @Column (name = "qty")
+   @Column (name = "quantity")
    private int qtyOnHand;
 
-   @Column (name = "unitPrice")
+   @Column (name = "unit_price")
    private double unitPrice;
 
+   @ManyToOne
+   @JoinColumn(name = "item_code", referencedColumnName = "item_code", nullable = false)
+   private ItemEntity item;
+
+   @ManyToOne
+   @JoinColumn(name = "order_id", referencedColumnName = "order_id", nullable = false)
+   private OrderEntity orders;
+
+
+   public OrderDetailsEntity( int qtyOnHand, double unitPrice, ItemEntity item, OrderEntity orders) {
+      this.qtyOnHand = qtyOnHand;
+      this.unitPrice = unitPrice;
+      this.item = item;
+      this.orders = orders;
+   }
 }
+

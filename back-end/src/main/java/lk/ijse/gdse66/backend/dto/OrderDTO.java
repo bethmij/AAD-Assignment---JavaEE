@@ -18,7 +18,7 @@ public class OrderDTO {
     @JsonbDateFormat(value = "yyyy-MM-dd")
     private LocalDate orderDate;
     private String customerId;
-    private List<OrderDetailsEntity> orderDetails;
+    private List<OrderDetailDTO> orderDetails;
 
 
 }

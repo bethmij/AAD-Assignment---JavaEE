@@ -51,7 +51,7 @@ btnCustomerSave.click(function (event){
                                 setCustomerCount();
                             }
                         },
-                        error: function (xhr, status, error) {
+                        error: function (xhr) {
                             alert("Error : "+xhr.responseText)
                         }
                     });
@@ -148,7 +148,7 @@ function getAll() {
             }
         },
         error: function (xhr){
-            console.log("Error : ", xhr.statusText);
+            alert("Error : "+xhr.responseText)
         }
     })
 }
@@ -199,7 +199,6 @@ function deleteDetail() {
                 },
                 error: function (xhr) {
                     alert("Error : "+xhr.responseText)
-                    console.log("Error : ", xhr.statusText);
                 }
             });
             setCusID();
@@ -214,8 +213,8 @@ export function getCustomerList(id, callback) {
         success: function (resp, status, xhr) {
             callback(resp, xhr);
         },
-        error: function (resp) {
-            alert(resp);
+        error: function (xhr) {
+            alert("Error : "+xhr.responseText)
         }
     });
 }
@@ -245,7 +244,7 @@ $('#btnSearch').click(function (){
                         deleteDetail();
                     },
                     error: function (xhr) {
-                        alert("Error : "+xhr.responseText);
+                        alert("Error : "+xhr.responseText)
                     }
                 })
             } else {
@@ -269,8 +268,8 @@ export function getCusIDList(callback) {
                 callback(cusIDList);
             }
         },
-        error: function (xhr){
-            alert("Error : "+xhr.responseText);
+        error: function (xhr) {
+            alert("Error : "+xhr.responseText)
         }
     });
 }

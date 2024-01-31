@@ -96,8 +96,8 @@ selectCusOp.change(function () {
                     $('#cusSalary').val(`Customer Salary : ${resp.cusSalary}`);
                 }
             },
-            error: function (resp) {
-                alert(resp);
+            error: function (xhr) {
+                alert("Error : "+xhr.responseText)
             }
         });
     }else {
@@ -124,8 +124,8 @@ selectItemOp.change(function () {
                     txtItemQty.val(`Item Quantity : ${resp.qtyOnHand}`);
                 }
             },
-            error:function (resp) {
-                alert(resp);
+            error: function (xhr) {
+                alert("Error : "+xhr.responseText)
             }
         });
     } else {
@@ -316,8 +316,8 @@ btnOrder.click(function (event){
                             updateSearch();
                         }
                     },
-                    error:function (resp){
-                        alert(resp);
+                    error: function (xhr) {
+                        alert("Error : "+xhr.responseText)
                     }
                 });
             }
@@ -487,8 +487,7 @@ btnSearch.click(function (){
                     }
                 },
                 error: function (xhr) {
-                    alert("Error : " + xhr.responseText)
-                    console.log("Error : ", xhr.statusText);
+                    alert("Error : " + xhr.responseText);
                 }
             });
         }
@@ -510,8 +509,8 @@ function getOrderIDList(callback) {
                 }
             }
         },
-        error: function (resp) {
-            alert(resp);
+        error: function (xhr) {
+            alert("Error : "+xhr.responseText)
         }
     })
 }
@@ -531,8 +530,8 @@ function getOrderList(id,callback) {
                 callback(newOrder);
             }
         },
-        error: function (resp) {
-            alert(resp);
+        error: function (xhr) {
+            alert("Error : "+xhr.responseText)
         }
     })
 }

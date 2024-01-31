@@ -1,55 +1,65 @@
-//package lk.ijse.gdse66.backend.dao.custom.impl;
-//
-//import lk.ijse.gdse66.backend.dao.SuperDAO;
-//import lk.ijse.gdse66.backend.dao.custom.OrderDetailDAO;
-//import lk.ijse.gdse66.backend.entity.OrderDetailsEntity;
-//import lk.ijse.gdse66.backend.util.CrudUtil;
-//
-//import java.sql.Connection;
-//import java.sql.SQLException;
-//import java.util.List;
-//
-//public class OrderDetailDAOImpl implements OrderDetailDAO {
-//
-//
-//    public boolean save(Connection connection, List<OrderDetailsEntity> orderDetailsList) throws SQLException {
-//
-//        int savedCount = 0;
-//
-//        for (OrderDetailsEntity orderDetail : orderDetailsList) {
-//
-//            String oid = orderDetail.getOrderId();
-//            String code = orderDetail.getItemCode();
-//            int qty = orderDetail.getQtyOnHand();
-//            double unitPrice = orderDetail.getUnitPrice();
-//
-//            String sql1 = "INSERT INTO orderdetails (oid, itemCode, qty, unitPrice) VALUES (?,?,?,?)";
-//            boolean isAdded = CrudUtil.execute(sql1, connection, oid, code, qty, unitPrice);
-//            savedCount +=  isAdded ? 1:0;
-//
-//        }
-//
-//        return savedCount == orderDetailsList.size();
-//
-//    }
-//
-//    public boolean update(Connection connection, List<OrderDetailsEntity> orderDetailsList) throws SQLException {
-//        int updatedCount = 0;
-//
-//        for (OrderDetailsEntity orderDetail : orderDetailsList) {
-//
-//            String oid = orderDetail.getOrderId();
-//            String code = orderDetail.getItemCode();
-//            int qty = orderDetail.getQtyOnHand();
-//            double unitPrice = orderDetail.getUnitPrice();
-//
-//            String sql1 = "UPDATE orderdetails SET qty=?, unitPrice=? WHERE oid=? AND itemCode=?";
-//            boolean isUpdated = CrudUtil.execute(sql1, connection, qty, unitPrice, oid, code);
-//            updatedCount +=  isUpdated ? 1:0;
-//
-//        }
-//
-//        return updatedCount == orderDetailsList.size();
-//    }
-//
-//}
+package lk.ijse.gdse66.backend.dao.custom.impl;
+
+import lk.ijse.gdse66.backend.config.SessionFactoryConfig;
+import lk.ijse.gdse66.backend.dao.custom.OrderDetailDAO;
+import lk.ijse.gdse66.backend.entity.OrderDetailsEntity;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
+import org.hibernate.query.Query;
+
+import java.util.List;
+
+public class OrderDetailDAOImpl implements OrderDetailDAO {
+    Session session;
+
+
+    public boolean save(List<OrderDetailsEntity> orderDetailsList)  {
+
+        int savedCount = 0;
+        for (OrderDetailsEntity orderDetail : orderDetailsList) {
+            session = SessionFactoryConfig.getInstance().getSession();
+            Transaction transaction = session.beginTransaction();
+
+            try {
+                session.save(orderDetail);
+                transaction.commit();
+                savedCount++;
+            }catch (Exception e){
+                transaction.rollback();
+                return false;
+            }finally {
+                session.close();
+            }
+        }
+
+        return savedCount == orderDetailsList.size();
+
+    }
+
+    public boolean update(List<OrderDetailsEntity> orderDetailsList)  {
+
+        for (OrderDetailsEntity orderDetail : orderDetailsList) {
+            session = SessionFactoryConfig.getInstance().getSession();
+            Transaction transaction = session.beginTransaction();
+
+            try {
+                Query query = session.createQuery("UPDATE OrderDetailsEntity o SET o.qtyOnHand = :qty, o.unitPrice = :uPrice" +
+                        " WHERE o.item.itemCode = :itemCode AND o.orders.orderId = :orderID");
+                query.setParameter("qty", orderDetail.getQtyOnHand());
+                query.setParameter("uPrice", orderDetail.getUnitPrice());
+                query.setParameter("itemCode", orderDetail.getItem().getItemCode());
+                query.setParameter("orderID", orderDetail.getOrders().getOrderId());
+                return query.executeUpdate() > 0;
+
+            }catch (Exception e){
+                transaction.rollback();
+                return false;
+            }finally {
+                session.close();
+            }
+
+        }
+        return false;
+    }
+
+}

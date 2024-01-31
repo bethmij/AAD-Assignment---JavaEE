@@ -5,12 +5,12 @@ import jakarta.json.bind.annotation.JsonbDateFormat;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -20,14 +20,28 @@ import java.time.LocalDate;
 public class OrderEntity {
 
     @Id
-    @Column(name = "oid")
+    @Column(name = "order_id")
     private String orderId;
 
     @JsonbDateFormat(value = "yyyy-MM-dd")
-    @Column (name = "date", columnDefinition = "DATE")
+    @CreationTimestamp
+    @Column (name = "order_date", columnDefinition = "DATE")
     private LocalDate orderDate;
 
-    @Column (name = "custonerID")
-    private String customerId;
+    @ManyToOne
+    @JoinColumn(name = "customer_id", referencedColumnName = "customer_id", nullable = false)
+    private CustomerEntity customer;
 
+    @OneToMany (cascade = CascadeType.ALL,fetch = FetchType.LAZY,mappedBy = "orders")
+    private List<OrderDetailsEntity> orderDetails = new ArrayList<>();
+
+    public OrderEntity(String orderId, LocalDate orderDate, CustomerEntity customer) {
+        this.orderId = orderId;
+        this.orderDate = orderDate;
+        this.customer = customer;
+    }
+
+    public OrderEntity(String orderId) {
+        this.orderId = orderId;
+    }
 }

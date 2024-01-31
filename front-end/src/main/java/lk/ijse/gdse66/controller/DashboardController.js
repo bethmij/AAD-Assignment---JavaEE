@@ -172,7 +172,7 @@ export function setItemCount() {
             }
         },
         error: function (xhr) {
-            alert("Error : "+xhr.responseText)
+            alert("Error : fbsdgsdgsdgsdgsdg")
         }
     });
 }
@@ -188,7 +188,8 @@ export function seOrderCount() {
             }
         },
         error: function (xhr) {
-            alert("Error : "+xhr.responseText)
+            console.log(xhr)
+           // alert("ErrorError : fbsdgsdgsdgsdgsdg")
         }
     });
 }

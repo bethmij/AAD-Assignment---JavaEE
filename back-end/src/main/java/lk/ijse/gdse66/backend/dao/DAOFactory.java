@@ -21,14 +21,14 @@ public class DAOFactory {
         switch (daoTypes){
             case CUSTOMERDAO:
                 return (T) new CustomerDAOImpl();
-//            case ITEMDAO:
-//                return (T) new ItemDAOImpl();
-//            case ORDERDAO:
-//                return (T) new OrderDAOImpl();
-//            case ORDERDETAILDAO:
-//                return (T) new OrderDetailDAOImpl();
-//            case QUERYDAO:
-//                return (T) new QueryDAOImpl();
+            case ITEMDAO:
+                return (T) new ItemDAOImpl();
+            case ORDERDAO:
+                return (T) new OrderDAOImpl();
+            case ORDERDETAILDAO:
+                return (T) new OrderDetailDAOImpl();
+            case QUERYDAO:
+                return (T) new QueryDAOImpl();
             default:
                 return null;
         }

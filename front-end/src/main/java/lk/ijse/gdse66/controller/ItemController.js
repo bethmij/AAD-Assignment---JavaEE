@@ -131,8 +131,8 @@ function getAll() {
                     itemBody.append(`<tr>
                         <th scope="row">${item.itemCode}</th>
                         <td>${item.description}</td>
-                        <td>${item.qtyOnHand}</td>
                         <td>${item.unitPrice}</td>
+                        <td>${item.qtyOnHand}</td>
                         <td style="width: 10%"><img  class="delete"  src="../resources/assests/img/icons8-delete-96.png" alt="Logo" width="50%" class="opacity-75"></td>
                 </tr>`);
                     deleteDetail();
@@ -140,8 +140,8 @@ function getAll() {
                 }
             }
         },
-        error: function (xhr, status, error){
-            console.log("Error : ", xhr.statusText);
+        error: function (xhr) {
+            alert("Error : "+xhr.responseText)
         }
     })
 
@@ -192,7 +192,6 @@ function deleteDetail() {
                 },
                 error: function (xhr) {
                     alert("Error : "+xhr.responseText)
-                    console.log("Error : ", xhr.statusText);
                 }
             });
             setItemCode();
@@ -209,8 +208,8 @@ export function getItemList(code, callback) {
                 callback(resp,xhr);
             }
         },
-        error: function (resp) {
-            alert(resp);
+        error: function (xhr) {
+            alert("Error : "+xhr.responseText)
         }
     });
 }
@@ -257,7 +256,7 @@ export function getItemCodeList(callback) {
             }
         },
         error: function (xhr, status, error){
-            console.log("Error : ", xhr.statusText);
+            console.log("Error : ", xhr.responseText);
         }
     });
 }
