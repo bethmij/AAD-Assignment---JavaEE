@@ -15,7 +15,6 @@ import lk.ijse.gdse66.backend.entity.OrderEntity;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,7 +24,7 @@ public class PlaceOrderBOImpl implements PlaceOrderBO {
     QueryDAO queryDAO = DAOFactory.getDaoFactory().getDAO(DAOFactory.DAOTypes.QUERYDAO);
 
     @Override
-    public OrderDTO getOrderByID(String id) throws SQLException {
+    public OrderDTO getOrderByID(String id) {
         OrderEntity order = queryDAO.getOrderDetail(id);
         List<OrderDetailDTO> orderDTOS = new ArrayList<>();
 
@@ -39,7 +38,7 @@ public class PlaceOrderBOImpl implements PlaceOrderBO {
     }
 
     @Override
-    public List<String> getOrderIDList() throws SQLException {
+    public List<String> getOrderIDList(){
         return orderDAO.getIDList();
     }
 
@@ -121,7 +120,7 @@ public class PlaceOrderBOImpl implements PlaceOrderBO {
 
 
     @Override
-    public boolean deleteOrder(String id) throws SQLException {
+    public boolean deleteOrder(String id){
         return  orderDAO.delete( id);
     }
 }

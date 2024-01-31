@@ -14,17 +14,17 @@ public class DashboardBOImpl implements DashboardBO {
     OrderDAO orderDAO = DAOFactory.getDaoFactory().getDAO(DAOFactory.DAOTypes.ORDERDAO);
 
     @Override
-    public int getCustomerCount() throws SQLException {
+    public int getCustomerCount() {
         return customerDAO.count();
     }
 
     @Override
-    public int getItemCount() throws SQLException {
+    public int getItemCount(){
         return itemDAO.count();
     }
 
     @Override
-    public int getOrderCount() throws SQLException {
+    public int getOrderCount(){
         return orderDAO.count();
     }
 

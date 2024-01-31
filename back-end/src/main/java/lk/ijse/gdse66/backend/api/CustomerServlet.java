@@ -12,7 +12,6 @@ import lk.ijse.gdse66.backend.bo.custom.DashboardBO;
 import lk.ijse.gdse66.backend.dto.CustomerDTO;
 
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.List;
 
 @WebServlet(urlPatterns = "/customer")
@@ -23,7 +22,7 @@ public class CustomerServlet extends HttpServlet {
     List<String> cusIDList;
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) {
         resp.setContentType("application/json");
         String option = req.getParameter("option");
 
@@ -39,7 +38,11 @@ public class CustomerServlet extends HttpServlet {
             case "ID":
                 cusIDList = getCusIDList();
                 Jsonb jsonb = JsonbBuilder.create();
-                jsonb.toJson(cusIDList, resp.getWriter());
+                try {
+                    jsonb.toJson(cusIDList, resp.getWriter());
+                } catch (IOException e) {
+                    sendServerMsg(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getLocalizedMessage());
+                }
                 break;
 
             case "COUNT":
@@ -76,31 +79,37 @@ public class CustomerServlet extends HttpServlet {
     }
 
     @Override
-    protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+    protected void doPut(HttpServletRequest req, HttpServletResponse resp)  {
 
-        CustomerDTO customer = JsonbBuilder.create().fromJson(req.getReader(),CustomerDTO.class);
-        String id = customer.getCusID();
-        String name = customer.getCusName();
-        String address = customer.getCusAddress();
-        double salary = customer.getCusSalary();
+        CustomerDTO customer;
+        try {
+            customer = JsonbBuilder.create().fromJson(req.getReader(), CustomerDTO.class);
+            String id = customer.getCusID();
+            String name = customer.getCusName();
+            String address = customer.getCusAddress();
+            double salary = customer.getCusSalary();
 
-        if (validation(id, resp, name, address, salary)) return;
+            if (validation(id, resp, name, address, salary)) return;
 
-        if(!cusIDList.contains(id)){
-            sendServerMsg(resp, HttpServletResponse.SC_BAD_REQUEST, "ID not saved!");
-            return;
+            if(!cusIDList.contains(id)){
+                sendServerMsg(resp, HttpServletResponse.SC_BAD_REQUEST, "ID not saved!");
+                return;
+            }
+
+            boolean isUpdated = customerBO.updateCustomer( customer);
+
+            if(isUpdated)
+                sendServerMsg(resp,HttpServletResponse.SC_OK,"Customer Updated Successfully!");
+            else
+                sendServerMsg(resp,HttpServletResponse.SC_BAD_REQUEST,"Customer Update Failed!");
+        } catch (IOException ex) {
+            sendServerMsg(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, ex.getLocalizedMessage());
         }
-
-        boolean isUpdated = customerBO.updateCustomer( customer);
-
-        if(isUpdated)
-            sendServerMsg(resp,HttpServletResponse.SC_OK,"Customer Updated Successfully!");
-        else
-            sendServerMsg(resp,HttpServletResponse.SC_BAD_REQUEST,"Customer Update Failed!");
     }
 
+
     @Override
-    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) {
         String cusID = req.getParameter("cusID");
 
         if(!cusIDList.contains(cusID)){
@@ -117,23 +126,31 @@ public class CustomerServlet extends HttpServlet {
         }
     }
 
-    private void getAllCustomer(HttpServletResponse resp) throws IOException {
+    private void getAllCustomer(HttpServletResponse resp)  {
 
         List<CustomerDTO> customerList = customerBO.getAllCustomer();
 
         Jsonb jsonb = JsonbBuilder.create();
-        jsonb.toJson(customerList, resp.getWriter());
+        try {
+            jsonb.toJson(customerList, resp.getWriter());
+        } catch (IOException e) {
+            sendServerMsg(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getLocalizedMessage());
+        }
 
     }
 
-    private void getCustomerById(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+    private void getCustomerById(HttpServletRequest req, HttpServletResponse resp)  {
         String cusID = req.getParameter("cusID");
         CustomerDTO customer;
 
         customer = customerBO.getCustomerByID( cusID);
 
         Jsonb jsonb = JsonbBuilder.create();
-        jsonb.toJson(customer, resp.getWriter());
+        try {
+            jsonb.toJson(customer, resp.getWriter());
+        } catch (IOException e) {
+            sendServerMsg(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getLocalizedMessage());
+        }
 
     }
 
@@ -145,21 +162,20 @@ public class CustomerServlet extends HttpServlet {
 
     }
 
-    private void getCustomerCount(HttpServletResponse resp) throws IOException {
-        try {
+    private void getCustomerCount(HttpServletResponse resp) {
+
             int count = dashboardBO.getCustomerCount();
 
             Jsonb jsonb = JsonbBuilder.create();
+        try {
             jsonb.toJson(count, resp.getWriter());
-
-        } catch (SQLException e) {
-            sendServerMsg(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getLocalizedMessage());
         } catch (IOException e) {
-            e.printStackTrace();
+            sendServerMsg(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getLocalizedMessage());
         }
+
     }
 
-    private boolean validation(String id, HttpServletResponse resp, String name, String address, double salary) throws IOException {
+    private boolean validation(String id, HttpServletResponse resp, String name, String address, double salary) {
         if(id.equals("") || !id.matches("^(C00-)[0-9]{3}$")){
             sendServerMsg(resp, HttpServletResponse.SC_BAD_REQUEST, "Cus ID is a required field : Pattern C00-000");
             return true;
@@ -176,8 +192,12 @@ public class CustomerServlet extends HttpServlet {
         return false;
     }
 
-    private void sendServerMsg(HttpServletResponse resp, int status, String msg) throws IOException {
+    private void sendServerMsg(HttpServletResponse resp, int status, String msg){
         resp.setStatus(status);
-        resp.getWriter().println(msg);
+        try {
+            resp.getWriter().println(msg);
+        } catch (IOException e) {
+            sendServerMsg(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getLocalizedMessage());
+        }
     }
 }

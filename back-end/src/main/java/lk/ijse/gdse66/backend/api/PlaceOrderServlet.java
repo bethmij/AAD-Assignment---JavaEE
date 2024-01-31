@@ -12,7 +12,6 @@ import lk.ijse.gdse66.backend.bo.custom.PlaceOrderBO;
 import lk.ijse.gdse66.backend.dto.OrderDTO;
 
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.List;
 
 @WebServlet(urlPatterns = "/order")
@@ -22,7 +21,7 @@ public class PlaceOrderServlet extends HttpServlet {
     DashboardBO dashboardBO = BOFactory.getBoFactory().getBO(BOFactory.BOTypes.DASHBOARDBO);
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) {
         resp.setContentType("application/json");
         String option = req.getParameter("option");
 
@@ -41,11 +40,11 @@ public class PlaceOrderServlet extends HttpServlet {
     }
 
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) {
 
-        OrderDTO orderDTO = JsonbBuilder.create().fromJson(req.getReader(), OrderDTO.class);
-
-        try{
+        OrderDTO orderDTO;
+        try {
+            orderDTO = JsonbBuilder.create().fromJson(req.getReader(), OrderDTO.class);
             boolean isOrderSaved = placeOrderBO.saveOrder( orderDTO);
 
             if (isOrderSaved) {
@@ -53,18 +52,20 @@ public class PlaceOrderServlet extends HttpServlet {
             }else {
                 sendServerMsg(resp, HttpServletResponse.SC_BAD_REQUEST, "Order Save Failed!");
             }
-
-        } catch (SQLException e) {
+        } catch (IOException e) {
             sendServerMsg(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getLocalizedMessage());
         }
+
+
+
     }
 
     @Override
-    protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+    protected void doPut(HttpServletRequest req, HttpServletResponse resp) {
 
-        OrderDTO orderDTO = JsonbBuilder.create().fromJson(req.getReader(), OrderDTO.class);
-
-        try{
+        OrderDTO orderDTO;
+        try {
+            orderDTO = JsonbBuilder.create().fromJson(req.getReader(), OrderDTO.class);
             boolean isOrderSaved = placeOrderBO.updateOrder(orderDTO);
 
             if (isOrderSaved) {
@@ -72,73 +73,72 @@ public class PlaceOrderServlet extends HttpServlet {
             }else {
                 sendServerMsg(resp, HttpServletResponse.SC_BAD_REQUEST, "Order Update Failed!");
             }
-
-        } catch (SQLException e) {
+        } catch (IOException e) {
             sendServerMsg(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getLocalizedMessage());
         }
+
+
+
     }
 
 
     @Override
-    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) {
         String cusID = req.getParameter("ID");
 
-        try{
-            boolean isDeleted = placeOrderBO.deleteOrder(cusID);
+        boolean isDeleted = placeOrderBO.deleteOrder(cusID);
 
-            if(isDeleted){
-                sendServerMsg(resp, HttpServletResponse.SC_OK, "Order Deleted Successfully!");
-            }else {
-                sendServerMsg(resp, HttpServletResponse.SC_BAD_REQUEST, "Order Delete Failed!");
-            }
-        } catch (SQLException e) {
-            sendServerMsg(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getLocalizedMessage());
-        } catch (IOException e) {
-            e.printStackTrace();
+        if(isDeleted){
+            sendServerMsg(resp, HttpServletResponse.SC_OK, "Order Deleted Successfully!");
+        }else {
+            sendServerMsg(resp, HttpServletResponse.SC_BAD_REQUEST, "Order Delete Failed!");
         }
     }
 
-    private void getOrderDetailsByID(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+    private void getOrderDetailsByID(HttpServletRequest req, HttpServletResponse resp) {
         String id = req.getParameter("id");
 
-        try{
-            OrderDTO order = placeOrderBO.getOrderByID( id);
+        OrderDTO order = placeOrderBO.getOrderByID( id);
 
-            Jsonb jsonb = JsonbBuilder.create();
+        Jsonb jsonb = JsonbBuilder.create();
+        try {
             jsonb.toJson(order, resp.getWriter());
-
-        } catch (SQLException e) {
+        } catch (IOException e) {
             sendServerMsg(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getLocalizedMessage());
         }
+
     }
 
-    private void getOrderIDs(HttpServletResponse resp) throws IOException {
-        try{
-            List<String> orderIDList = placeOrderBO.getOrderIDList();
+    private void getOrderIDs(HttpServletResponse resp) {
+        List<String> orderIDList = placeOrderBO.getOrderIDList();
 
-            Jsonb jsonb = JsonbBuilder.create();
+        Jsonb jsonb = JsonbBuilder.create();
+        try {
             jsonb.toJson(orderIDList, resp.getWriter());
-
-        } catch (SQLException e) {
+        } catch (IOException e) {
             sendServerMsg(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getLocalizedMessage());
         }
+
     }
 
-    private void getOrderCount(HttpServletResponse resp) throws IOException {
+    private void getOrderCount(HttpServletResponse resp){
         try {
             int count = dashboardBO.getOrderCount();
 
             Jsonb jsonb = JsonbBuilder.create();
             jsonb.toJson(count, resp.getWriter());
 
-        } catch (SQLException | IOException e) {
-            System.out.println(e.getLocalizedMessage());
+        } catch (IOException e) {
             sendServerMsg(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getLocalizedMessage());
         }
     }
 
-    private void sendServerMsg(HttpServletResponse resp, int status, String msg) throws IOException {
+    private void sendServerMsg(HttpServletResponse resp, int status, String msg) {
         resp.setStatus(status);
-        resp.getWriter().println(msg);
+        try {
+            resp.getWriter().println(msg);
+        } catch (IOException e) {
+            sendServerMsg(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getLocalizedMessage());
+        }
     }
 }

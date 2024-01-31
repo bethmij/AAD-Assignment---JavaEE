@@ -9,20 +9,20 @@ import java.util.List;
 
 public interface ItemDAO extends CrudDAO<ItemEntity> {
     @Override
-    boolean save(ItemEntity dto) throws SQLException;
+    boolean save(ItemEntity dto);
 
     @Override
-    boolean update(ItemEntity dto) throws SQLException;
+    boolean update(ItemEntity dto);
 
     @Override
-    boolean delete(String id) throws SQLException;
+    boolean delete(String id);
 
     @Override
-    ItemEntity search(String id) throws SQLException;
+    ItemEntity search(String id) ;
 
     @Override
-    List<ItemEntity> getAll() throws SQLException;
+    List<ItemEntity> getAll();
 
     @Override
-    List<String> getIDList() throws SQLException;
+    List<String> getIDList();
 }

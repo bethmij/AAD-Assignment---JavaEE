@@ -12,7 +12,6 @@ import lk.ijse.gdse66.backend.bo.custom.ItemBO;
 import lk.ijse.gdse66.backend.dto.ItemDTO;
 
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.List;
 
 @WebServlet(urlPatterns = "/item")
@@ -24,7 +23,7 @@ public class ItemServlet extends HttpServlet {
 
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) {
         resp.setContentType("application/json");
         String option = req.getParameter("option");
 
@@ -38,9 +37,13 @@ public class ItemServlet extends HttpServlet {
                 break;
             }
             case "ID":
-                itemCodeList = getItemIDList(resp);
+                itemCodeList = getItemIDList();
                 Jsonb jsonb = JsonbBuilder.create();
-                jsonb.toJson(itemCodeList, resp.getWriter());
+                try {
+                    jsonb.toJson(itemCodeList, resp.getWriter());
+                } catch (IOException e) {
+                    sendServerMsg(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getLocalizedMessage());
+                }
                 break;
 
             case "COUNT":
@@ -49,22 +52,22 @@ public class ItemServlet extends HttpServlet {
     }
 
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp){
 
-        ItemDTO item = JsonbBuilder.create().fromJson(req.getReader(),ItemDTO.class);
-        String code = item.getItemCode();
-        String description = item.getDescription();
-        int qtyOnHand = item.getQtyOnHand();
-        double unitPrice = item.getUnitPrice();
+        ItemDTO item;
+        try {
+            item = JsonbBuilder.create().fromJson(req.getReader(), ItemDTO.class);
+            String code = item.getItemCode();
+            String description = item.getDescription();
+            int qtyOnHand = item.getQtyOnHand();
+            double unitPrice = item.getUnitPrice();
 
-        if (validation(code, resp, description, qtyOnHand, unitPrice)) return;
+            if (validation(code, resp, description, qtyOnHand, unitPrice)) return;
 
-        if(itemCodeList.contains(code)){
-            sendServerMsg(resp, HttpServletResponse.SC_BAD_REQUEST, "Item code already saved!");
-            return;
-        }
-
-        try{
+            if(itemCodeList.contains(code)){
+                sendServerMsg(resp, HttpServletResponse.SC_BAD_REQUEST, "Item code already saved!");
+                return;
+            }
 
             boolean isSaved = itemBO.saveItem(item);
 
@@ -73,29 +76,30 @@ public class ItemServlet extends HttpServlet {
             }else {
                 sendServerMsg(resp, HttpServletResponse.SC_BAD_REQUEST, "Item Save Failed!");
             }
-        } catch (SQLException e) {
+        } catch (IOException e) {
             sendServerMsg(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getLocalizedMessage());
         }
+
 
     }
 
     @Override
-    protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+    protected void doPut(HttpServletRequest req, HttpServletResponse resp)  {
 
-        ItemDTO item = JsonbBuilder.create().fromJson(req.getReader(),ItemDTO.class);
-        String code = item.getItemCode();
-        String description = item.getDescription();
-        int qtyOnHand = item.getQtyOnHand();
-        double unitPrice = item.getUnitPrice();
+        ItemDTO item;
+        try {
+            item = JsonbBuilder.create().fromJson(req.getReader(), ItemDTO.class);
+            String code = item.getItemCode();
+            String description = item.getDescription();
+            int qtyOnHand = item.getQtyOnHand();
+            double unitPrice = item.getUnitPrice();
 
-        if (validation(code, resp, description, qtyOnHand, unitPrice)) return;
+            if (validation(code, resp, description, qtyOnHand, unitPrice)) return;
 
-        if(!itemCodeList.contains(code)){
-            sendServerMsg(resp, HttpServletResponse.SC_BAD_REQUEST, "Item code not added!");
-            return;
-        }
-
-        try{
+            if(!itemCodeList.contains(code)){
+                sendServerMsg(resp, HttpServletResponse.SC_BAD_REQUEST, "Item code not added!");
+                return;
+            }
 
             boolean isUpdated = itemBO.updateItem(item);
 
@@ -103,13 +107,14 @@ public class ItemServlet extends HttpServlet {
                 sendServerMsg(resp,HttpServletResponse.SC_OK,"Item Updated Successfully!");
             else
                 sendServerMsg(resp,HttpServletResponse.SC_BAD_REQUEST,"Item Update Failed!");
-        } catch (SQLException e) {
+        } catch (IOException e) {
             sendServerMsg(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getLocalizedMessage());
         }
+
     }
 
     @Override
-    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) {
         String itemCode = req.getParameter("itemCode");
 
         if(!itemCodeList.contains(itemCode)){
@@ -117,74 +122,64 @@ public class ItemServlet extends HttpServlet {
             return;
         }
 
-        try{
-            boolean isDeleted = itemBO.deleteItem( itemCode);
+        boolean isDeleted = itemBO.deleteItem( itemCode);
 
-            if(isDeleted){
-                sendServerMsg(resp, HttpServletResponse.SC_OK, "Item Deleted Successfully!");
-            }else {
-                sendServerMsg(resp, HttpServletResponse.SC_BAD_REQUEST, "Item Delete Failed!");
-            }
-        } catch (SQLException e) {
-            sendServerMsg(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getLocalizedMessage());
+        if(isDeleted){
+            sendServerMsg(resp, HttpServletResponse.SC_OK, "Item Deleted Successfully!");
+        }else {
+            sendServerMsg(resp, HttpServletResponse.SC_BAD_REQUEST, "Item Delete Failed!");
         }
     }
 
-    private void getAllItem(HttpServletResponse resp) throws IOException {
+    private void getAllItem(HttpServletResponse resp) {
 
+        List<ItemDTO> itemList = itemBO.getAllItems();
+
+        Jsonb jsonb = JsonbBuilder.create();
         try {
-            List<ItemDTO> itemList = itemBO.getAllItems();
-
-            Jsonb jsonb = JsonbBuilder.create();
             jsonb.toJson(itemList, resp.getWriter());
-
-        } catch (SQLException e) {
+        } catch (IOException e) {
             sendServerMsg(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getLocalizedMessage());
         }
+
     }
 
 
 
-    private void getItemById(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+    private void getItemById(HttpServletRequest req, HttpServletResponse resp) {
         String itemCode = req.getParameter("itemCode");
 
-        try {
-            ItemDTO item = itemBO.getItemByCode( itemCode);
+        ItemDTO item = itemBO.getItemByCode( itemCode);
 
-            Jsonb jsonb = JsonbBuilder.create();
+        Jsonb jsonb = JsonbBuilder.create();
+        try {
             jsonb.toJson(item, resp.getWriter());
-
-        } catch (SQLException e) {
+        } catch (IOException e) {
             sendServerMsg(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getLocalizedMessage());
         }
+
     }
 
-    private List<String> getItemIDList(HttpServletResponse resp) throws IOException {
+    private List<String> getItemIDList(){
 
-        try {
-            return itemBO.getItemIDList();
+        return itemBO.getItemIDList();
 
-        } catch (SQLException e) {
-            sendServerMsg(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getLocalizedMessage());
-        }
-        return itemCodeList;
     }
 
-    private void getItemCount(HttpServletResponse resp) throws IOException {
-        try{
+    private void getItemCount(HttpServletResponse resp) {
+
             int count = dashboardBO.getItemCount();
 
             Jsonb jsonb = JsonbBuilder.create();
+        try {
             jsonb.toJson(count, resp.getWriter());
-
-        } catch (SQLException e) {
-            sendServerMsg(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getLocalizedMessage());
         } catch (IOException e) {
-            e.printStackTrace();
+            sendServerMsg(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getLocalizedMessage());
         }
+
     }
 
-    private boolean validation(String code, HttpServletResponse resp, String description, int qty, double price) throws IOException {
+    private boolean validation(String code, HttpServletResponse resp, String description, int qty, double price) {
         if(code.equals("") || !code.matches("^(I00-)[0-9]{3}$")){
             sendServerMsg(resp, HttpServletResponse.SC_BAD_REQUEST, "Item code is a required field : Pattern I00-000");
             return true;
@@ -201,8 +196,12 @@ public class ItemServlet extends HttpServlet {
         return false;
     }
 
-    private void sendServerMsg(HttpServletResponse resp, int status, String msg) throws IOException {
+    private void sendServerMsg(HttpServletResponse resp, int status, String msg)  {
         resp.setStatus(status);
-        resp.getWriter().println(msg);
+        try {
+            resp.getWriter().println(msg);
+        } catch (IOException e) {
+            sendServerMsg(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getLocalizedMessage());
+        }
     }
 }

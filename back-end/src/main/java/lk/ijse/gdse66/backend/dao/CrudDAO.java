@@ -1,24 +1,20 @@
 package lk.ijse.gdse66.backend.dao;
 
-import lk.ijse.gdse66.backend.entity.CustomerEntity;
-
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.List;
 
 public interface CrudDAO<T> extends SuperDAO{
 
-    boolean save( T dto) throws SQLException;
+    boolean save( T dto) ;
 
-    boolean update(T dto) throws SQLException;
+    boolean update(T dto);
 
-    boolean delete( String id) throws SQLException;
+    boolean delete( String id) ;
 
-    T search(String id) throws SQLException;
+    T search(String id);
 
-    int count() throws SQLException;
+    int count();
 
-    List<T> getAll() throws SQLException;
+    List<T> getAll();
 
-    List<String> getIDList() throws SQLException;
+    List<String> getIDList();
 }
