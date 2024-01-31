@@ -9,17 +9,17 @@ import java.util.List;
 
 public interface CustomerBO extends SuperBO {
 
-    List<CustomerDTO> getAllCustomer(Connection connection) throws SQLException;
+    List<CustomerDTO> getAllCustomer() throws SQLException;
 
-    CustomerDTO getCustomerByID(Connection connection, String id) throws SQLException;
+    CustomerDTO getCustomerByID( String id) throws SQLException;
 
-    List<String> getCustomerIDList(Connection connection) throws SQLException;
+    List<String> getCustomerIDList() throws SQLException;
 
-    boolean saveCustomer(Connection connection, CustomerDTO customerDTO) throws SQLException;
+    boolean saveCustomer(CustomerDTO customerDTO) throws SQLException;
 
-    boolean updateCustomer(Connection connection, CustomerDTO customerDTO) throws SQLException;
+    boolean updateCustomer(CustomerDTO customerDTO) throws SQLException;
 
-    boolean deleteCustomer(Connection connection, String id) throws SQLException;
+    boolean deleteCustomer(String id) throws SQLException;
 
 
 }

@@ -9,12 +9,11 @@ import jakarta.servlet.http.HttpServletResponse;
 import lk.ijse.gdse66.backend.bo.BOFactory;
 import lk.ijse.gdse66.backend.bo.custom.CustomerBO;
 import lk.ijse.gdse66.backend.bo.custom.DashboardBO;
+import lk.ijse.gdse66.backend.config.SessionFactoryConfig;
 import lk.ijse.gdse66.backend.dto.CustomerDTO;
 import lk.ijse.gdse66.backend.entity.CustomerEntity;
+import org.hibernate.Session;
 
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
-import javax.sql.DataSource;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -24,19 +23,20 @@ import java.util.List;
 public class CustomerServlet extends HttpServlet {
     CustomerBO customerBO = BOFactory.getBoFactory().getBO(BOFactory.BOTypes.CUSTOMERBO);
     DashboardBO dashboardBO = BOFactory.getBoFactory().getBO(BOFactory.BOTypes.DASHBOARDBO);
-    DataSource source;
+    Session source;
     List<String> cusIDList;
 
     @Override
     public void init(){
-        try {
-            InitialContext initCtx = new InitialContext();
-            source = (DataSource)initCtx.lookup("java:comp/env/jdbc/pool");
-            cusIDList = getCusIDList(null, source);
+         source = SessionFactoryConfig.getInstance().getSession();
+//        try {
+//            InitialContext initCtx = new InitialContext();
+//            source = (DataSource)initCtx.lookup("java:comp/env/jdbc/pool");
+//            cusIDList = getCusIDList(null, source);
 
-        } catch (NamingException | IOException e) {
-            e.printStackTrace();
-        }
+//        } catch (NamingException | IOException e) {
+//            e.printStackTrace();
+//        }
     }
 
     @Override
@@ -82,9 +82,9 @@ public class CustomerServlet extends HttpServlet {
             return;
         }
 
-        try (Connection connection = source.getConnection()) {
+        try {
             CustomerDTO customerDTO = new CustomerDTO(id, name, address, salary);
-            boolean isSaved = customerBO.saveCustomer(connection, customerDTO);
+            boolean isSaved = customerBO.saveCustomer(customerDTO);
 
             if(isSaved){
                 sendServerMsg(resp, HttpServletResponse.SC_OK, "Customer Saved Successfully!");
@@ -113,9 +113,9 @@ public class CustomerServlet extends HttpServlet {
             return;
         }
 
-        try (Connection connection = source.getConnection()){
+        try {
             CustomerDTO customerDTO = new CustomerDTO(id, name, address, salary);
-            boolean isUpdated = customerBO.updateCustomer(connection, customerDTO);
+            boolean isUpdated = customerBO.updateCustomer( customerDTO);
 
             if(isUpdated)
                 sendServerMsg(resp,HttpServletResponse.SC_OK,"Customer Updated Successfully!");
@@ -135,8 +135,8 @@ public class CustomerServlet extends HttpServlet {
             return;
         }
 
-        try (Connection connection = source.getConnection()){
-            boolean isDeleted = customerBO.deleteCustomer(connection, cusID);
+        try {
+            boolean isDeleted = customerBO.deleteCustomer( cusID);
 
             if(isDeleted){
                 sendServerMsg(resp, HttpServletResponse.SC_OK, "Customer Deleted Successfully!");
@@ -148,10 +148,10 @@ public class CustomerServlet extends HttpServlet {
         }
     }
 
-    private void getAllCustomer(HttpServletResponse resp, DataSource source) throws IOException {
+    private void getAllCustomer(HttpServletResponse resp, Session source) throws IOException {
 
-        try (Connection connection = source.getConnection()){
-            List<CustomerDTO> customerList = customerBO.getAllCustomer(connection);
+        try {
+            List<CustomerDTO> customerList = customerBO.getAllCustomer();
 
             Jsonb jsonb = JsonbBuilder.create();
             jsonb.toJson(customerList, resp.getWriter());
@@ -161,13 +161,13 @@ public class CustomerServlet extends HttpServlet {
         }
     }
 
-    private void getCustomerById(HttpServletRequest req, HttpServletResponse resp, DataSource source) throws IOException {
+    private void getCustomerById(HttpServletRequest req, HttpServletResponse resp, Session source) throws IOException {
         String cusID = req.getParameter("cusID");
         CustomerDTO customer;
 
-        try (Connection connection = source.getConnection()){
+        try{
 
-            customer = customerBO.getCustomerByID(connection, cusID);
+            customer = customerBO.getCustomerByID( cusID);
 
             Jsonb jsonb = JsonbBuilder.create();
             jsonb.toJson(customer, resp.getWriter());
@@ -177,11 +177,11 @@ public class CustomerServlet extends HttpServlet {
         }
     }
 
-    private List<String> getCusIDList(HttpServletResponse resp, DataSource source) throws IOException {
+    private List<String> getCusIDList(HttpServletResponse resp, Session source) throws IOException {
         List<String> customerIDList;
 
-        try (Connection connection = source.getConnection()){
-            customerIDList = customerBO.getCustomerIDList(connection);
+        try {
+            customerIDList = customerBO.getCustomerIDList();
             return customerIDList;
 
         } catch (SQLException e) {
@@ -190,18 +190,18 @@ public class CustomerServlet extends HttpServlet {
         return cusIDList;
     }
 
-    private void getCustomerCount(HttpServletResponse resp, DataSource source) throws IOException {
-        try (Connection connection = source.getConnection()){
-            int count = dashboardBO.getCustomerCount(connection);
-
-            Jsonb jsonb = JsonbBuilder.create();
-            jsonb.toJson(count, resp.getWriter());
-
-        } catch (SQLException e) {
-            sendServerMsg(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getLocalizedMessage());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    private void getCustomerCount(HttpServletResponse resp, Session source) throws IOException {
+//        try {
+//            int count = dashboardBO.getCustomerCount();
+//
+//            Jsonb jsonb = JsonbBuilder.create();
+//            jsonb.toJson(count, resp.getWriter());
+//
+//        } catch (SQLException e) {
+//            sendServerMsg(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getLocalizedMessage());
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
     }
 
     private boolean validation(String id, HttpServletResponse resp, String name, String address, double salary) throws IOException {

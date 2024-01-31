@@ -8,5 +8,5 @@ import java.sql.SQLException;
 
 public interface QueryDAO extends SuperDAO {
 
-    OrderDTO getOrderDetail(Connection connection, String id) throws SQLException;
+    OrderDTO getOrderDetail(String id) throws SQLException;
 }

@@ -15,8 +15,8 @@ public class CustomerBOImpl implements CustomerBO {
     CustomerDAO customerDAO = DAOFactory.getDaoFactory().getDAO(DAOFactory.DAOTypes.CUSTOMERDAO);
 
     @Override
-    public List<CustomerDTO> getAllCustomer(Connection connection) throws SQLException {
-        List<CustomerEntity> customerEntityList = customerDAO.getAll(connection);
+    public List<CustomerDTO> getAllCustomer() throws SQLException {
+        List<CustomerEntity> customerEntityList = customerDAO.getAll();
         List<CustomerDTO> customerDTOList = new ArrayList<>();
         CustomerDTO customerDTO;
 
@@ -28,35 +28,35 @@ public class CustomerBOImpl implements CustomerBO {
     }
 
     @Override
-    public CustomerDTO getCustomerByID(Connection connection, String id) throws SQLException {
-        CustomerEntity customer = customerDAO.search(connection, id);
+    public CustomerDTO getCustomerByID(String id) throws SQLException {
+        CustomerEntity customer = customerDAO.search(id);
         return new CustomerDTO(customer.getCusID(), customer.getCusName(), customer.getCusAddress(), customer.getCusSalary());
     }
 
     @Override
-    public List<String> getCustomerIDList(Connection connection) throws SQLException {
-        return customerDAO.getIDList(connection);
+    public List<String> getCustomerIDList() throws SQLException {
+        return customerDAO.getIDList();
     }
 
     @Override
-    public boolean saveCustomer(Connection connection, CustomerDTO customerDTO) throws SQLException {
+    public boolean saveCustomer( CustomerDTO customerDTO) throws SQLException {
         CustomerEntity customerEntity = new CustomerEntity(customerDTO.getCusID(), customerDTO.getCusName(),
                 customerDTO.getCusAddress(), customerDTO.getCusSalary());
 
-        return customerDAO.save(connection, customerEntity);
+        return customerDAO.save(customerEntity);
     }
 
     @Override
-    public boolean updateCustomer(Connection connection, CustomerDTO customerDTO) throws SQLException {
+    public boolean updateCustomer( CustomerDTO customerDTO) throws SQLException {
         CustomerEntity customerEntity = new CustomerEntity(customerDTO.getCusID(), customerDTO.getCusName(),
                 customerDTO.getCusAddress(), customerDTO.getCusSalary());
 
-        return customerDAO.update(connection, customerEntity);
+        return customerDAO.update( customerEntity);
     }
 
     @Override
-    public boolean deleteCustomer(Connection connection, String id) throws SQLException {
-        return  customerDAO.delete(connection, id);
+    public boolean deleteCustomer(String id) throws SQLException {
+        return  customerDAO.delete( id);
     }
 
 

@@ -1,9 +1,7 @@
 
-
 initiateUI();
 setDate();
 setTime();
-
 
 setCustomerCount();
 setItemCount();

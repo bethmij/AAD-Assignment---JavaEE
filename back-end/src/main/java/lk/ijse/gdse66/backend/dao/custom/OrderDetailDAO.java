@@ -9,9 +9,9 @@ import java.util.List;
 
 public interface OrderDetailDAO extends SuperDAO {
 
-    boolean save(Connection connection, List<OrderDetailsEntity> dto) throws SQLException;
+    boolean save( List<OrderDetailsEntity> dto) throws SQLException;
 
-    boolean update(Connection connection, List<OrderDetailsEntity> dto) throws SQLException;
+    boolean update(List<OrderDetailsEntity> dto) throws SQLException;
 
 
 }
