@@ -227,8 +227,8 @@ $('#itemSearch').click(function (){
                             <tr>
                                 <th scope="row">${resp.itemCode}</th>
                                 <td>${resp.description}</td>
-                                <td>${resp.qtyOnHand}</td>
                                 <td>${resp.unitPrice}</td>
+                                <td>${resp.qtyOnHand}</td>
                                 <td style="width: 10%"><img class="delete" src="../resources/assests/img/icons8-delete-96.png" alt="Logo" width="50%" style="opacity: 100%;"></td>
                             </tr>`);
                         deleteDetail();
