@@ -2,6 +2,7 @@ package lk.ijse.gdse66.backend.api;
 
 import jakarta.json.bind.Jsonb;
 import jakarta.json.bind.JsonbBuilder;
+import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -11,15 +12,21 @@ import lk.ijse.gdse66.backend.bo.custom.CustomerBO;
 import lk.ijse.gdse66.backend.bo.custom.DashboardBO;
 import lk.ijse.gdse66.backend.dto.CustomerDTO;
 
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+import javax.sql.DataSource;
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.List;
 
 @WebServlet(urlPatterns = "/customer")
 public class CustomerServlet extends HttpServlet {
     CustomerBO customerBO = BOFactory.getBoFactory().getBO(BOFactory.BOTypes.CUSTOMERBO);
     DashboardBO dashboardBO = BOFactory.getBoFactory().getBO(BOFactory.BOTypes.DASHBOARDBO);
-
     List<String> cusIDList;
+
+
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) {

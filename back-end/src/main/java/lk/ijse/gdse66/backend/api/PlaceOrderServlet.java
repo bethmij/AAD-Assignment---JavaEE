@@ -55,9 +55,6 @@ public class PlaceOrderServlet extends HttpServlet {
         } catch (IOException e) {
             sendServerMsg(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getLocalizedMessage());
         }
-
-
-
     }
 
     @Override
@@ -110,6 +107,7 @@ public class PlaceOrderServlet extends HttpServlet {
     }
 
     private void getOrderIDs(HttpServletResponse resp) {
+
         List<String> orderIDList = placeOrderBO.getOrderIDList();
 
         Jsonb jsonb = JsonbBuilder.create();

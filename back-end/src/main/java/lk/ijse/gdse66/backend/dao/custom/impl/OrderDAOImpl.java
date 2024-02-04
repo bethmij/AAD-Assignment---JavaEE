@@ -6,6 +6,7 @@ import lk.ijse.gdse66.backend.entity.OrderEntity;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class OrderDAOImpl implements OrderDAO {
@@ -90,7 +91,7 @@ public class OrderDAOImpl implements OrderDAO {
     public List<String> getIDList() {
 
         try (Session session = SessionFactoryConfig.getInstance().getSession()){
-            return session.createQuery("SELECT o.orderId FROM OrderEntity o", String.class).list();
+            return   session.createQuery("SELECT o.orderId FROM OrderEntity o", String.class).list();
         }
     }
 }
