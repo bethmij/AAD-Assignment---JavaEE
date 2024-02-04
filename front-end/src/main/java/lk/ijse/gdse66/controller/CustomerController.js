@@ -10,7 +10,6 @@ let cusSalary = $("#txtCusSalary");
 let btnCustomerSave = $('#btnSave');
 
 
-
 $(document).on('keydown', function(event) {
     if (event.keyCode === 9) {
         event.preventDefault();
@@ -28,69 +27,91 @@ btnCustomerSave.click(function (event){
 
     if(btnCustomerSave.text()==="Save ") {
         event.preventDefault();
-        const userChoice = window.confirm("Do you want to save the customer?")
-        if (userChoice) {
-            getCusIDList( function (IDList) {
-                if (!(IDList.includes(cusId.val()))) {
-                    $.ajax({
-                        url: "http://localhost:8000/java-pos/customer",
-                        method: "POST",
-                        contentType: "application/json",
-                        data: JSON.stringify(newCustomer),
-                        success: function (resp, status, xhr) {
-                            if (xhr.status === 200) {
-                                alert(resp)
-                                getAll();
-                                deleteDetail();
-                                setFeilds();
-                                clearAll(event);
-                                getCusIDList(function (IDList) {
-                                   setCusID(IDList);
-                                });
-                                btnCustomerSave.attr("disabled", true);
-                                setCustomerCount();
-                            }
-                        },
-                        error: function (xhr) {
-                            alert("Error : "+xhr.responseText)
+
+        swal("Do you want to save the customer?", {
+            buttons: {
+                cancel: "Cancel",
+                ok: {
+                    text: "OK",
+                    value: "catch",
+                }
+            },
+        }).then((value) => {
+                if (value === "catch" ) {
+                    getCusIDList( function (IDList) {
+                        if (!(IDList.includes(cusId.val()))) {
+                            $.ajax({
+                                url: "http://localhost:8000/java-pos/customer",
+                                method: "POST",
+                                contentType: "application/json",
+                                data: JSON.stringify(newCustomer),
+                                success: function (resp, status, xhr) {
+                                    if (xhr.status === 200) {
+                                        swal("Saved", resp, "success");
+                                        getAll();
+                                        deleteDetail();
+                                        setFeilds();
+                                        clearAll(event);
+                                        getCusIDList(function (IDList) {
+                                            setCusID(IDList);
+                                        });
+                                        btnCustomerSave.attr("disabled", true);
+                                        setCustomerCount();
+                                    }
+                                },
+                                error: function (xhr) {
+                                    swal("Error", xhr.responseText, "error");
+                                }
+                            });
+                        } else {
+                            swal("Error", "Duplicate customer ID!", "error");
                         }
                     });
-                } else {
-                    alert("Duplicate customer ID!");
                 }
             });
-        }
+
 
     }else if(btnCustomerSave.text()==="Update ") {
-        const userChoice = window.confirm("Do you want to update the customer?");
-        if (userChoice) {
-            let newCustomer = Object.assign({}, customer);
-            newCustomer.cusID = cusId.val();
-            newCustomer.cusName = cusName.val();
-            newCustomer.cusAddress = cusAddress.val();
-            newCustomer.cusSalary = cusSalary.val();
-
-            $.ajax({
-                url: "http://localhost:8000/java-pos/customer",
-                method: "PUT",
-                contentType: "application/json",
-                data: JSON.stringify(newCustomer),
-                success: function (resp, status, xhr) {
-                    if (xhr.status === 200) {
-                        alert(resp)
-                        getAll();
-                        clearAll(event);
-                        btnCustomerSave.text("Save ");
-                        btnCustomerSave.attr("disabled", true);
-                        cusId.attr("disabled", false);
-                    }
-                },
-                error: function (xhr) {
-                    alert("Error : "+xhr.responseText)
+        swal("Do you want to update the customer?", {
+            buttons: {
+                cancel: "Cancel",
+                ok: {
+                    text: "OK",
+                    value: "catch",
                 }
-            });
-        }
+            },
+        }).then((value) => {
+            if (value === "catch") {
+
+                let newCustomer = Object.assign({}, customer);
+                newCustomer.cusID = cusId.val();
+                newCustomer.cusName = cusName.val();
+                newCustomer.cusAddress = cusAddress.val();
+                newCustomer.cusSalary = cusSalary.val();
+
+                $.ajax({
+                    url: "http://localhost:8000/java-pos/customer",
+                    method: "PUT",
+                    contentType: "application/json",
+                    data: JSON.stringify(newCustomer),
+                    success: function (resp, status, xhr) {
+                        if (xhr.status === 200) {
+                            swal("Updated", resp, "success");
+                            getAll();
+                            clearAll(event);
+                            btnCustomerSave.text("Save ");
+                            btnCustomerSave.attr("disabled", true);
+                            cusId.attr("disabled", false);
+                        }
+                    },
+                    error: function (xhr) {
+                        swal("Error", xhr.responseText, "error");
+                    }
+                });
+            }
+        });
     }
+
     event.preventDefault();
 })
 
@@ -140,7 +161,7 @@ function getAll() {
                             <td>${customer.cusName}</td>
                             <td>${customer.cusAddress}</td>
                             <td>${customer.cusSalary}</td>
-                            <td style="width: 10%"><img  class="delete"  src="../resources/assests/img/icons8-delete-96.png" alt="Logo" width="50%" style="opacity: 100%;" "></td>
+                            <td style="width: 10%;"><img  class="delete"  src="../resources/assests/img/icons8-delete-96.png" alt="Logo" width="50%" style="opacity: 100%;" "></td>
                         </tr>`);
                     deleteDetail();
                     setFeilds();
@@ -148,7 +169,7 @@ function getAll() {
             }
         },
         error: function (xhr){
-            alert("Error : "+xhr.responseText)
+            swal("Error", xhr.responseText, "error");
         }
     })
 }
@@ -177,32 +198,42 @@ function deleteDetail() {
     )
 
     btnDelete.click(function (event) {
-        const userChoice = window.confirm("Do you want to delete the customer?");
 
-        if (userChoice) {
-            let deleteRow = $(this).parents('tr');
-            let cusID = $( deleteRow.children(':nth-child(1)')).text();
-
-            $.ajax({
-                url: "http://localhost:8000/java-pos/customer?cusID="+cusID,
-                method: "DELETE",
-                success: function (resp, status, xhr){
-                    if(xhr.status === 200) {
-                        alert(resp);
-                        deleteRow.remove();
-                        clearAll(event);
-                        getCusIDList(function (IDList) {
-                            setCusID(IDList)
-                        });
-                        setCustomerCount();
-                    }
-                },
-                error: function (xhr) {
-                    alert("Error : "+xhr.responseText)
+        swal("Do you want to delete the customer?", {
+            buttons: {
+                cancel: "Cancel",
+                ok: {
+                    text: "OK",
+                    value: "catch",
                 }
-            });
-            setCusID();
-        }
+            },
+        }).then((value) => {
+            if (value === "catch") {
+
+                let deleteRow = $(this).parents('tr');
+                let cusID = $(deleteRow.children(':nth-child(1)')).text();
+
+                $.ajax({
+                    url: "http://localhost:8000/java-pos/customer?cusID=" + cusID,
+                    method: "DELETE",
+                    success: function (resp, status, xhr) {
+                        if (xhr.status === 200) {
+                            swal("Deleted", resp, "success");
+                            deleteRow.remove();
+                            clearAll(event);
+                            getCusIDList(function (IDList) {
+                                setCusID(IDList)
+                            });
+                            setCustomerCount();
+                        }
+                    },
+                    error: function (xhr) {
+                        swal("Error", xhr.responseText, "error");
+                    }
+                });
+                setCusID();
+            }
+        });
     })
 }
 
@@ -214,7 +245,7 @@ export function getCustomerList(id, callback) {
             callback(resp, xhr);
         },
         error: function (xhr) {
-            alert("Error : "+xhr.responseText)
+            swal("Error", xhr.responseText, "error");
         }
     });
 }
@@ -237,22 +268,22 @@ $('#btnSearch').click(function (){
                                    <td>${resp.cusName}</td>
                                    <td>${resp.cusAddress}</td>
                                    <td>${resp.cusSalary}</td>
-                                   <td style="width: 10%"><img  class="delete"  src="../resources/assests/img/icons8-delete-96.png" alt="Logo" width="50%" class="opacity-75"></td>
+                                   <td style="width: 10%;"><img  class="delete"  src="../resources/assests/img/icons8-delete-96.png" alt="Logo" width="50%" class="opacity-75"></td>
                                 </tr>`)
 
                         setFeilds();
                         deleteDetail();
                     },
                     error: function (xhr) {
-                        alert("Error : "+xhr.responseText)
+                        swal("Error", xhr.responseText, "error");
                     }
                 })
             } else {
-                alert("Invalid customer ID! Please try again")
+                swal("Error", "Invalid customer ID! Please try again", "error");
             }
         });
     }else {
-        alert("Please enter the customer ID!");
+        swal("Error", "Please enter the customer ID!", "error");
     }
 
 });
@@ -269,7 +300,7 @@ export function getCusIDList(callback) {
             }
         },
         error: function (xhr) {
-            alert("Error : "+xhr.responseText)
+            swal("Error", xhr.responseText, "error");
         }
     });
 }

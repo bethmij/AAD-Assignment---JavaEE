@@ -60,7 +60,6 @@ function setView(viewOb) {
     clearAll();
     viewOb.css("display", "block");
     saveLastView(viewOb.get(0).id);
-    // console.log(viewOb.get(0).id);
 }
 
 //bind events
@@ -80,7 +79,7 @@ $(".btnOrder").click(function () {
     setView($("#orderContent"));
 });
 
-var img =  document.querySelectorAll(".menuImg");
+const img = document.querySelectorAll(".menuImg");
 img.forEach(function(element5) {
     element5.addEventListener("mouseover",function (){
         element5.style.opacity = "1";
@@ -92,7 +91,7 @@ img.forEach(function(element5) {
     });
 });
 
-var btn =  document.querySelectorAll(".menuBtn");
+const btn = document.querySelectorAll(".menuBtn");
 btn.forEach(function(element) {
     element.addEventListener("mouseover",function (){
         element.style.cursor = "pointer";
@@ -106,7 +105,7 @@ btn.forEach(function(element) {
 
 window.addEventListener("load", function(event) {
     event.preventDefault();
-    var savedScrollPosition = localStorage.getItem("scrollPosition");
+    const savedScrollPosition = localStorage.getItem("scrollPosition");
 
     if (savedScrollPosition !== null) {
         window.scrollTo(0, savedScrollPosition);
@@ -140,7 +139,7 @@ function setTime() {
             seconds = "0" + seconds;
         }
 
-        var formattedTime = hours + ":" + minutes + ":" + seconds;
+        const formattedTime = hours + ":" + minutes + ":" + seconds;
         $('#currTime').text(`Time : ${formattedTime}`);
     },1000);
 }
@@ -156,7 +155,7 @@ export function setCustomerCount() {
             }
         },
         error: function (xhr) {
-            alert("Error : "+xhr.responseText)
+            swal("Error", xhr.responseText, "error");
         }
     });
 }
@@ -172,7 +171,7 @@ export function setItemCount() {
             }
         },
         error: function (xhr) {
-            alert("Error : fbsdgsdgsdgsdgsdg")
+            swal("Error", xhr.responseText, "error");
         }
     });
 }
@@ -188,10 +187,8 @@ export function seOrderCount() {
             }
         },
         error: function (xhr) {
-            console.log(xhr)
-           // alert("ErrorError : fbsdgsdgsdgsdgsdg")
+            swal("Error", xhr.responseText, "error");
         }
     });
 }
-
 

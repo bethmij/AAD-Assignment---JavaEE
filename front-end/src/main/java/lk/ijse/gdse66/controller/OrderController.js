@@ -97,7 +97,7 @@ selectCusOp.change(function () {
                 }
             },
             error: function (xhr) {
-                alert("Error : "+xhr.responseText)
+                swal("Error", xhr.responseText, "error");
             }
         });
     }else {
@@ -125,7 +125,7 @@ selectItemOp.change(function () {
                 }
             },
             error: function (xhr) {
-                alert("Error : "+xhr.responseText)
+                swal("Error", xhr.responseText, "error");
             }
         });
     } else {
@@ -155,7 +155,7 @@ btnSave.click(function (event){
                         <td>${itemName[1]}</td>
                         <td>${itemPrice[1]}</td>
                         <td>${txtOrderQty.val()}</td>
-                        <td style="width: 10%"><img class="orderDelete" src="../resources/assests/img/icons8-delete-96.png" alt="Logo" width="50%" class="opacity-75"></td>
+                        <td style="width: 10%;"><img class="orderDelete" src="../resources/assests/img/icons8-delete-96.png" alt="Logo" width="50%" class="opacity-75"></td>
                     </tr>`
                 );
 
@@ -166,7 +166,7 @@ btnSave.click(function (event){
                 calcTotal(itemPrice[1], txtOrderQty.val());
             }
         } else {
-            alert("Stock unavailable!");
+            swal("Error", "Stock unavailable!", "error");
         }
     }else if(btnSave.text()==="Update "){
         tbRow.children(':eq(1)').text(itemName[1]);
@@ -192,16 +192,26 @@ function deleteDetail() {
     )
 
     btnDelete.click(function () {
-        const userChoice = window.confirm("Do you want to delete the item?");
 
-        if (userChoice) {
-            $(this).parents('tr').remove();
-            let tablePrice = $(this).parents('tr').children(':nth-child(3)').text();
-            let tableQty = $(this).parents('tr').children(':nth-child(4)').text();
-            total1 -= (tablePrice*tableQty);
-            $('#total-text').text(`Total : ${total1.toFixed(2)}`);
-            subTotalTxt.text(`Sub Total : ${total1.toFixed(2)}`);
-        }
+        swal("Do you want to delete the item?", {
+            buttons: {
+                cancel: "Cancel",
+                ok: {
+                    text: "OK",
+                    value: "catch",
+                }
+            },
+        }).then((value) => {
+            if (value === "catch") {
+
+                $(this).parents('tr').remove();
+                let tablePrice = $(this).parents('tr').children(':nth-child(3)').text();
+                let tableQty = $(this).parents('tr').children(':nth-child(4)').text();
+                total1 -= (tablePrice * tableQty);
+                $('#total-text').text(`Total : ${total1.toFixed(2)}`);
+                subTotalTxt.text(`Sub Total : ${total1.toFixed(2)}`);
+            }
+        });
     })
 }
 
@@ -268,63 +278,71 @@ function setOrderArray(orderID, oID, currDate) {
 btnOrder.click(function (event){
     let tableCode = $('#orderTbody').children('tr').children(':nth-child(1)');
     if($(tableCode[1]).text()!==0) {
-        var userChoice = window.confirm("Do you want to continue?");
+        swal("Do you want to continue?", {
+            buttons: {
+                cancel: "Cancel",
+                ok: {
+                    text: "OK",
+                    value: "catch",
+                }
+            },
+        }).then((value) => {
+            if (value === "catch") {
 
-        if (userChoice) {
-            let oID = $("#orderID").val().split("Order ID : ");
-            let orderID = oID[1];
-            let currDate = $('#currDate').text().split("Date : ");
+                let oID = $("#orderID").val().split("Order ID : ");
+                let orderID = oID[1];
+                let currDate = $('#currDate').text().split("Date : ");
 
-            if (btnOrder.text().includes("Place Order")) {
-                if (cash.val() !== "") {
-                    if (!(parseInt(cash.val()) < total1)) {
-                        let order = setOrderArray(orderID, oID, currDate);
-                        console.log(order)
-                        $.ajax({
-                           url: "http://localhost:8000/java-pos/order",
-                            method: "POST",
-                            data: JSON.stringify(order),
-                            success: function (resp, status, xhr) {
-                                if (xhr.status === 200) {
-                                    alert(resp);
-                                    clearItemSelect();
-                                    clearCusDetail();
-                                    clearTotal();
-                                    setOrderID();
-                                    seOrderCount();
+                if (btnOrder.text().includes("Place Order")) {
+                    if (cash.val() !== "") {
+                        if (!(parseInt(cash.val()) < total1)) {
+                            let order = setOrderArray(orderID, oID, currDate);
+                            console.log(order)
+                            $.ajax({
+                                url: "http://localhost:8000/java-pos/order",
+                                method: "POST",
+                                data: JSON.stringify(order),
+                                success: function (resp, status, xhr) {
+                                    if (xhr.status === 200) {
+                                        swal("Order Placed!", resp, "success");
+                                        clearItemSelect();
+                                        clearCusDetail();
+                                        clearTotal();
+                                        setOrderID();
+                                        seOrderCount();
+                                    }
+                                },
+                                error: function (xhr) {
+                                    swal("Error", xhr.responseText, "error");
                                 }
-                            },
-                            error:function (xhr){
-                                alert(xhr.responseText);
-                            }
-                        });
+                            });
+                        } else {
+                            swal("Error", "Insufficient payment amount!", "error");
+                        }
                     } else {
-                        alert("Insufficient payment amount")
+                        swal("Error", "Please add ur payment", "error");
                     }
-                } else {
-                    alert("Please add ur payment")
                 }
             } else if (btnOrder.text().includes("Update Order")) {
                 let order = setOrderArray(orderID, oID, currDate);
                 $.ajax({
-                    url:"http://localhost:8000/java-pos/order",
+                    url: "http://localhost:8000/java-pos/order",
                     method: "PUT",
                     data: JSON.stringify(order),
-                    success:function (resp, status, xhr){
+                    success: function (resp, status, xhr) {
                         if (xhr.status === 200) {
-                            alert(resp);
+                            swal("Updated!", resp, "success");
                             updateSearch();
                         }
                     },
                     error: function (xhr) {
-                        alert("Error : "+xhr.responseText)
+                        swal("Error", xhr.responseText, "error");
                     }
                 });
             }
-
-        }
+        });
     }else {
-        alert("Add items to your cart");
+        swal("Error", "Add items to your cart", "error");
     }
     event.preventDefault();
 })
@@ -467,11 +485,11 @@ btnSearch.click(function (){
                         })
                     });
                 } else {
-                    alert("No such Order..please check the order ID");
+                    swal("Error", "No such Order..please check the order ID", "error");
                 }
             });
         } else {
-            alert("Please enter the order ID");
+            swal("Error", "Please enter the order ID!", "error");
         }
     }else if(btnSearch.text().includes("Delete")) {
         const userChoice = window.confirm("Do you want to delete the order?");
@@ -481,13 +499,13 @@ btnSearch.click(function (){
                 method: "DELETE",
                 success: function (resp, status, xhr) {
                     if (xhr.status === 200) {
-                        alert(resp);
+                        swal("Deleted", resp, "success");
                         updateSearch();
                         seOrderCount();
                     }
                 },
                 error: function (xhr) {
-                    alert("Error : " + xhr.responseText);
+                    swal("Error", xhr.responseText, "error");
                 }
             });
         }
@@ -510,7 +528,7 @@ function getOrderIDList(callback) {
             }
         },
         error: function (xhr) {
-            alert("Error : "+xhr.message);
+            swal("Error", xhr.message, "error");
         }
     })
 }
@@ -531,8 +549,9 @@ function getOrderList(id,callback) {
             }
         },
         error: function (xhr) {
-            alert("Error : "+xhr.responseText)
+            swal("Error", xhr.responseText, "error");
         }
+
     })
 }
 
@@ -549,6 +568,4 @@ function checkDuplicateItem(itemCode, itemQty) {
     }
     return false;
 }
-
-
 

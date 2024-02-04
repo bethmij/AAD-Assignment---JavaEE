@@ -29,9 +29,32 @@ body{
     color: #919191;
 }
 
+/*.swal-modal {*/
+/*    background-color: rgba(0, 0, 0, 0.69);*/
+/*    border: 3px solid #027e2c;*/
+/*}*/
+
+/*.swal-overlay {*/
+/*    background-color: rgba(0, 0, 0, 0.45);*/
+/*}*/
+
+/*.swal-text {*/
+/*    color: #ffffff;*/
+/*}*/
+
+/*.swal-title {*/
+/*    color: #ffffff;*/
+/*}*/
+
+/*.swal-button {*/
+/*    color: #ffffff;*/
+/*    border-radius: 2px;*/
+/*    background-color: #02591f;*/
+/*}*/
+
 .custom-tooltip {
-    --bs-tooltip-bg: #151515;
-    --bs-tooltip-color: #0c9a3b;
+    --bs-tooltip-bg: rgb(21, 21, 21);
+    --bs-tooltip-color: rgb(12, 154, 59);
 }
 
 @media all and (max-width: 768px){

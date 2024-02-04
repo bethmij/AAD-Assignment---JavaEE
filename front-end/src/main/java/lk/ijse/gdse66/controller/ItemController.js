@@ -26,65 +26,87 @@ btnItemSave.click(function (event){
     newItem.qtyOnHand = itemQuantity.val();
 
     if(btnItemSave.text()==="Save ") {
-        const userChoice = window.confirm("Do you want to save the item?")
-        if (userChoice) {
-            getItemCodeList( function (IDList) {
 
-                if (!(IDList.includes(itemCode.val()))) {
-                    $.ajax({
-                        url: "http://localhost:8000/java-pos/item",
-                        method: "POST",
-                        contentType: "application/json",
-                        data: JSON.stringify(newItem),
-                        success: function (resp, status, xhr) {
-                            if (xhr.status === 200) {
-                                alert(resp)
-                                getAll();
-                                deleteDetail();
-                                setFeilds();
-                                clearAll(event);
-                                getItemCodeList(function (CodeList) {
-                                   setItemCode(CodeList)
-                                });
-                                btnItemSave.attr("disabled", true);
-                                setItemCount();
-                            }
-                        },
-                        error: function (xhr, status, error) {
-                            alert("Error : "+xhr.responseText)
-                        }
-                    });
-                } else {
-                    alert("Duplicate item code!");
+        swal("Do you want to save the item?", {
+            buttons: {
+                cancel: "Cancel",
+                ok: {
+                    text: "OK",
+                    value: "catch",
                 }
-            });
-        }
+            },
+        }).then((value) => {
+            if (value === "catch") {
+
+                getItemCodeList(function (IDList) {
+
+                    if (!(IDList.includes(itemCode.val()))) {
+                        $.ajax({
+                            url: "http://localhost:8000/java-pos/item",
+                            method: "POST",
+                            contentType: "application/json",
+                            data: JSON.stringify(newItem),
+                            success: function (resp, status, xhr) {
+                                if (xhr.status === 200) {
+                                    swal("Saved", resp, "success");
+                                    getAll();
+                                    deleteDetail();
+                                    setFeilds();
+                                    clearAll(event);
+                                    getItemCodeList(function (CodeList) {
+                                        setItemCode(CodeList)
+                                    });
+                                    btnItemSave.attr("disabled", true);
+                                    setItemCount();
+                                }
+                            },
+                            error: function (xhr, status, error) {
+                                swal("Error", xhr.responseText, "error");
+                            }
+                        });
+                    } else {
+                        swal("Error", "Duplicate item code!", "error");
+                    }
+                });
+            }
+        });
 
     }else if(btnItemSave.text()==="Update ") {
-        const userChoice = window.confirm("Do you want to update the item?");
-        if (userChoice) {
-            newItem.qtyOnHand = itemQuantity.val();
 
-            $.ajax({
-                url: "http://localhost:8000/java-pos/item",
-                method: "PUT",
-                contentType: "application/json",
-                data: JSON.stringify(newItem),
-                success: function (resp, status, xhr) {
-                    if (xhr.status === 200) {
-                        alert(resp)
-                        getAll();
-                        clearAll(event);
-                        btnItemSave.text("Save ");
-                        btnItemSave.attr("disabled", true);
-                        itemCode.attr("disabled", false);
-                    }
-                },
-                error: function (xhr) {
-                    alert("Error : "+xhr.responseText)
+        swal("Do you want to update the item?", {
+            buttons: {
+                cancel: "Cancel",
+                ok: {
+                    text: "OK",
+                    value: "catch",
                 }
-            });
-        }
+            },
+        }).then((value) => {
+            if (value === "catch") {
+
+                newItem.qtyOnHand = itemQuantity.val();
+
+                $.ajax({
+                    url: "http://localhost:8000/java-pos/item",
+                    method: "PUT",
+                    contentType: "application/json",
+                    data: JSON.stringify(newItem),
+                    success: function (resp, status, xhr) {
+                        if (xhr.status === 200) {
+                            swal("Updated", resp, "success");
+                            getAll();
+                            clearAll(event);
+                            btnItemSave.text("Save ");
+                            btnItemSave.attr("disabled", true);
+                            itemCode.attr("disabled", false);
+                        }
+                    },
+                    error: function (xhr) {
+                        swal("Error", xhr.responseText, "error");
+                    }
+                });
+            }
+        });
     }
     event.preventDefault();
 })
@@ -133,7 +155,7 @@ function getAll() {
                         <td>${item.description}</td>
                         <td>${item.unitPrice}</td>
                         <td>${item.qtyOnHand}</td>
-                        <td style="width: 10%"><img  class="delete"  src="../resources/assests/img/icons8-delete-96.png" alt="Logo" width="50%" class="opacity-75"></td>
+                        <td style="width: 10%;"><img  class="delete"  src="../resources/assests/img/icons8-delete-96.png" alt="Logo" width="50%" class="opacity-75"></td>
                 </tr>`);
                     deleteDetail();
                     setFeilds();
@@ -141,7 +163,7 @@ function getAll() {
             }
         },
         error: function (xhr) {
-            alert("Error : "+xhr.responseText)
+            swal("Error", xhr.responseText, "error");
         }
     })
 
@@ -170,32 +192,42 @@ function deleteDetail() {
     )
 
     btnDelete.click(function (event) {
-        const userChoice = window.confirm("Do you want to delete the item?");
 
-        if (userChoice) {
-            let deleteRow = $(this).parents('tr');
-            let code = $( deleteRow.children(':nth-child(1)')).text();
-
-            $.ajax({
-                url: "http://localhost:8000/java-pos/item?itemCode="+code,
-                method: "DELETE",
-                success: function (resp, status, xhr){
-                    if(xhr.status === 200) {
-                        deleteRow.remove();
-                        clearAll(event);
-                        getItemCodeList(function (CodeList) {
-                            setItemCode(CodeList);
-                        });
-                        alert(resp);
-                        setItemCount();
-                    }
-                },
-                error: function (xhr) {
-                    alert("Error : "+xhr.responseText)
+        swal("Do you want to delete the item?", {
+            buttons: {
+                cancel: "Cancel",
+                ok: {
+                    text: "OK",
+                    value: "catch",
                 }
-            });
-            setItemCode();
-        }
+            },
+        }).then((value) => {
+            if (value === "catch") {
+
+                let deleteRow = $(this).parents('tr');
+                let code = $(deleteRow.children(':nth-child(1)')).text();
+
+                $.ajax({
+                    url: "http://localhost:8000/java-pos/item?itemCode=" + code,
+                    method: "DELETE",
+                    success: function (resp, status, xhr) {
+                        if (xhr.status === 200) {
+                            swal("Deleted", resp, "success");
+                            deleteRow.remove();
+                            clearAll(event);
+                            getItemCodeList(function (CodeList) {
+                                setItemCode(CodeList);
+                            });
+                            setItemCount();
+                        }
+                    },
+                    error: function (xhr) {
+                        swal("Error", xhr.responseText, "error");
+                    }
+                });
+                setItemCode();
+            }
+        });
     })
 }
 
@@ -209,7 +241,7 @@ export function getItemList(code, callback) {
             }
         },
         error: function (xhr) {
-            alert("Error : "+xhr.responseText)
+            swal("Error", xhr.responseText, "error");
         }
     });
 }
@@ -229,18 +261,18 @@ $('#itemSearch').click(function (){
                                 <td>${resp.description}</td>
                                 <td>${resp.unitPrice}</td>
                                 <td>${resp.qtyOnHand}</td>
-                                <td style="width: 10%"><img class="delete" src="../resources/assests/img/icons8-delete-96.png" alt="Logo" width="50%" style="opacity: 100%;"></td>
+                                <td style="width: 10%;"><img class="delete" src="../resources/assests/img/icons8-delete-96.png" alt="Logo" width="50%" style="opacity: 100%;"></td>
                             </tr>`);
                         deleteDetail();
                         setFeilds();
                 });
 
             } else {
-                alert("No such Item..please check the Code");
+                swal("Error", "No such Item..please check the Code", "error");
             }
         });
     }else {
-        alert("Please enter the Code");
+        swal("Error", "Please enter the Code", "error");
     }
 });
 
@@ -256,7 +288,7 @@ export function getItemCodeList(callback) {
             }
         },
         error: function (xhr, status, error){
-            console.log("Error : ", xhr.responseText);
+            swal("Error", xhr.responseText, "error");
         }
     });
 }
