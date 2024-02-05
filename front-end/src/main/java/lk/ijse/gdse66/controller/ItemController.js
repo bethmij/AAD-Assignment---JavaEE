@@ -29,10 +29,14 @@ btnItemSave.click(function (event){
 
         swal("Do you want to save the item?", {
             buttons: {
-                cancel: "Cancel",
+                cancel1: {
+                    text: "Cancel",
+                    className: "custom-cancel-btn",
+                },
                 ok: {
                     text: "OK",
                     value: "catch",
+                    className: "custom-ok-btn",
                 }
             },
         }).then((value) => {
@@ -75,10 +79,14 @@ btnItemSave.click(function (event){
 
         swal("Do you want to update the item?", {
             buttons: {
-                cancel: "Cancel",
+                cancel1: {
+                    text: "Cancel",
+                    className: "custom-cancel-btn",
+                },
                 ok: {
                     text: "OK",
                     value: "catch",
+                    className: "custom-ok-btn",
                 }
             },
         }).then((value) => {
@@ -195,10 +203,14 @@ function deleteDetail() {
 
         swal("Do you want to delete the item?", {
             buttons: {
-                cancel: "Cancel",
+                cancel1: {
+                    text: "Cancel",
+                    className: "custom-cancel-btn",
+                },
                 ok: {
                     text: "OK",
                     value: "catch",
+                    className: "custom-ok-btn",
                 }
             },
         }).then((value) => {

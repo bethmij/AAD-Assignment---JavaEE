@@ -195,10 +195,14 @@ function deleteDetail() {
 
         swal("Do you want to delete the item?", {
             buttons: {
-                cancel: "Cancel",
+                cancel1: {
+                    text: "Cancel",
+                    className: "custom-cancel-btn",
+                },
                 ok: {
                     text: "OK",
                     value: "catch",
+                    className: "custom-ok-btn",
                 }
             },
         }).then((value) => {
@@ -280,10 +284,14 @@ btnOrder.click(function (event){
     if($(tableCode[1]).text()!==0) {
         swal("Do you want to continue?", {
             buttons: {
-                cancel: "Cancel",
+                cancel1: {
+                    text: "Cancel",
+                    className: "custom-cancel-btn",
+                },
                 ok: {
                     text: "OK",
                     value: "catch",
+                    className: "custom-ok-btn",
                 }
             },
         }).then((value) => {

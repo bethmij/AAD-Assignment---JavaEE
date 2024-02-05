@@ -30,10 +30,14 @@ btnCustomerSave.click(function (event){
 
         swal("Do you want to save the customer?", {
             buttons: {
-                cancel: "Cancel",
+                cancel1: {
+                    text: "Cancel",
+                    className: "custom-cancel-btn",
+                },
                 ok: {
                     text: "OK",
                     value: "catch",
+                    className: "custom-ok-btn",
                 }
             },
         }).then((value) => {
@@ -74,10 +78,14 @@ btnCustomerSave.click(function (event){
     }else if(btnCustomerSave.text()==="Update ") {
         swal("Do you want to update the customer?", {
             buttons: {
-                cancel: "Cancel",
+                cancel1: {
+                    text: "Cancel",
+                    className: "custom-cancel-btn",
+                },
                 ok: {
                     text: "OK",
                     value: "catch",
+                    className: "custom-ok-btn",
                 }
             },
         }).then((value) => {
@@ -201,10 +209,14 @@ function deleteDetail() {
 
         swal("Do you want to delete the customer?", {
             buttons: {
-                cancel: "Cancel",
+                cancel1: {
+                    text: "Cancel",
+                    className: "custom-cancel-btn",
+                },
                 ok: {
                     text: "OK",
                     value: "catch",
+                    className: "custom-ok-btn",
                 }
             },
         }).then((value) => {
@@ -304,4 +316,3 @@ export function getCusIDList(callback) {
         }
     });
 }
-

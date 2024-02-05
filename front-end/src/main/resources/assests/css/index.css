@@ -29,27 +29,54 @@ body{
     color: #919191;
 }
 
-/*.swal-modal {*/
-/*    background-color: rgba(0, 0, 0, 0.69);*/
-/*    border: 3px solid #027e2c;*/
-/*}*/
 
-/*.swal-overlay {*/
-/*    background-color: rgba(0, 0, 0, 0.45);*/
-/*}*/
 
-/*.swal-text {*/
+.swal-modal {
+    background-color: rgb(26, 26, 26);
+    border: 3px solid #024d1b;
+}
+
+.swal-overlay {
+    background-color: rgba(0, 0, 0, 0.70);
+}
+
+.swal-text {
+    color: #ffffff;
+    font-size: 20px;
+}
+
+.swal-title {
+    color: #ffffff;
+    font-size: 30px;
+}
+
+.swal-button {
+    color: #ffffff;
+    background-color: #014d1a;
+}
+
+.swal-button:hover {
+    background-color: #039b35 !important;
+}
+
+.custom-cancel-btn{
+        color: #ffffff;
+        background-color: #340606;
+}
+
+.custom-cancel-btn:hover{
+    background-color: #731010 !important;
+}
+
+.swal-icon--success:after, .swal-icon--success:before, .swal-icon--success__hide-corners{
+    display: none;
+}
+
+
+    /*.custom-ok-btn{*/
 /*    color: #ffffff;*/
-/*}*/
+/*    background-color: #987a41;*/
 
-/*.swal-title {*/
-/*    color: #ffffff;*/
-/*}*/
-
-/*.swal-button {*/
-/*    color: #ffffff;*/
-/*    border-radius: 2px;*/
-/*    background-color: #02591f;*/
 /*}*/
 
 .custom-tooltip {
