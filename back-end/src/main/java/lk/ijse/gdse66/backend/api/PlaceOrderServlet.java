@@ -53,11 +53,6 @@ public class PlaceOrderServlet extends HttpServlet {
         try {
             orderDTO = JsonbBuilder.create().fromJson(req.getReader(), OrderDTO.class);
 
-            if(orderDTO.getOrderId().equals("") || !orderDTO.getOrderId().matches("^\\d+$")){
-                sendServerMsg(resp, HttpServletResponse.SC_BAD_REQUEST, "Order quantity is a required field : only numbers");
-                return;
-            }
-
             if(orderIDList.contains(orderDTO.getOrderId())){
                 sendServerMsg(resp, HttpServletResponse.SC_BAD_REQUEST, "Order ID already saved!");
                 return;
@@ -81,11 +76,6 @@ public class PlaceOrderServlet extends HttpServlet {
         OrderDTO orderDTO;
         try {
             orderDTO = JsonbBuilder.create().fromJson(req.getReader(), OrderDTO.class);
-
-            if(orderDTO.getOrderId().equals("") || !orderDTO.getOrderId().matches("^\\d+$")){
-                sendServerMsg(resp, HttpServletResponse.SC_BAD_REQUEST, "Order quantity is a required field : only numbers");
-                return;
-            }
 
             if(!orderIDList.contains(orderDTO.getOrderId())){
                 sendServerMsg(resp, HttpServletResponse.SC_BAD_REQUEST, "Order ID not saved!");

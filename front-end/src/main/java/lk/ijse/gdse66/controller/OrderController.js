@@ -296,62 +296,67 @@ btnOrder.click(function (event){
             },
         }).then((value) => {
             if (value === "catch") {
-
                 let oID = $("#orderID").val().split("Order ID : ");
                 let orderID = oID[1];
                 let currDate = $('#currDate').text().split("Date : ");
 
                 if (btnOrder.text().includes("Place Order")) {
-                    if (cash.val() !== "") {
-                        if (!(parseInt(cash.val()) < total1)) {
-                            let order = setOrderArray(orderID, oID, currDate);
-                            console.log(order)
-                            $.ajax({
-                                url: "http://localhost:8000/java-pos/order",
-                                method: "POST",
-                                data: JSON.stringify(order),
-                                success: function (resp, status, xhr) {
-                                    if (xhr.status === 200) {
-                                        swal("Order Placed!", resp, "success");
-                                        clearItemSelect();
-                                        clearCusDetail();
-                                        clearTotal();
-                                        setOrderID();
-                                        seOrderCount();
+                    if ($('#total-text').text() !== "Total : 00.00") {
+                        if (cash.val() !== "") {
+                            if (!(parseInt(cash.val()) < total1)) {
+                                let order = setOrderArray(orderID, oID, currDate);
+                                console.log(order)
+                                $.ajax({
+                                    url: "http://localhost:8000/java-pos/order",
+                                    method: "POST",
+                                    data: JSON.stringify(order),
+                                    success: function (resp, status, xhr) {
+                                        if (xhr.status === 200) {
+                                            swal("Order Placed!", resp, "success");
+                                            clearItemSelect();
+                                            clearCusDetail();
+                                            clearTotal();
+                                            setOrderID();
+                                            seOrderCount();
+                                        }
+                                    },
+                                    error: function (xhr) {
+                                        swal("Error", xhr.responseText, "error");
                                     }
-                                },
-                                error: function (xhr) {
-                                    swal("Error", xhr.responseText, "error");
-                                }
-                            });
+                                });
+                            } else {
+                                swal("Error", "Insufficient payment amount!", "error");
+                            }
                         } else {
-                            swal("Error", "Insufficient payment amount!", "error");
+                            swal("Error", "Please add ur payment", "error");
                         }
-                    } else {
-                        swal("Error", "Please add ur payment", "error");
+                    }else {
+                        swal("Error", "Empty Cart! Please Add items to cart", "error");
                     }
-                }
-            } else if (btnOrder.text().includes("Update Order")) {
-                let order = setOrderArray(orderID, oID, currDate);
-                $.ajax({
-                    url: "http://localhost:8000/java-pos/order",
-                    method: "PUT",
-                    data: JSON.stringify(order),
-                    success: function (resp, status, xhr) {
-                        if (xhr.status === 200) {
-                            swal("Updated!", resp, "success");
-                            updateSearch();
-                        }
-                    },
-                    error: function (xhr) {
-                        swal("Error", xhr.responseText, "error");
+                } else if (btnOrder.text().includes("Update Order")) {
+                        let order = setOrderArray(orderID, oID, currDate);
+                        $.ajax({
+                            url: "http://localhost:8000/java-pos/order",
+                            method: "PUT",
+                            data: JSON.stringify(order),
+                            success: function (resp, status, xhr) {
+                                if (xhr.status === 200) {
+                                    swal("Updated!", resp, "success");
+                                    updateSearch();
+                                }
+                            },
+                            error: function (xhr) {
+                                swal("Error", xhr.responseText, "error");
+                            }
+                        });
                     }
-                });
+
             }
         });
     }else {
         swal("Error", "Add items to your cart", "error");
     }
+
     event.preventDefault();
 })
 
@@ -500,23 +505,37 @@ btnSearch.click(function (){
             swal("Error", "Please enter the order ID!", "error");
         }
     }else if(btnSearch.text().includes("Delete")) {
-        const userChoice = window.confirm("Do you want to delete the order?");
-        if (userChoice) {
-            $.ajax({
-                url: "http://localhost:8000/java-pos/order?ID=" + id,
-                method: "DELETE",
-                success: function (resp, status, xhr) {
-                    if (xhr.status === 200) {
-                        swal("Deleted", resp, "success");
-                        updateSearch();
-                        seOrderCount();
-                    }
+
+        swal("Do you want to delete the order?", {
+            buttons: {
+                cancel1: {
+                    text: "Cancel",
+                    className: "custom-cancel-btn",
                 },
-                error: function (xhr) {
-                    swal("Error", xhr.responseText, "error");
+                ok: {
+                    text: "OK",
+                    value: "catch",
+                    className: "custom-ok-btn",
                 }
-            });
-        }
+            },
+        }).then((value) => {
+            if (value === "catch") {
+                $.ajax({
+                    url: "http://localhost:8000/java-pos/order?ID=" + id,
+                    method: "DELETE",
+                    success: function (resp, status, xhr) {
+                        if (xhr.status === 200) {
+                            swal("Deleted", resp, "success");
+                            updateSearch();
+                            seOrderCount();
+                        }
+                    },
+                    error: function (xhr) {
+                        swal("Error", xhr.responseText, "error");
+                    }
+                });
+            }
+        });
     }
 })
 
