@@ -401,6 +401,7 @@ function clearItemSelect(){
     btnSave.text("");
     btnSave.append(`<img src="../resources/assests/img/Screenshot__543_-removebg-preview.png" alt="Logo" width="25vw" class="opacity-50 me-3">Add to Cart`);
     btnSave.attr("disabled", true);
+    selectItemOp.attr("disabled", false);
 }
 
 function clearCusDetail(){
