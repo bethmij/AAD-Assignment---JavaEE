@@ -27,7 +27,6 @@ public class CustomerServlet extends HttpServlet {
     List<String> cusIDList;
 
 
-
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) {
         resp.setContentType("application/json");

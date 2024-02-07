@@ -19,6 +19,7 @@ public class PlaceOrderServlet extends HttpServlet {
 
     PlaceOrderBO placeOrderBO = BOFactory.getBoFactory().getBO(BOFactory.BOTypes.PLACEORDERBO);
     DashboardBO dashboardBO = BOFactory.getBoFactory().getBO(BOFactory.BOTypes.DASHBOARDBO);
+    List<String> orderIDList;
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) {
@@ -31,7 +32,13 @@ public class PlaceOrderServlet extends HttpServlet {
                 break;
 
             case "ID" :
-                getOrderIDs(resp);
+                orderIDList = getOrderIDs();
+                Jsonb jsonb = JsonbBuilder.create();
+                try {
+                    jsonb.toJson(orderIDList, resp.getWriter());
+                } catch (IOException e) {
+                    sendServerMsg(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getLocalizedMessage());
+                }
                 break;
 
             case "COUNT":
@@ -45,6 +52,17 @@ public class PlaceOrderServlet extends HttpServlet {
         OrderDTO orderDTO;
         try {
             orderDTO = JsonbBuilder.create().fromJson(req.getReader(), OrderDTO.class);
+
+            if(orderDTO.getOrderId().equals("") || !orderDTO.getOrderId().matches("^\\d+$")){
+                sendServerMsg(resp, HttpServletResponse.SC_BAD_REQUEST, "Order quantity is a required field : only numbers");
+                return;
+            }
+
+            if(orderIDList.contains(orderDTO.getOrderId())){
+                sendServerMsg(resp, HttpServletResponse.SC_BAD_REQUEST, "Order ID already saved!");
+                return;
+            }
+
             boolean isOrderSaved = placeOrderBO.saveOrder( orderDTO);
 
             if (isOrderSaved) {
@@ -63,6 +81,17 @@ public class PlaceOrderServlet extends HttpServlet {
         OrderDTO orderDTO;
         try {
             orderDTO = JsonbBuilder.create().fromJson(req.getReader(), OrderDTO.class);
+
+            if(orderDTO.getOrderId().equals("") || !orderDTO.getOrderId().matches("^\\d+$")){
+                sendServerMsg(resp, HttpServletResponse.SC_BAD_REQUEST, "Order quantity is a required field : only numbers");
+                return;
+            }
+
+            if(!orderIDList.contains(orderDTO.getOrderId())){
+                sendServerMsg(resp, HttpServletResponse.SC_BAD_REQUEST, "Order ID not saved!");
+                return;
+            }
+
             boolean isOrderSaved = placeOrderBO.updateOrder(orderDTO);
 
             if (isOrderSaved) {
@@ -81,9 +110,14 @@ public class PlaceOrderServlet extends HttpServlet {
 
     @Override
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) {
-        String cusID = req.getParameter("ID");
+        String orderID = req.getParameter("ID");
 
-        boolean isDeleted = placeOrderBO.deleteOrder(cusID);
+        if(!orderIDList.contains(orderID)){
+            sendServerMsg(resp, HttpServletResponse.SC_BAD_REQUEST, "Order ID not saved!");
+            return;
+        }
+
+        boolean isDeleted = placeOrderBO.deleteOrder(orderID);
 
         if(isDeleted){
             sendServerMsg(resp, HttpServletResponse.SC_OK, "Order Deleted Successfully!");
@@ -106,17 +140,8 @@ public class PlaceOrderServlet extends HttpServlet {
 
     }
 
-    private void getOrderIDs(HttpServletResponse resp) {
-
-        List<String> orderIDList = placeOrderBO.getOrderIDList();
-
-        Jsonb jsonb = JsonbBuilder.create();
-        try {
-            jsonb.toJson(orderIDList, resp.getWriter());
-        } catch (IOException e) {
-            sendServerMsg(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getLocalizedMessage());
-        }
-
+    private List<String> getOrderIDs() {
+        return placeOrderBO.getOrderIDList();
     }
 
     private void getOrderCount(HttpServletResponse resp){
