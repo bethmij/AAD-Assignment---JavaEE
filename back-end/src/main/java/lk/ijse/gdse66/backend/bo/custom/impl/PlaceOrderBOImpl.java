@@ -48,6 +48,7 @@ public class PlaceOrderBOImpl implements PlaceOrderBO {
         Session session = SessionFactoryConfig.getInstance().getSession();
         Transaction transaction = session.beginTransaction();
 
+
         try {
             CustomerEntity customer = new CustomerEntity(orderDTO.getCustomerId());
             OrderEntity orderEntity = new OrderEntity(orderDTO.getOrderId(), orderDTO.getOrderDate(), customer);
